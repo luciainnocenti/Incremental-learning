@@ -13,20 +13,20 @@ from torchvision import transforms
 from torchvision import datasets
 
 class Dataset(torch.utils.data.Dataset):
-    '''
-    The class Dataset define methods and attributes to manage a CIFAR100 dataset
-    Attributes:
-        train = Bool, default value = True
-        Transform
-        Target_Transform
+  '''
+  The class Dataset define methods and attributes to manage a CIFAR100 dataset
+  Attributes:
+      train = Bool, default value = True
+      Transform
+      Target_Transform
 
-        _dataset = contains the pythorch dataset CIFAR100 defined by hyperparameters passes by input
-        _targets = contains a lisf of 60000 elements, and each one referred to an image of the dataset. The value of each element is an integer in [0,99] that explicit the label for that image
-                    E.g. _targets[100] get the label of the 100th image in the dataset
-        _data = contains a list of 60000 imagest, each one represented by a [32]x[32]x[3] vector that define pixels 
-        _labelNames = contains a list of 100 elements, each one represent a class; it maps integer indexes to human readable labels
-        
-    '''
+      _dataset = contains the pythorch dataset CIFAR100 defined by hyperparameters passes by input
+      _targets = contains a lisf of 60000 elements, and each one referred to an image of the dataset. The value of each element is an integer in [0,99] that explicit the label for that image
+                  E.g. _targets[100] get the label of the 100th image in the dataset
+      _data = contains a list of 60000 imagest, each one represented by a [32]x[32]x[3] vector that define pixels 
+      _labelNames = contains a list of 100 elements, each one represent a class; it maps integer indexes to human readable labels
+      
+  '''
   def __init__(self, train = True, transform=None, target_transform=None):
     self._train = train
     self._dataset = datasets.cifar.CIFAR100( 'data', train=train, download=True, transform= transform, target_transform = target_transform )
