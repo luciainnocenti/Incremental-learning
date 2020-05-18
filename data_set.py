@@ -33,6 +33,7 @@ class Dataset(torch.utils.data.Dataset):
     classi = list(self._dataset.class_to_idx.keys())
     for i in self.searched_classes:
       names.append(classi[int(i)])
+    self._labelNames = names
     return names
   
   def __init__(self, train = True, transform=None, target_transform=None):
@@ -40,7 +41,6 @@ class Dataset(torch.utils.data.Dataset):
     self._dataset = datasets.cifar.CIFAR100( 'data', train=train, download=True, transform= transform, target_transform = target_transform )
     self._targets = np.array(self._dataset.targets) #Essendo CIFAR100 una sottoclasse di CIFAR10, qui fa riferimento a quell'implementazione.
     self._data = np.array(self._dataset.data)
-    self._labelNames = __getClassesNames__()
 
   def __getIndexesGroups__(self, startIndex = 0):
     #This method returns a list containing the indexes of all the images belonging to classes [starIndex, startIndex + 10]
