@@ -27,6 +27,14 @@ class Dataset(torch.utils.data.Dataset):
       _labelNames = contains a list of 100 elements, each one represent a class; it maps integer indexes to human readable labels
       
   '''
+  def __getClassesNames__(self):
+    #This method returns a list mapping the 100 classes into a human readable label. E.g. names[0] is the label that maps the class 0
+    names = []
+    classi = list(self._dataset.class_to_idx.keys())
+    for i in self.searched_classes:
+      names.append(classi[int(i)])
+    return names
+  
   def __init__(self, train = True, transform=None, target_transform=None):
     self._train = train
     self._dataset = datasets.cifar.CIFAR100( 'data', train=train, download=True, transform= transform, target_transform = target_transform )
@@ -44,14 +52,6 @@ class Dataset(torch.utils.data.Dataset):
         indexes.append(i)
       i+=1
     return indexes
-
-  def __getClassesNames__(self):
-    #This method returns a list mapping the 100 classes into a human readable label. E.g. names[0] is the label that maps the class 0
-    names = []
-    classi = list(self._dataset.class_to_idx.keys())
-    for i in self.searched_classes:
-      names.append(classi[int(i)])
-    return names
   
   def __getitem__(self, idx):
     #Given an index, this method return the image and the class corresponding to that index
