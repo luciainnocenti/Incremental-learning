@@ -57,6 +57,9 @@ class Dataset(torch.utils.data.Dataset):
     #Given an index, this method return the image and the class corresponding to that index
     image = np.transpose(self._data[idx])
     label = self._targets[idx]
+   
+    if self.transform is not None:
+        image = self.transform(image)
     return image, label
 
   def __len__(self):
