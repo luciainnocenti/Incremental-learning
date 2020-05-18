@@ -55,7 +55,7 @@ class Dataset(torch.utils.data.Dataset):
   
   def __getitem__(self, idx):
     #Given an index, this method return the image and the class corresponding to that index
-    image = self._data[idx]
+    image = np.transpose(self._data[idx])
     label = self._targets[idx]
     return image, label
 
