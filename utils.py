@@ -94,7 +94,7 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task = 0):
 	
 	distLoss = distLoss * (step-1)/step
 
-	print(f'class loss = {classLoss}' f' dist loss = {distLoss.item()}')
+	#print(f'class loss = {classLoss}' f' dist loss = {distLoss.item()}')
 	return classLoss,distLoss
 
 def evaluationTest(task, test_loader):
