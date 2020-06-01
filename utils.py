@@ -55,8 +55,6 @@ def trainfunction(task, train_loader):
 			# Forward pass to the network
 			old_outputs = old_resNet(images)
 			outputs = resNet(images)
-			print(f' shape outputs = {outputs.shape}')
-			print(f' shape labels = {labels.shape}')
 			classLoss, distLoss = calculateLoss(outputs, old_outputs, onehot_labels, task)
 			
 			loss = classLoss + distLoss
@@ -109,7 +107,8 @@ def evaluationTest(task, test_loader):
 		# Forward Pass
 		outputs = resNet(images)
 		# Get predictions
-		_, preds = torch.max(outputs.data, 1)
+		cut_outputs = outputs[..., 0 : task + TASK_SIZE]
+		_, preds = torch.max(cut_outputs.data, 1)
 		# Update Corrects
 		running_corrects += torch.sum(preds == labels.data).data.item()
 		print(f' running corrects = {running_corrects}')
