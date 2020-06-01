@@ -85,8 +85,6 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task = 0):
 	cut_outputs = outputs[..., task : task + TASK_SIZE]
 	
 	step = task/TASK_SIZE + 1
-	print(step)
-	print(cut_outputs.shape)
 	classLoss = F.binary_cross_entropy_with_logits(cut_outputs,onehot_labels)
 	classLoss /= step
 	
