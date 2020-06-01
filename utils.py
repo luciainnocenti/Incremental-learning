@@ -79,8 +79,15 @@ def trainfunction(task, train_loader):
 
 
 def calculateLoss(outputs, old_outputs, onehot_labels, task = 0):
+	outputs, old_outputs, onehot_labels = outputs.to(DEVICE), old_outputs.to(DEVICE), onehot_labels.to(DEVICE)
+	
 	classLoss = F.binary_cross_entropy_with_logits(outputs,onehot_labels)
-	distLoss = F.binary_cross_entropy_with_logits(outputs, old_outputs) if task else 0 #se task != 0, calcola la loss; altrimenti ritorna 0
+	
+	if( task > 0 ):
+		distLoss = F.binary_cross_entropy_with_logits( input=outputs[..., :task], target=old_outputs[..., :task] )
+	else:
+		distLoss = torch.zeros(1, requires_grad=False).to(DEVICE)
+		
 	print(f'class loss = {classLoss}' f' dist loss = {distLoss}')
 	return classLoss,distLoss
 
