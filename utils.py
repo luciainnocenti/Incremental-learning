@@ -66,7 +66,7 @@ def trainfunction(task, train_loader):
 			
 			# Update Corrects
 			running_corrects += torch.sum(preds == labels.data).data.item()
-			
+			print(preds)
 			loss.backward()  # backward pass: computes gradients
 			optimizer.step() # update weights based on accumulated gradients
 			
