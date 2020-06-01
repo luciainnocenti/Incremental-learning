@@ -15,10 +15,8 @@ DEVICE = 'cuda' # 'cuda' or 'cpu'
 BATCH_SIZE = 128
 NUM_WORKERS = 100
 TASK_SIZE = 10
-############################################
-#NUM_EPOCHS = 70
-NUM_EPOCHS = 5
-############################################
+NUM_EPOCHS = 70
+
 
 
 
@@ -41,7 +39,7 @@ def trainfunction(task, train_loader):
 	for epoch in range(NUM_EPOCHS):
 		lenght = 0
 		scheduler.step() #update the learning rate
-		print(scheduler.get_lr(), "   ", scheduler.get_last_lr()) #check if the lr is okay
+		#print(scheduler.get_lr(), "   ", scheduler.get_last_lr()) #check if the lr is okay
 		running_corrects = 0
 
 		for images, labels in train_loader:
