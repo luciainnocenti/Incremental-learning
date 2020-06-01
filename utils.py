@@ -39,7 +39,7 @@ def trainfunction(task, train_loader, test_loader, pars_tasks):
 
 	##Train phase
 	for epoch in range(NUM_EPOCHS):
-
+		lenght = 0
 		scheduler.step() #update the learning rate
 		print(scheduler.get_lr(), "   ", scheduler.get_last_lr()) #check if the lr is okay
 		running_corrects = 0
@@ -71,8 +71,9 @@ def trainfunction(task, train_loader, test_loader, pars_tasks):
 			optimizer.step() # update weights based on accumulated gradients
 			
 			current_step += 1
+			lenght += len(images)
 		# Calculate Accuracy
-		accuracy = running_corrects / float(len(train_dataset))
+		accuracy = running_corrects / float(lenght)
 		print("At step ", str(task), " and at epoch = ", epoch, " the loss is = ", loss.item(), " and accuracy is = ", accuracy)
 		
 		#Some variables useful for visualization
@@ -95,6 +96,7 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task = 0):
 	return classLoss,distLoss
 
 def eachEpochEvaluation(task, test_loader):
+	t_l = 0
 	resNet = torch.load('resNet_task' + str(task) + '.pt')
 	resNet.train(False) # Set Network to evaluation mode
 	running_corrects = 0
@@ -109,9 +111,9 @@ def eachEpochEvaluation(task, test_loader):
 		_, preds = torch.max(outputs.data, 1)
 		# Update Corrects
 		running_corrects += torch.sum(preds == labels.data).data.item()
-	
+		t_l += len(images)
 	# Calculate Accuracy
-	accuracy = running_corrects / float(len(test_dataset))
+	accuracy = running_corrects / float(tl)
 	
 	#Calculate Loss
 	loss = F.binary_cross_entropy_with_logits(outputs,onehot_labels)
