@@ -78,7 +78,7 @@ def trainfunction(task, train_loader, test_loader, pars_tasks):
 		
 		#Some variables useful for visualization
 		
-		param=eachEpochEvaluation() #run the network in the validation set, it returns validation accuracy and loss 
+		param=eachEpochEvaluation(task, test_loader) #run the network in the validation set, it returns validation accuracy and loss 
 		
 		pars_epoch.append( (param[0], param[1], accuracy, loss.item()) )
 		#pars_epoch -->   val_acc,  val_loss, train_acc,train_loss
