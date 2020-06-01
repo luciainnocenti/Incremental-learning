@@ -8,6 +8,8 @@ import torchvision
 from torchvision import transforms
 from torch.utils.data import Subset, DataLoader
 from torch.nn import functional as F
+import numpy as np
+import matplotlib.pyplot as plt
 
 DEVICE = 'cuda' # 'cuda' or 'cpu'
 BATCH_SIZE = 128
@@ -116,3 +118,31 @@ def eachepochevaluation(task, test_loader):
 	print('Validation Loss: {} Validation Accuracy : {}'.format(loss,accuracy))
 	return (accuracy, loss.item())	  
  
+def plotEpoch(pars):
+
+  x_epochs = np.linspace(1,NUM_EPOCHS,NUM_EPOCHS)
+  y1 = [e[0] for e in pars] #val acuracy
+  y2 = [e[2] for e in pars] #train accuracy
+  plt.plot(x_epochs, y1 , '-', color='red')
+  plt.plot(x_epochs, y2, '-', color='blue')
+  plt.xlabel("Epoch")
+  plt.legend(['Validation Accuracy', 'Train accuracy'])
+  plt.show()
+
+  y1 = [e[1] for e in pars] #val loss
+  y2 = [e[3] for e in pars] #train loss
+  plt.plot(x_epochs, y1 , '-', color='red')
+  plt.plot(x_epochs, y2, '-', color='blue')
+  plt.xlabel("Epoch")
+  plt.legend(['Validation Loss', 'Train Loss'])
+  plt.show()
+
+def plotTask(pars_tasks):
+  x_tasks =  np.linspace(10, 100, 10)
+
+  plt.plot(x_tasks, pars_tasks ,'b', label='Accuracy')
+  plt.xlabel("Epoch")
+  plt.title('Accuracy over classes')
+  plt.legend(['Validation Accuracy'])
+  plt.grid(True)
+  plt.show()
