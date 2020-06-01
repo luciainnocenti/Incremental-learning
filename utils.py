@@ -81,11 +81,10 @@ def trainfunction(task, train_loader):
 def calculateLoss(outputs, old_outputs, onehot_labels, task = 0):
 	outputs, old_outputs, onehot_labels = outputs.to(DEVICE), old_outputs.to(DEVICE), onehot_labels.to(DEVICE)
 	cut_outputs = outputs[..., task : task + TASK_SIZE]
-	print(f'outputs {outputs.shape} ')
-	print(f'old_outputs {old_outputs.shape} ')
 	
 	step = task/TASK_SIZE + 1
-	
+	print(step)
+	print(cut_outputs.shape)
 	classLoss = F.binary_cross_entropy_with_logits(cut_outputs,onehot_labels)
 	classLoss /= step
 	
@@ -99,7 +98,6 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task = 0):
 	print(f'class loss = {classLoss}' f' dist loss = {distLoss.item()}')
 	return classLoss,distLoss
 
-#def eachEpochEvaluation(task, test_loader):
 def evaluationTest(task, test_loader):
 	t_l = 0
 	resNet = torch.load('resNet_task' + str(task + 10) + '.pt')
