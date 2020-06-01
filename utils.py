@@ -105,7 +105,7 @@ def evaluationTest(task, test_loader):
 	for images, labels in test_loader:
 		images = images.float().to(DEVICE)
 		labels = labels.to(DEVICE)
-		onehot_labels = torch.eye(100)[labels].to(DEVICE) #it creates the one-hot-encoding list for the labels; neede for BCELoss
+		onehot_labels = torch.eye(task + TASK_SIZE)[labels].to(DEVICE) #it creates the one-hot-encoding list for the labels; neede for BCELoss
 		# Forward Pass
 		outputs = resNet(images)
 		# Get predictions
@@ -113,13 +113,12 @@ def evaluationTest(task, test_loader):
 		_, preds = torch.max(cut_outputs.data, 1)
 		# Update Corrects
 		running_corrects += torch.sum(preds == labels.data).data.item()
-		print(f' running corrects = {running_corrects}')
 		t_l += len(images)
 	# Calculate Accuracy
 	accuracy = running_corrects / float(t_l)
 	
 	#Calculate Loss
-	loss = F.binary_cross_entropy_with_logits(outputs,onehot_labels)
+	loss = F.binary_cross_entropy_with_logits(cut_outputs,onehot_labels)
 	print('Validation Loss: {} Validation Accuracy : {}'.format(loss.item(),accuracy) )
 	return(accuracy, loss.item())	  
  
