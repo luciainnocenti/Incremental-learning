@@ -79,6 +79,8 @@ def trainfunction(task, train_loader):
 
 
 def calculateLoss(outputs, old_outputs, onehot_labels, task = 0):
+	m = nn.Sigmoid()
+	
 	outputs, old_outputs, onehot_labels = outputs.to(DEVICE), old_outputs.to(DEVICE), onehot_labels.to(DEVICE)
 	cut_outputs = outputs[..., task : task + TASK_SIZE]
 	
@@ -89,7 +91,7 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task = 0):
 	classLoss /= step
 	
 	if( task > 0 ):
-		distLoss = F.binary_cross_entropy_with_logits( input=outputs[..., :task], target=old_outputs[..., :task] )
+		distLoss = F.binary_cross_entropy_with_logits( input=outputs[..., :task], target=m(old_outputs[..., :task]) )
 	else:
 		distLoss = torch.zeros(1, requires_grad=False).to(DEVICE)
 	
