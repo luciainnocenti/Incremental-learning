@@ -49,7 +49,7 @@ def trainfunction(task, train_loader):
 			images = images.float().to(DEVICE)
 			labels = labels.to(DEVICE)
 			
-			onehot_labels = torch.eye(10)[labels].to(DEVICE)#it creates the one-hot-encoding list for the labels; needed for BCELoss
+			onehot_labels = torch.eye(10)[labels%10].to(DEVICE)#it creates the one-hot-encoding list for the labels; needed for BCELoss
 			
 			optimizer.zero_grad() # Zero-ing the gradients
 			
