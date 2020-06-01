@@ -49,7 +49,7 @@ def trainfunction(task, train_loader):
 			images = images.float().to(DEVICE)
 			labels = labels.to(DEVICE)
 			
-			onehot_labels = torch.eye(100)[labels].to(DEVICE)#it creates the one-hot-encoding list for the labels; needed for BCELoss
+			onehot_labels = torch.eye(10)[labels].to(DEVICE)#it creates the one-hot-encoding list for the labels; needed for BCELoss
 			
 			optimizer.zero_grad() # Zero-ing the gradients
 			
@@ -80,15 +80,22 @@ def trainfunction(task, train_loader):
 
 def calculateLoss(outputs, old_outputs, onehot_labels, task = 0):
 	outputs, old_outputs, onehot_labels = outputs.to(DEVICE), old_outputs.to(DEVICE), onehot_labels.to(DEVICE)
+	cut_outputs = outputs[..., task : task + TASK_SIZE]
 	print(f'outputs {outputs.shape} ')
 	print(f'old_outputs {old_outputs.shape} ')
-	classLoss = F.binary_cross_entropy_with_logits(outputs,onehot_labels)
+	
+	step = task/TASK_SIZE + 1
+	
+	classLoss = F.binary_cross_entropy_with_logits(cut_outputs,onehot_labels)
+	classLoss /= step
 	
 	if( task > 0 ):
 		distLoss = F.binary_cross_entropy_with_logits( input=outputs[..., :task], target=old_outputs[..., :task] )
 	else:
 		distLoss = torch.zeros(1, requires_grad=False).to(DEVICE)
-		
+	
+	distLoss = distLoss * (step-1)/step
+
 	print(f'class loss = {classLoss}' f' dist loss = {distLoss.item()}')
 	return classLoss,distLoss
 
