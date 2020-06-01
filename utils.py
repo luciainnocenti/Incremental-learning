@@ -113,7 +113,7 @@ def eachEpochEvaluation(task, test_loader):
 		running_corrects += torch.sum(preds == labels.data).data.item()
 		t_l += len(images)
 	# Calculate Accuracy
-	accuracy = running_corrects / float(tl)
+	accuracy = running_corrects / float(t_l)
 	
 	#Calculate Loss
 	loss = F.binary_cross_entropy_with_logits(outputs,onehot_labels)
