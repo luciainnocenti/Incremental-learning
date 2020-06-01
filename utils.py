@@ -63,7 +63,7 @@ def trainfunction(task, train_loader):
 			
 			# Get predictions
 			#cut_outputs = outputs[..., task : task + TASK_SIZE]
-			_, preds = torch.max(cut_outputs.data, 1)
+			_, preds = torch.max(outputs.data, 1)
 			# Update Corrects
 			running_corrects += torch.sum(preds == labels.data).data.item()
 			loss.backward()  # backward pass: computes gradients
