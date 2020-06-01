@@ -88,7 +88,7 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task = 0):
 	else:
 		distLoss = torch.zeros(1, requires_grad=False).to(DEVICE)
 		
-	print(f'class loss = {classLoss}' f' dist loss = {distLoss}')
+	print(f'class loss = {classLoss}' f' dist loss = {distLoss.item()}')
 	return classLoss,distLoss
 
 #def eachEpochEvaluation(task, test_loader):
