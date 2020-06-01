@@ -153,9 +153,9 @@ def plotTask(pars_tasks):
   plt.show()
 
 def distillation_loss(outputs, old_outputs):
-    assert len(outputs) == len(old_outputs)
-
-    return sum(
-        q * torch.log(g) + (1 - q) * torch.log(1 - g)
-        for q, g in zip(F.sigmoid(old_outputs), F.sigmoid(outputs))
-    )
+	assert len(outputs) == len(old_outputs)
+	dist_l = 0
+	
+	for o, n in zip(F.softmax(old_outputs, dim=1) ,F.softmax(outputs, dim=1) ):
+		dist_l += o * torch.log(n)
+	return - dist_l
