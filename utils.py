@@ -26,7 +26,7 @@ LR = 2
 STEP_SIZE = [49,63]
 GAMMA = 1/5
 
-def trainfunction(task, train_loader, test_loader, pars_tasks):
+def trainfunction(task, train_loader):
 	pars_epoch = [] #clean the pars_epoch after visualizations
 
 	resNet = torch.load('resNet_task' + str(task) + '.pt')
@@ -75,21 +75,8 @@ def trainfunction(task, train_loader, test_loader, pars_tasks):
 		# Calculate Accuracy
 		accuracy = running_corrects / float(lenght)
 		print("At step ", str(task), " and at epoch = ", epoch, " the loss is = ", loss.item(), " and accuracy is = ", accuracy)
-		
-		#Some variables useful for visualization
-		
-		#param=evaluationTest(task, test_loader) #run the network in the validation set, it returns validation accuracy and loss 
-		
-		#pars_epoch.append( (param[0], param[1], accuracy, loss.item()) )
-		#pars_epoch -->   val_acc,  val_loss, train_acc,train_loss
-		#pars_tasks[int(task/10)] += param[0] # 
-		#pars_task[task/10] --> contains the sum of all the accuracies obtained in a specific task
-
-	#plotEpoch(pars_epoch) 
-	param=evaluationTest(task, test_loader) #evaluate test set at step task
-	pars_tasks[int(task/10)] = param #pars_task[i] = (accuracy, loss) at i-th task	
 	torch.save(resNet, 'resNet_task{0}.pt'.format(task+10))
-	return param
+
 
 def calculateLoss(outputs, old_outputs, onehot_labels, task = 0):
 	classLoss = F.binary_cross_entropy_with_logits(outputs,onehot_labels)
