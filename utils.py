@@ -103,7 +103,6 @@ def evaluationTest(task, test_loader):
 	resNet = torch.load('resNet_task' + str(task) + '.pt')
 	resNet.train(False) # Set Network to evaluation mode
 	running_corrects = 0
-	#confusion_matrix = torch.zeros(10, 10)
 	for images, labels in test_loader:
 		images = images.float().to(DEVICE)
 		labels = labels.to(DEVICE)
@@ -114,6 +113,7 @@ def evaluationTest(task, test_loader):
 		_, preds = torch.max(outputs.data, 1)
 		# Update Corrects
 		running_corrects += torch.sum(preds == labels.data).data.item()
+		print(f' running corrects = {running_corrects}')
 		t_l += len(images)
 	# Calculate Accuracy
 	accuracy = running_corrects / float(t_l)
@@ -153,7 +153,7 @@ def plotTask(pars_tasks):
   plt.show()
 
 def distillation_loss(outputs, old_outputs):
-    assert len(logits) == len(old_logits)
+    assert len(outputs) == len(old_outputs)
 
     return sum(
         q * torch.log(g) + (1 - q) * torch.log(1 - g)
