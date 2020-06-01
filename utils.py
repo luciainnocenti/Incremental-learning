@@ -114,7 +114,7 @@ def evaluationTest(task, test_loader):
 	
 	#Calculate Loss
 	loss = F.binary_cross_entropy_with_logits(outputs,onehot_labels)
-	print('Validation Loss: {} Validation Accuracy : {}'.format(loss,accuracy))
+	print('Validation Loss: {} Validation Accuracy : {}'.format(loss.item(),accuracy))
 	return (accuracy, loss.item())	  
  
 def plotEpoch(pars):
