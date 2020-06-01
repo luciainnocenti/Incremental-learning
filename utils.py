@@ -21,19 +21,19 @@ NUM_EPOCHS = 5
 ############################################
 
 
-WEIGHT_DECAY = 0.00001
+
 LR = 2
 STEP_SIZE = [49,63]
 GAMMA = 1/5
 
 def trainfunction(task, train_loader):
 	pars_epoch = [] #clean the pars_epoch after visualizations
-
+	print(f'task = {task} ')
 	resNet = torch.load('resNet_task' + str(task) + '.pt')
 	old_resNet = torch.load('resNet_task' + str(task) + '.pt')
 
 	#Define the parameters for traininig:
-	optimizer = torch.optim.SGD(resNet.parameters(), lr=2., weight_decay=WEIGHT_DECAY)
+	optimizer = torch.optim.SGD(resNet.parameters(), lr=2.)
 	scheduler = optim.lr_scheduler.MultiStepLR(optimizer, STEP_SIZE, gamma=GAMMA) #allow to change the LR at predefined epochs
 	current_step = 0
 
@@ -75,7 +75,7 @@ def trainfunction(task, train_loader):
 		# Calculate Accuracy
 		accuracy = running_corrects / float(lenght)
 		print("At step ", str(task), " and at epoch = ", epoch, " the loss is = ", loss.item(), " and accuracy is = ", accuracy)
-	torch.save(resNet, 'resNet_task{0}.pt'.format(task+10))
+	torch.save(resNet, 'resNet_task{0}.pt'.format(task + 10))
 
 
 def calculateLoss(outputs, old_outputs, onehot_labels, task = 0):
@@ -94,7 +94,7 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task = 0):
 #def eachEpochEvaluation(task, test_loader):
 def evaluationTest(task, test_loader):
 	t_l = 0
-	resNet = torch.load('resNet_task' + str(task) + '.pt')
+	resNet = torch.load('resNet_task' + str(task + 10) + '.pt')
 	resNet.eval() # Set Network to evaluation mode
 	running_corrects = 0
 	for images, labels in test_loader:
@@ -114,35 +114,33 @@ def evaluationTest(task, test_loader):
 	
 	#Calculate Loss
 	loss = F.binary_cross_entropy_with_logits(outputs,onehot_labels)
-	print('Validation Loss: {} Validation Accuracy : {}'.format(loss.item(),accuracy))
-	return (accuracy, loss.item())	  
+	print('Validation Loss: {} Validation Accuracy : {}'.format(loss.item(),accuracy)
+	return(accuracy, loss.item())	  
  
 def plotEpoch(pars):
+	x_epochs = np.linspace(1,NUM_EPOCHS,NUM_EPOCHS)
+	y1 = [e[0] for e in pars] #val acuracy
+	y2 = [e[2] for e in pars] #train accuracy
+	plt.plot(x_epochs, y1 , '-', color='red')
+	plt.plot(x_epochs, y2, '-', color='blue')
+	plt.xlabel("Epoch")
+	plt.legend(['Validation Accuracy', 'Train accuracy'])
+	plt.show()
 
-  x_epochs = np.linspace(1,NUM_EPOCHS,NUM_EPOCHS)
-  y1 = [e[0] for e in pars] #val acuracy
-  y2 = [e[2] for e in pars] #train accuracy
-  plt.plot(x_epochs, y1 , '-', color='red')
-  plt.plot(x_epochs, y2, '-', color='blue')
-  plt.xlabel("Epoch")
-  plt.legend(['Validation Accuracy', 'Train accuracy'])
-  plt.show()
-
-  y1 = [e[1] for e in pars] #val loss
-  y2 = [e[3] for e in pars] #train loss
-  plt.plot(x_epochs, y1 , '-', color='red')
-  plt.plot(x_epochs, y2, '-', color='blue')
-  plt.xlabel("Epoch")
-  plt.legend(['Validation Loss', 'Train Loss'])
-  plt.show()
+	y1 = [e[1] for e in pars] #val loss
+	y2 = [e[3] for e in pars] #train loss
+	plt.plot(x_epochs, y1 , '-', color='red')
+	plt.plot(x_epochs, y2, '-', color='blue')
+	plt.xlabel("Epoch")
+	plt.legend(['Validation Loss', 'Train Loss'])
+	plt.show()
 
 def plotTask(pars_tasks):
-  x_tasks =  np.linspace(10, 100, 10)
+	x_tasks =  np.linspace(10, 100, 10)
 
-  plt.plot(x_tasks, pars_tasks ,'b', label='Accuracy')
-  plt.xlabel("Epoch")
-  plt.title('Accuracy over classes')
-  plt.legend(['Validation Accuracy'])
-  plt.grid(True)
-  plt.show()
-
+	plt.plot(x_tasks, pars_tasks ,'b', label='Accuracy')
+	plt.xlabel("Epoch")
+	plt.title('Accuracy over classes')
+	plt.legend(['Validation Accuracy'])
+	plt.grid(True)
+	plt.show()
