@@ -35,6 +35,7 @@ def trainfunction(task, train_loader, test_loader, pars_tasks):
 	#Define the parameters for traininig:
 	optimizer = torch.optim.SGD(resNet.parameters(), lr=2., weight_decay=WEIGHT_DECAY)
 	scheduler = optim.lr_scheduler.MultiStepLR(optimizer, STEP_SIZE, gamma=GAMMA) #allow to change the LR at predefined epochs
+	current_step = 0
 
 	##Train phase
 	for epoch in range(NUM_EPOCHS):
@@ -76,7 +77,7 @@ def trainfunction(task, train_loader, test_loader, pars_tasks):
 		
 		#Some variables useful for visualization
 		
-		param=eachepochevaluation() #run the network in the validation set, it returns validation accuracy and loss 
+		param=eachEpochEvaluation() #run the network in the validation set, it returns validation accuracy and loss 
 		
 		pars_epoch.append( (param[0], param[1], accuracy, loss.item()) )
 		#pars_epoch -->   val_acc,  val_loss, train_acc,train_loss
@@ -85,7 +86,7 @@ def trainfunction(task, train_loader, test_loader, pars_tasks):
 
 	plotEpoch(pars_epoch) 
 	pars_tasks[int(task/10)] /= NUM_EPOCHS #make the average sum(accuracy)/num_epochs	
-	torch.save(resNet, 'resNet_task{0}.pt'.format(task+1))
+	torch.save(resNet, 'resNet_task{0}.pt'.format(task+10))
 
 def calculateLoss(outputs, old_outputs, onehot_labels, task = 0):
 	classLoss = F.binary_cross_entropy_with_logits(outputs,onehot_labels)
@@ -93,7 +94,7 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task = 0):
 
 	return classLoss,distLoss
 
-def eachepochevaluation(task, test_loader):
+def eachEpochEvaluation(task, test_loader):
 	resNet = torch.load('resNet_task' + str(task) + '.pt')
 	resNet.train(False) # Set Network to evaluation mode
 	running_corrects = 0
