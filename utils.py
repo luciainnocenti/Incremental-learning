@@ -95,7 +95,7 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task = 0):
 def evaluationTest(task, test_loader):
 	t_l = 0
 	resNet = torch.load('resNet_task' + str(task) + '.pt')
-	resNet.train(False) # Set Network to evaluation mode
+	resNet.eval() # Set Network to evaluation mode
 	running_corrects = 0
 	for images, labels in test_loader:
 		images = images.float().to(DEVICE)
