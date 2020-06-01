@@ -88,8 +88,8 @@ def trainfunction(task, train_loader, test_loader, pars_tasks):
 	torch.save(resNet, 'resNet_task{0}.pt'.format(task+1))
 
 def calculateLoss(outputs, old_outputs, onehot_labels, task = 0):
-	classLoss = nn.BCEWithLogitsLoss(outputs, onehot_labels)
-	distLoss = nn.BCEWithLogitsLoss(outputs[..., :task], old_outputs[..., :task]) if task else 0 #se task != 0, calcola la loss; altrimenti ritorna 0
+	classLoss = F.binary_cross_entropy_with_logits(outputs,onehot_labels)
+	distLoss = F.binary_cross_entropy_with_logits(outputs[..., :task], old_outputs[..., :task]) if task else 0 #se task != 0, calcola la loss; altrimenti ritorna 0
 
 	return classLoss,distLoss
 
@@ -113,7 +113,7 @@ def eachepochevaluation(task, test_loader):
 	accuracy = running_corrects / float(len(test_dataset))
 	
 	#Calculate Loss
-	loss = nn.BCEWithLogitsLoss(outputs,onehot_labels)
+	loss = F.binary_cross_entropy_with_logits(outputs,onehot_labels)
 	print("epoch =" + str(epoch))
 	print('Validation Loss: {} Validation Accuracy : {}'.format(loss,accuracy))
 	return (accuracy, loss.item())	  
