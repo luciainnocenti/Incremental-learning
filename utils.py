@@ -80,7 +80,8 @@ def trainfunction(task, train_loader):
 
 def calculateLoss(outputs, old_outputs, onehot_labels, task = 0):
 	outputs, old_outputs, onehot_labels = outputs.to(DEVICE), old_outputs.to(DEVICE), onehot_labels.to(DEVICE)
-	
+	print(f'outputs {outputs.shape} ')
+	print(f'old_outputs {old_outputs.shape} ')
 	classLoss = F.binary_cross_entropy_with_logits(outputs,onehot_labels)
 	
 	if( task > 0 ):
