@@ -109,6 +109,8 @@ def evaluationTest(task, test_loader):
 		onehot_labels = torch.eye(100)[labels].to(DEVICE) #it creates the one-hot-encoding list for the labels; neede for BCELoss
 		# Forward Pass
 		outputs = resNet(images)
+		print(onehot_labels.shape, images.shape, labels.shape)
+		print(onehot_labels[0],labels[0], outputs[0])
 		# Get predictions
 		_, preds = torch.max(outputs.data, 1)
 		# Update Corrects
