@@ -93,7 +93,7 @@ def trainfunction(task, train_loader, test_loader, pars_tasks):
 
 def calculateLoss(outputs, old_outputs, onehot_labels, task = 0):
 	classLoss = F.binary_cross_entropy_with_logits(outputs,onehot_labels)
-	distLoss = F.binary_cross_entropy_with_logits(outputs[..., :task], old_outputs[..., :task]) if task else 0 #se task != 0, calcola la loss; altrimenti ritorna 0
+	distLoss = distillation_loss(outputs, old_outputs) if task else 0 #se task != 0, calcola la loss; altrimenti ritorna 0
 	print(f'class loss = {classLoss}' f'dist loss = {distLoss}')
 	return classLoss,distLoss
 
@@ -151,3 +151,11 @@ def plotTask(pars_tasks):
   plt.legend(['Validation Accuracy'])
   plt.grid(True)
   plt.show()
+
+def distillation_loss(outputs, old_outputs):
+    assert len(logits) == len(old_logits)
+
+    return sum(
+        q * torch.log(g) + (1 - q) * torch.log(1 - g)
+        for q, g in zip(F.sigmoid(old_outputs), F.sigmoid(outputs))
+    )
