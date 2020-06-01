@@ -117,7 +117,6 @@ def eachEpochEvaluation(task, test_loader):
 	
 	#Calculate Loss
 	loss = F.binary_cross_entropy_with_logits(outputs,onehot_labels)
-	print("epoch =" + str(epoch))
 	print('Validation Loss: {} Validation Accuracy : {}'.format(loss,accuracy))
 	return (accuracy, loss.item())	  
  
