@@ -69,14 +69,19 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task = 0):
 	m = nn.Sigmoid()
 	
 	outputs, old_outputs, onehot_labels = outputs.to(params.DEVICE), old_outputs.to(params.DEVICE), onehot_labels.to(params.DEVICE)
-	cut_outputs = outputs[..., task : task + params.TASK_SIZE]
-	
+	#cut_outputs = outputs[..., task : task + params.TASK_SIZE]
+	col = np.array(train_splits[int(task/10)]).astype(int)
+	cut_outputs = np.take_along_axis(outputs, col[None, :], axis = 1)	
 	step = task/params.TASK_SIZE + 1
 	classLoss = F.binary_cross_entropy_with_logits(cut_outputs,onehot_labels)
 	classLoss /= step
 	
 	if( task > 0 ):
-		distLoss = F.binary_cross_entropy_with_logits( input=outputs[..., :task], target=m(old_outputs[..., :task]) )
+		col = np.array(train_splits[..., : int(task/10)]).astype(int)
+		out1 = np.take_along_axis(outputs, col[None, :], axis = 1)
+		out2 = np.take_along_axis(old_outputs, col[None, :], axis = 1)
+		#distLoss = F.binary_cross_entropy_with_logits( input=outputs[..., :task], target=m(old_outputs[..., :task]) )
+		distLoss = F.binary_cross_entropy_with_logits( input=out1, target=m(out2) )
 	else:
 		distLoss = torch.zeros(1, requires_grad=False).to(params.DEVICE)
 	
