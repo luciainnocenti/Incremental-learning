@@ -11,6 +11,8 @@ import numpy as np
 import torch
 from torchvision import transforms
 from torchvision import datasets
+import random
+random.seed(42)
 
 class Dataset(torch.utils.data.Dataset):
   '''
