@@ -50,9 +50,10 @@ def trainfunction(task, train_loader, train_splits):
 			# Forward pass to the network
 			old_outputs = old_resNet(images)
 			outputs = resNet(images)
-			classLoss, distLoss = calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits )
+			#classLoss, distLoss = calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits )
+			loss = calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits )
 			
-			loss = classLoss + distLoss
+			#loss = classLoss + distLoss
 			
 			# Get predictions
 			
@@ -123,25 +124,24 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits):
 	col = np.array(train_splits[int(task/10)]).astype(int)
 	cut_outputs = np.take_along_axis(outputs, col[None, :], axis = 1)	
 	step = task/params.TASK_SIZE + 1
-	classLoss = F.binary_cross_entropy_with_logits(cut_outputs,onehot_labels)
-	classLoss /= step
 	
-	'''
+	if( task == 0):
+		loss = F.binary_cross_entropy_with_logits(cut_outputs,onehot_labels)
+		
 	if( task > 0 ):
 		col = []
-		for i,x in enumerate( train_splits[ :int(task/10) + 1]):
+		for i,x in enumerate( train_splits[ :int(task/10)]):
 		  v = np.array(x)
 		  col = np.concatenate( (col,v), axis = None)
 		col = col.astype(int)
-		out1 = np.take_along_axis(outputs, col[None, :], axis = 1)
-		out2 = np.take_along_axis(old_outputs, col[None, :], axis = 1)
+		#out1 = np.take_along_axis(outputs, col[None, :], axis = 1)
+		out = np.take_along_axis(old_outputs, col[None, :], axis = 1)
+		target = torch.cat((out, onehot_labels), 1)
 		#distLoss = F.binary_cross_entropy_with_logits( input=outputs[..., :task], target=m(old_outputs[..., :task]) )
-		distLoss = F.binary_cross_entropy_with_logits( input=out1, target=m(out2) )
-	else:
-		distLoss = torch.zeros(1, requires_grad=False).to(params.DEVICE)
+		loss = F.binary_cross_entropy_with_logits( input=cut_outputs, target=m(target) )
+
+	#distLoss = distLoss * (step-1)/step
 	
-	distLoss = distLoss * (step-1)/step
-	'''
 	distLoss = torch.zeros(1, requires_grad=False).to(params.DEVICE)
 	#print(f'class loss = {classLoss}' f' dist loss = {distLoss.item()}')
-	return classLoss,distLoss
+	return loss
