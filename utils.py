@@ -40,7 +40,7 @@ def trainfunction(task, train_loader, train_splits):
 		for images, labels in train_loader:
 			images = images.float().to(params.DEVICE)
 			labels = labels.to(params.DEVICE)
-			print(labels)
+			
 			mappedLabels = mapFunction(labels, col)
 			onehot_labels = torch.eye(10)[mappedLabels].to(params.DEVICE)#it creates the one-hot-encoding list for the labels; needed for BCELoss
 			
@@ -56,9 +56,9 @@ def trainfunction(task, train_loader, train_splits):
 			# Get predictions
 			
 			cut_outputs = np.take_along_axis(outputs, col[None, :], axis = 1)
-			print(col)
+			
 			_, preds = torch.max(cut_outputs.data, 1)
-			preds = preds + task
+			
 			# Update Corrects
 			running_corrects += torch.sum(preds == mappedLabels.data).data.item()
 			loss.backward()  # backward pass: computes gradients
