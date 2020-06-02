@@ -104,8 +104,9 @@ def evaluationTest(task, test_loader, test_splits):
 		# Update Corrects
 		print(mappedLabels)
 		print(preds)
-		print(running_corrects)
+		
 		running_corrects += torch.sum(preds == mappedLabels.data).data.item()
+		print(running_corrects)
 		t_l += len(images)
 	# Calculate Accuracy
 	accuracy = running_corrects / float(t_l)
@@ -132,7 +133,6 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits):
 		
 	if( task > 0 ):
 		target = onehot_labels.clone()
-		print(old_outputs.shape)
 		target[col] = m(old_outputs[col])
 		loss = F.binary_cross_entropy_with_logits( input=outputs, target=target )
 
