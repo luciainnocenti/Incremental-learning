@@ -126,6 +126,7 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits):
 	classLoss = F.binary_cross_entropy_with_logits(cut_outputs,onehot_labels)
 	classLoss /= step
 	
+	'''
 	if( task > 0 ):
 		col = []
 		for i,x in enumerate( train_splits[ :int(task/10) + 1]):
@@ -140,6 +141,7 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits):
 		distLoss = torch.zeros(1, requires_grad=False).to(params.DEVICE)
 	
 	distLoss = distLoss * (step-1)/step
-
+	'''
+	distLoss = torch.zeros(1, requires_grad=False).to(params.DEVICE)
 	#print(f'class loss = {classLoss}' f' dist loss = {distLoss.item()}')
 	return classLoss,distLoss
