@@ -47,7 +47,7 @@ def trainfunction(task, train_loader, train_splits):
 			loss = classLoss + distLoss
 			
 			# Get predictions
-			col = np.array(train_splits[int(task/10)])
+			col = np.array(train_splits[int(task/10)]).astype(int)
 			cut_outputs = np.take_along_axis(outputs, col[None, :], axis = 1)
 			
 			_, preds = torch.max(cut_outputs.data, 1)
@@ -97,7 +97,7 @@ def evaluationTest(task, test_loader, test_splits):
 		# Forward Pass
 		outputs = resNet(images)
 		# Get predictions
-		col =  np.array( train_splits[int(task/10)])
+		col =  np.array( train_splits[int(task/10)]).astype(int)
 		cut_outputs = np.take_along_axis(outputs, col[None, :], axis = 1)
 		#cut_outputs = outputs[..., 0 : task + params.TASK_SIZE]
 		_, preds = torch.max(cut_outputs.data, 1)
