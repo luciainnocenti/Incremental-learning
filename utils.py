@@ -12,6 +12,10 @@ from torch.nn import functional as F
 import numpy as np
 import matplotlib.pyplot as plt
 
+def mapFunction(labels, train_splits):
+	for i, x in enumerate(train_splits):
+		labels[labels == x] = i
+	return labels
 
 def trainfunction(task, train_loader, train_splits):
 	pars_epoch = [] #clean the pars_epoch after visualizations
@@ -23,7 +27,9 @@ def trainfunction(task, train_loader, train_splits):
 	optimizer = torch.optim.SGD(resNet.parameters(), lr=2.)
 	scheduler = optim.lr_scheduler.MultiStepLR(optimizer, params.STEP_SIZE, gamma=params.GAMMA) #allow to change the LR at predefined epochs
 	current_step = 0
-
+	
+	col = np.array(train_splits[int(task/10)]).astype(int)
+	
 	##Train phase
 	for epoch in range(params.NUM_EPOCHS):
 		lenght = 0
@@ -35,7 +41,8 @@ def trainfunction(task, train_loader, train_splits):
 			images = images.float().to(params.DEVICE)
 			labels = labels.to(params.DEVICE)
 			print(labels)
-			onehot_labels = torch.eye(10)[labels%10].to(params.DEVICE)#it creates the one-hot-encoding list for the labels; needed for BCELoss
+			mappedLabels = mapFunction(labels, col)
+			onehot_labels = torch.eye(10)[mappedLabels].to(params.DEVICE)#it creates the one-hot-encoding list for the labels; needed for BCELoss
 			
 			optimizer.zero_grad() # Zero-ing the gradients
 			
@@ -47,13 +54,13 @@ def trainfunction(task, train_loader, train_splits):
 			loss = classLoss + distLoss
 			
 			# Get predictions
-			col = np.array(train_splits[int(task/10)]).astype(int)
+			
 			cut_outputs = np.take_along_axis(outputs, col[None, :], axis = 1)
 			print(col)
 			_, preds = torch.max(cut_outputs.data, 1)
 			preds = preds + task
 			# Update Corrects
-			running_corrects += torch.sum(preds == labels.data).data.item()
+			running_corrects += torch.sum(preds == mappedLabels.data).data.item()
 			loss.backward()  # backward pass: computes gradients
 			optimizer.step() # update weights based on accumulated gradients
 			
@@ -95,19 +102,24 @@ def evaluationTest(task, test_loader, test_splits):
 	resNet = torch.load('resNet_task' + str(task + 10) + '.pt')
 	resNet.eval() # Set Network to evaluation mode
 	running_corrects = 0
+	col =  np.array( test_splits[int(task/10)]).astype(int)
+	
 	for images, labels in test_loader:
 		images = images.float().to(params.DEVICE)
 		labels = labels.to(params.DEVICE)
-		onehot_labels = torch.eye(task + params.TASK_SIZE)[labels].to(params.DEVICE) #it creates the one-hot-encoding list for the labels; neede for BCELoss
+		
+		mappedLabels = mapFunction(labels, col)
+		
+		onehot_labels = torch.eye(task + params.TASK_SIZE)[mappedLabels].to(params.DEVICE) #it creates the one-hot-encoding list for the labels; neede for BCELoss
 		# Forward Pass
 		outputs = resNet(images)
 		# Get predictions
-		col =  np.array( test_splits[int(task/10)]).astype(int)
+		
 		cut_outputs = np.take_along_axis(outputs, col[None, :], axis = 1)
 		#cut_outputs = outputs[..., 0 : task + params.TASK_SIZE]
 		_, preds = torch.max(cut_outputs.data, 1)
 		# Update Corrects
-		running_corrects += torch.sum(preds == labels.data).data.item()
+		running_corrects += torch.sum(preds == mappedLabels.data).data.item()
 		t_l += len(images)
 	# Calculate Accuracy
 	accuracy = running_corrects / float(t_l)
