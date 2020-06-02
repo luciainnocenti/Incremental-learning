@@ -27,6 +27,15 @@ class Dataset(torch.utils.data.Dataset):
       _labelNames = contains a list of 100 elements, each one represent a class; it maps integer indexes to human readable labels
       
   '''
+  def returnSplits(self):
+    el = np.linspace(0,99,100)
+    splits  = [None] * 10
+    for i in range(0,10):
+      n = random.sample(set(el), k=10)
+      splits[i] = n
+      el = list( set(el) - set(n) )
+    return splits 
+
   def __getClassesNames__(self):
     #This method returns a list mapping the 100 classes into a human readable label. E.g. names[0] is the label that maps the class 0
     names = []
@@ -41,11 +50,12 @@ class Dataset(torch.utils.data.Dataset):
     self._dataset = datasets.cifar.CIFAR100( 'data', train=train, download=True, transform= transform, target_transform = target_transform )
     self._targets = np.array(self._dataset.targets) #Essendo CIFAR100 una sottoclasse di CIFAR10, qui fa riferimento a quell'implementazione.
     self._data = np.array(self._dataset.data)
+    self.splits = self.returnSplits()
 
   def __getIndexesGroups__(self, startIndex = 0):
     #This method returns a list containing the indexes of all the images belonging to classes [starIndex, startIndex + 10]
     indexes = []
-    self.searched_classes = np.linspace(startIndex, startIndex + 9, 10)
+    self.searched_classes = self.splits[int(index/10)]
     i = 0
     for el in self._targets:
       if (el in self.searched_classes):
