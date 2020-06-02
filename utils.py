@@ -65,7 +65,7 @@ def trainfunction(task, train_loader, train_splits):
 	torch.save(resNet, 'resNet_task{0}.pt'.format(task + 10))
 
 
-def calculateLoss(outputs, old_outputs, onehot_labels, task = 0, train_splits):
+def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits):
 	m = nn.Sigmoid()
 	
 	outputs, old_outputs, onehot_labels = outputs.to(params.DEVICE), old_outputs.to(params.DEVICE), onehot_labels.to(params.DEVICE)
