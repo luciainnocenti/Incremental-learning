@@ -42,7 +42,7 @@ def trainfunction(task, train_loader, train_splits):
 			# Forward pass to the network
 			old_outputs = old_resNet(images)
 			outputs = resNet(images)
-			classLoss, distLoss = calculateLoss(outputs, old_outputs, onehot_labels, task)
+			classLoss, distLoss = calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits )
 			
 			loss = classLoss + distLoss
 			
@@ -65,7 +65,7 @@ def trainfunction(task, train_loader, train_splits):
 	torch.save(resNet, 'resNet_task{0}.pt'.format(task + 10))
 
 
-def calculateLoss(outputs, old_outputs, onehot_labels, task = 0):
+def calculateLoss(outputs, old_outputs, onehot_labels, task = 0, train_splits):
 	m = nn.Sigmoid()
 	
 	outputs, old_outputs, onehot_labels = outputs.to(params.DEVICE), old_outputs.to(params.DEVICE), onehot_labels.to(params.DEVICE)
@@ -102,7 +102,7 @@ def evaluationTest(task, test_loader, test_splits):
 		# Forward Pass
 		outputs = resNet(images)
 		# Get predictions
-		col =  np.array( train_splits[int(task/10)]).astype(int)
+		col =  np.array( test_splits[int(task/10)]).astype(int)
 		cut_outputs = np.take_along_axis(outputs, col[None, :], axis = 1)
 		#cut_outputs = outputs[..., 0 : task + params.TASK_SIZE]
 		_, preds = torch.max(cut_outputs.data, 1)
