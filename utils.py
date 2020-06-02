@@ -12,10 +12,11 @@ from torch.nn import functional as F
 import numpy as np
 import matplotlib.pyplot as plt
 
-def mapFunction(labels, train_splits):
-	for i, x in enumerate(train_splits):
-		labels[labels == x] = i
-	return labels
+def mapFunction(labels, splits):
+	lab = labels.clone()
+	for i, x in enumerate(splits):
+		lab[lab == x] = i
+	return lab
 
 def trainfunction(task, train_loader, train_splits):
 	pars_epoch = [] #clean the pars_epoch after visualizations
@@ -72,6 +73,45 @@ def trainfunction(task, train_loader, train_splits):
 	torch.save(resNet, 'resNet_task{0}.pt'.format(task + 10))
 
 
+def evaluationTest(task, test_loader, test_splits):
+	t_l = 0
+	resNet = torch.load('resNet_task' + str(task + 10) + '.pt')
+	resNet.eval() # Set Network to evaluation mode
+	running_corrects = 0
+	
+	col = []
+	#in fase di test verifico su tutti le classi viste fino ad ora, quindi prendo da test splits gli indici dei gruppi da 0 a task
+	for i,x in enumerate( test_splits[ :int(task/10) + 1]):
+		 v = np.array(x)
+		 col = np.concatenate( (col,v), axis = None)
+	col = col.astype(int)	
+
+	for images, labels in test_loader:
+		images = images.float().to(params.DEVICE)
+		labels = labels.to(params.DEVICE)
+		
+		mappedLabels = mapFunction(labels, col)
+		
+		onehot_labels = torch.eye(task + params.TASK_SIZE)[mappedLabels].to(params.DEVICE) #it creates the one-hot-encoding list for the labels; neede for BCELoss
+		# Forward Pass
+		outputs = resNet(images)
+		# Get predictions
+		
+		cut_outputs = np.take_along_axis(outputs, col[None, :], axis = 1)
+		#cut_outputs = outputs[..., 0 : task + params.TASK_SIZE]
+		_, preds = torch.max(cut_outputs.data, 1)
+		# Update Corrects
+		running_corrects += torch.sum(preds == mappedLabels.data).data.item()
+		t_l += len(images)
+	# Calculate Accuracy
+	accuracy = running_corrects / float(t_l)
+	
+	#Calculate Loss
+	loss = F.binary_cross_entropy_with_logits(cut_outputs,onehot_labels)
+	print('Validation Loss: {} Validation Accuracy : {}'.format(loss.item(),accuracy) )
+	return(accuracy, loss.item())	  
+
+
 def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits):
 	m = nn.Sigmoid()
 	
@@ -100,63 +140,3 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits):
 
 	#print(f'class loss = {classLoss}' f' dist loss = {distLoss.item()}')
 	return classLoss,distLoss
-
-def evaluationTest(task, test_loader, test_splits):
-	t_l = 0
-	resNet = torch.load('resNet_task' + str(task + 10) + '.pt')
-	resNet.eval() # Set Network to evaluation mode
-	running_corrects = 0
-	col =  np.array( test_splits[int(task/10)]).astype(int)
-	
-	for images, labels in test_loader:
-		images = images.float().to(params.DEVICE)
-		labels = labels.to(params.DEVICE)
-		
-		mappedLabels = mapFunction(labels, col)
-		
-		onehot_labels = torch.eye(task + params.TASK_SIZE)[mappedLabels].to(params.DEVICE) #it creates the one-hot-encoding list for the labels; neede for BCELoss
-		# Forward Pass
-		outputs = resNet(images)
-		# Get predictions
-		
-		cut_outputs = np.take_along_axis(outputs, col[None, :], axis = 1)
-		#cut_outputs = outputs[..., 0 : task + params.TASK_SIZE]
-		_, preds = torch.max(cut_outputs.data, 1)
-		# Update Corrects
-		running_corrects += torch.sum(preds == mappedLabels.data).data.item()
-		t_l += len(images)
-	# Calculate Accuracy
-	accuracy = running_corrects / float(t_l)
-	
-	#Calculate Loss
-	loss = F.binary_cross_entropy_with_logits(cut_outputs,onehot_labels)
-	print('Validation Loss: {} Validation Accuracy : {}'.format(loss.item(),accuracy) )
-	return(accuracy, loss.item())	  
- 
-def plotEpoch(pars):
-	x_epochs = np.linspace(1,params.NUM_EPOCHS,params.NUM_EPOCHS)
-	y1 = [e[0] for e in pars] #val acuracy
-	y2 = [e[2] for e in pars] #train accuracy
-	plt.plot(x_epochs, y1 , '-', color='red')
-	plt.plot(x_epochs, y2, '-', color='blue')
-	plt.xlabel("Epoch")
-	plt.legend(['Validation Accuracy', 'Train accuracy'])
-	plt.show()
-
-	y1 = [e[1] for e in pars] #val loss
-	y2 = [e[3] for e in pars] #train loss
-	plt.plot(x_epochs, y1 , '-', color='red')
-	plt.plot(x_epochs, y2, '-', color='blue')
-	plt.xlabel("Epoch")
-	plt.legend(['Validation Loss', 'Train Loss'])
-	plt.show()
-
-def plotTask(pars_tasks):
-	x_tasks =  np.linspace(10, 100, 10)
-
-	plt.plot(x_tasks, pars_tasks ,'b', label='Accuracy')
-	plt.xlabel("Epoch")
-	plt.title('Accuracy over classes')
-	plt.legend(['Validation Accuracy'])
-	plt.grid(True)
-	plt.show()
