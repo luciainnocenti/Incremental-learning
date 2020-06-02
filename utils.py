@@ -101,7 +101,7 @@ def evaluationTest(task, test_loader, test_splits):
 		#cut_outputs = outputs[..., 0 : task + params.TASK_SIZE]
 		_, preds = torch.max(cut_outputs.data, 1)
 		# Update Corrects
-		print(labels)
+		print(mappedLabels)
 		print(preds)
 		print(running_corrects)
 		running_corrects += torch.sum(preds == mappedLabels.data).data.item()
