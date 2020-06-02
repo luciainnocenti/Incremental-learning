@@ -11,6 +11,7 @@ import numpy as np
 import torch
 from torchvision import transforms
 from torchvision import datasets
+from DatasetCIFAR import params
 import random
 random.seed(42)
 
@@ -29,15 +30,6 @@ class Dataset(torch.utils.data.Dataset):
       _labelNames = contains a list of 100 elements, each one represent a class; it maps integer indexes to human readable labels
       
   '''
-  def returnSplits(self):
-    el = np.linspace(0,99,100)
-    splits  = [None] * 10
-    for i in range(0,10):
-      n = random.sample(set(el), k=10)
-      splits[i] = n
-      el = list( set(el) - set(n) )
-    return splits 
-
   def __getClassesNames__(self):
     #This method returns a list mapping the 100 classes into a human readable label. E.g. names[0] is the label that maps the class 0
     names = []
@@ -52,7 +44,7 @@ class Dataset(torch.utils.data.Dataset):
     self._dataset = datasets.cifar.CIFAR100( 'data', train=train, download=True, transform= transform, target_transform = target_transform )
     self._targets = np.array(self._dataset.targets) #Essendo CIFAR100 una sottoclasse di CIFAR10, qui fa riferimento a quell'implementazione.
     self._data = np.array(self._dataset.data)
-    self.splits = self.returnSplits()
+    self.splits = params.returnSplits()
 
   def __getIndexesGroups__(self, index = 0):
     #This method returns a list containing the indexes of all the images belonging to classes [starIndex, startIndex + 10]
