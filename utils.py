@@ -43,7 +43,7 @@ def trainfunction(task, train_loader, train_splits):
 			labels = labels.to(params.DEVICE)
 			
 			mappedLabels = mapFunction(labels, col)
-			onehot_labels = torch.eye(10)[mappedLabels].to(params.DEVICE)#it creates the one-hot-encoding list for the labels; needed for BCELoss
+			onehot_labels = torch.eye(100)[labels].to(params.DEVICE)#it creates the one-hot-encoding list for the labels; needed for BCELoss
 			
 			optimizer.zero_grad() # Zero-ing the gradients
 			
@@ -120,34 +120,19 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits):
 	m = nn.Sigmoid()
 	
 	outputs, old_outputs, onehot_labels = outputs.to(params.DEVICE), old_outputs.to(params.DEVICE), onehot_labels.to(params.DEVICE)
-	#cut_outputs = outputs[..., task : task + params.TASK_SIZE]
-	col1 = np.array(train_splits[int(task/10)]).astype(int)
-	
-	col2 = []
+
+	col = []
 	for i,x in enumerate( train_splits[ :int(task/10) ]):
 		v = np.array(x)
-		col2 = np.concatenate( (col2,v), axis = None)
-	col2 = np.array(col2).astype(int)
-
-	col3 = []
-	for i,x in enumerate( train_splits[ :int(task/10) +1]):
-		v = np.array(x)
-		col3 = np.concatenate( (col3,v), axis = None)
-	col3 = col3.astype(int)
+		col = np.concatenate( (col,v), axis = None)
+	col = np.array(col).astype(int)
 
 	if( task == 0):
-		cut_outputs = np.take_along_axis(outputs, col1[None, :], axis = 1)	
-		loss = F.binary_cross_entropy_with_logits(cut_outputs,onehot_labels)
+		loss = F.binary_cross_entropy_with_logits(outputs,onehot_labels)
 		
 	if( task > 0 ):
-		cut_outputs = np.take_along_axis(outputs, col3[None, :], axis = 1)
-		out = np.take_along_axis(old_outputs, col2[None, :], axis = 1)
-		target = torch.cat((out, onehot_labels), 1)
-		#distLoss = F.binary_cross_entropy_with_logits( input=outputs[..., :task], target=m(old_outputs[..., :task]) )
-		loss = F.binary_cross_entropy_with_logits( input=cut_outputs, target=m(target) )
+		target = onehot_labels.clone()
+		target[col] = m(old_outputs)
+		loss = F.binary_cross_entropy_with_logits( input=outputs, target=target )
 
-	#distLoss = distLoss * (step-1)/step
-	
-	distLoss = torch.zeros(1, requires_grad=False).to(params.DEVICE)
-	#print(f'class loss = {classLoss}' f' dist loss = {distLoss.item()}')
 	return loss
