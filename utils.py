@@ -127,7 +127,7 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits):
 	for i,x in enumerate( train_splits[ :int(task/10) ]):
 		v = np.array(x)
 		col2 = np.concatenate( (col2,v), axis = None)
-	col2 = col2.astype(int)
+	col2 = np.array(col2).astype(int)
 
 	col3 = []
 	for i,x in enumerate( train_splits[ :int(task/10) +1]):
