@@ -1,5 +1,6 @@
 from DatasetCIFAR.data_set import Dataset 
 from DatasetCIFAR import ResNet
+from DatasetCIFAR import params
 from torchvision import models
 import torch.nn as nn
 import torch
@@ -11,18 +12,6 @@ from torch.nn import functional as F
 import numpy as np
 import matplotlib.pyplot as plt
 
-DEVICE = 'cuda' # 'cuda' or 'cpu'
-BATCH_SIZE = 128
-NUM_WORKERS = 100
-TASK_SIZE = 10
-NUM_EPOCHS = 70
-
-
-
-
-LR = 2
-STEP_SIZE = [49,63]
-GAMMA = 1/5
 
 def trainfunction(task, train_loader):
 	pars_epoch = [] #clean the pars_epoch after visualizations
@@ -32,21 +21,21 @@ def trainfunction(task, train_loader):
 
 	#Define the parameters for traininig:
 	optimizer = torch.optim.SGD(resNet.parameters(), lr=2.)
-	scheduler = optim.lr_scheduler.MultiStepLR(optimizer, STEP_SIZE, gamma=GAMMA) #allow to change the LR at predefined epochs
+	scheduler = optim.lr_scheduler.MultiStepLR(optimizer, params.STEP_SIZE, gamma=params.GAMMA) #allow to change the LR at predefined epochs
 	current_step = 0
 
 	##Train phase
-	for epoch in range(NUM_EPOCHS):
+	for epoch in range(params.NUM_EPOCHS):
 		lenght = 0
 		scheduler.step() #update the learning rate
 		#print(scheduler.get_lr(), "   ", scheduler.get_last_lr()) #check if the lr is okay
 		running_corrects = 0
 
 		for images, labels in train_loader:
-			images = images.float().to(DEVICE)
-			labels = labels.to(DEVICE)
+			images = images.float().to(params.DEVICE)
+			labels = labels.to(params.DEVICE)
 			
-			onehot_labels = torch.eye(10)[labels%10].to(DEVICE)#it creates the one-hot-encoding list for the labels; needed for BCELoss
+			onehot_labels = torch.eye(10)[labels%10].to(params.DEVICE)#it creates the one-hot-encoding list for the labels; needed for BCELoss
 			
 			optimizer.zero_grad() # Zero-ing the gradients
 			
@@ -58,7 +47,7 @@ def trainfunction(task, train_loader):
 			loss = classLoss + distLoss
 			
 			# Get predictions
-			cut_outputs = outputs[..., task : task + TASK_SIZE]
+			cut_outputs = outputs[..., task : task + params.TASK_SIZE]
 			
 			_, preds = torch.max(cut_outputs.data, 1)
 			preds = preds + task
@@ -78,17 +67,17 @@ def trainfunction(task, train_loader):
 def calculateLoss(outputs, old_outputs, onehot_labels, task = 0):
 	m = nn.Sigmoid()
 	
-	outputs, old_outputs, onehot_labels = outputs.to(DEVICE), old_outputs.to(DEVICE), onehot_labels.to(DEVICE)
-	cut_outputs = outputs[..., task : task + TASK_SIZE]
+	outputs, old_outputs, onehot_labels = outputs.to(params.DEVICE), old_outputs.to(params.DEVICE), onehot_labels.to(params.DEVICE)
+	cut_outputs = outputs[..., task : task + params.TASK_SIZE]
 	
-	step = task/TASK_SIZE + 1
+	step = task/params.TASK_SIZE + 1
 	classLoss = F.binary_cross_entropy_with_logits(cut_outputs,onehot_labels)
 	classLoss /= step
 	
 	if( task > 0 ):
 		distLoss = F.binary_cross_entropy_with_logits( input=outputs[..., :task], target=m(old_outputs[..., :task]) )
 	else:
-		distLoss = torch.zeros(1, requires_grad=False).to(DEVICE)
+		distLoss = torch.zeros(1, requires_grad=False).to(params.DEVICE)
 	
 	distLoss = distLoss * (step-1)/step
 
@@ -101,13 +90,13 @@ def evaluationTest(task, test_loader):
 	resNet.eval() # Set Network to evaluation mode
 	running_corrects = 0
 	for images, labels in test_loader:
-		images = images.float().to(DEVICE)
-		labels = labels.to(DEVICE)
-		onehot_labels = torch.eye(task + TASK_SIZE)[labels].to(DEVICE) #it creates the one-hot-encoding list for the labels; neede for BCELoss
+		images = images.float().to(params.DEVICE)
+		labels = labels.to(params.DEVICE)
+		onehot_labels = torch.eye(task + params.TASK_SIZE)[labels].to(params.DEVICE) #it creates the one-hot-encoding list for the labels; neede for BCELoss
 		# Forward Pass
 		outputs = resNet(images)
 		# Get predictions
-		cut_outputs = outputs[..., 0 : task + TASK_SIZE]
+		cut_outputs = outputs[..., 0 : task + params.TASK_SIZE]
 		_, preds = torch.max(cut_outputs.data, 1)
 		# Update Corrects
 		running_corrects += torch.sum(preds == labels.data).data.item()
@@ -121,7 +110,7 @@ def evaluationTest(task, test_loader):
 	return(accuracy, loss.item())	  
  
 def plotEpoch(pars):
-	x_epochs = np.linspace(1,NUM_EPOCHS,NUM_EPOCHS)
+	x_epochs = np.linspace(1,params.NUM_EPOCHS,params.NUM_EPOCHS)
 	y1 = [e[0] for e in pars] #val acuracy
 	y2 = [e[2] for e in pars] #train accuracy
 	plt.plot(x_epochs, y1 , '-', color='red')
