@@ -84,7 +84,11 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits):
 	classLoss /= step
 	
 	if( task > 0 ):
-		col = np.array(train_splits[..., : int(task/10)]).astype(int)
+		col = []
+		for i,x in enumerate( train_splits[ :int(task/10) + 1]):
+		  v = np.array(x)
+		  col = np.concatenate( (col,v), axis = None)
+		col = col.astype(int)
 		out1 = np.take_along_axis(outputs, col[None, :], axis = 1)
 		out2 = np.take_along_axis(old_outputs, col[None, :], axis = 1)
 		#distLoss = F.binary_cross_entropy_with_logits( input=outputs[..., :task], target=m(old_outputs[..., :task]) )
