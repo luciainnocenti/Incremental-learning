@@ -13,7 +13,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def trainfunction(task, train_loader):
+def trainfunction(task, train_loader, train_splits):
 	pars_epoch = [] #clean the pars_epoch after visualizations
 	print(f'task = {task} ')
 	resNet = torch.load('resNet_task' + str(task) + '.pt')
@@ -47,7 +47,8 @@ def trainfunction(task, train_loader):
 			loss = classLoss + distLoss
 			
 			# Get predictions
-			cut_outputs = outputs[..., task : task + params.TASK_SIZE]
+			col = train_splits[int(task/10)]
+			cut_outputs = np.take_along_axis(outputs, col[None, :], axis = 1)
 			
 			_, preds = torch.max(cut_outputs.data, 1)
 			preds = preds + task
@@ -84,7 +85,7 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task = 0):
 	#print(f'class loss = {classLoss}' f' dist loss = {distLoss.item()}')
 	return classLoss,distLoss
 
-def evaluationTest(task, test_loader):
+def evaluationTest(task, test_loader, test_splits):
 	t_l = 0
 	resNet = torch.load('resNet_task' + str(task + 10) + '.pt')
 	resNet.eval() # Set Network to evaluation mode
@@ -96,7 +97,9 @@ def evaluationTest(task, test_loader):
 		# Forward Pass
 		outputs = resNet(images)
 		# Get predictions
-		cut_outputs = outputs[..., 0 : task + params.TASK_SIZE]
+		col = train_splits[int(task/10)]
+		cut_outputs = np.take_along_axis(outputs, col[None, :], axis = 1)
+		#cut_outputs = outputs[..., 0 : task + params.TASK_SIZE]
 		_, preds = torch.max(cut_outputs.data, 1)
 		# Update Corrects
 		running_corrects += torch.sum(preds == labels.data).data.item()
