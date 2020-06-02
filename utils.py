@@ -121,21 +121,27 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits):
 	
 	outputs, old_outputs, onehot_labels = outputs.to(params.DEVICE), old_outputs.to(params.DEVICE), onehot_labels.to(params.DEVICE)
 	#cut_outputs = outputs[..., task : task + params.TASK_SIZE]
-	col = np.array(train_splits[int(task/10)]).astype(int)
-	cut_outputs = np.take_along_axis(outputs, col[None, :], axis = 1)	
-	step = task/params.TASK_SIZE + 1
+	col1 = np.array(train_splits[int(task/10)]).astype(int)
 	
+	col2 = []
+	for i,x in enumerate( train_splits[ :int(task/10) ]):
+		v = np.array(x)
+		col2 = np.concatenate( (col2,v), axis = None)
+	col2 = col2.astype(int)
+
+	col3 = []
+	for i,x in enumerate( train_splits[ :int(task/10) +1]):
+		v = np.array(x)
+		col3 = np.concatenate( (col3,v), axis = None)
+	col3 = col3.astype(int)
+
 	if( task == 0):
+		cut_outputs = np.take_along_axis(outputs, col1[None, :], axis = 1)	
 		loss = F.binary_cross_entropy_with_logits(cut_outputs,onehot_labels)
 		
 	if( task > 0 ):
-		col = []
-		for i,x in enumerate( train_splits[ :int(task/10)]):
-		  v = np.array(x)
-		  col = np.concatenate( (col,v), axis = None)
-		col = col.astype(int)
-		#out1 = np.take_along_axis(outputs, col[None, :], axis = 1)
-		out = np.take_along_axis(old_outputs, col[None, :], axis = 1)
+		cut_outputs = np.take_along_axis(outputs, col3[None, :], axis = 1)
+		out = np.take_along_axis(old_outputs, col2[None, :], axis = 1)
 		target = torch.cat((out, onehot_labels), 1)
 		#distLoss = F.binary_cross_entropy_with_logits( input=outputs[..., :task], target=m(old_outputs[..., :task]) )
 		loss = F.binary_cross_entropy_with_logits( input=cut_outputs, target=m(target) )
