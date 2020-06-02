@@ -54,7 +54,7 @@ class Dataset(torch.utils.data.Dataset):
     self._data = np.array(self._dataset.data)
     self.splits = self.returnSplits()
 
-  def __getIndexesGroups__(self, startIndex = 0):
+  def __getIndexesGroups__(self, index = 0):
     #This method returns a list containing the indexes of all the images belonging to classes [starIndex, startIndex + 10]
     indexes = []
     self.searched_classes = self.splits[int(index/10)]
