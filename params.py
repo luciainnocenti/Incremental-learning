@@ -3,7 +3,6 @@ import torch
 from torchvision import transforms
 from torchvision import datasets
 import random
-random.seed(42)
 
 DEVICE = 'cuda' # 'cuda' or 'cpu'
 BATCH_SIZE = 128
@@ -21,6 +20,7 @@ def returnSplits():
 	el = np.linspace(0,99,100)
 	splits  = [None] * 10
 	for i in range(0,10):
+		random.seed(42)
 		n = random.sample(set(el), k=10)
 		splits[i] = n
 		el = list( set(el) - set(n) )
