@@ -30,7 +30,7 @@ def trainfunction(task, train_loader, train_splits):
 	current_step = 0
 	
 	col = np.array(train_splits[int(task/10)]).astype(int)
-	
+	print("train col = ", col)
 	##Train phase
 	for epoch in range(params.NUM_EPOCHS):
 		lenght = 0
@@ -102,6 +102,7 @@ def evaluationTest(task, test_loader, test_splits):
 		#cut_outputs = outputs[..., 0 : task + params.TASK_SIZE]
 		_, preds = torch.max(cut_outputs.data, 1)
 		# Update Corrects
+		print(labels)
 		print(mappedLabels)
 		print(preds)
 		
