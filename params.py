@@ -6,7 +6,7 @@ import random
 
 DEVICE = 'cuda' # 'cuda' or 'cpu'
 BATCH_SIZE = 128
-NUM_WORKERS = 100
+NUM_WORKERS = 4
 TASK_SIZE = 10
 
 NUM_EPOCHS = 60
