@@ -132,6 +132,8 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits):
 		loss = F.binary_cross_entropy_with_logits(outputs,onehot_labels)
 		
 	if( task > 0 ):
+		print("target.shape = ", target.shape)
+		print("col = ", col)
 		target = onehot_labels.clone()
 		target[col] = m(old_outputs[col])
 		loss = F.binary_cross_entropy_with_logits( input=outputs, target=target )
