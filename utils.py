@@ -102,9 +102,6 @@ def evaluationTest(task, test_loader, test_splits):
 		#cut_outputs = outputs[..., 0 : task + params.TASK_SIZE]
 		_, preds = torch.max(cut_outputs.data, 1)
 		# Update Corrects
-		print(labels)
-		print(mappedLabels)
-		print(preds)
 		
 		running_corrects += torch.sum(preds == mappedLabels.data).data.item()
 		print(running_corrects)
@@ -128,13 +125,15 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits):
 		v = np.array(x)
 		col = np.concatenate( (col,v), axis = None)
 	col = np.array(col).astype(int)
-
+	print(col)
 	if( task == 0):
 		loss = F.binary_cross_entropy_with_logits(outputs,onehot_labels)
 		
 	if( task > 0 ):
 		target = onehot_labels.clone()
+		print(target)
 		target[col] = m(old_outputs[col])
+		print(target)
 		loss = F.binary_cross_entropy_with_logits( input=outputs, target=target )
 
 	return loss
