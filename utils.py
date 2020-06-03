@@ -13,11 +13,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def mapFunction(labels, splits):
+	print(labels.dtype)
 	m_l = []
 	l_splits = list(splits)
 	for el in labels:
 		m_l.append( l_splits.index(el) )
-	return m_l
+	return torch.ByteTensor(m_l)
 
 def trainfunction(task, train_loader, train_splits):
 	pars_epoch = [] #clean the pars_epoch after visualizations
