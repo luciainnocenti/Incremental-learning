@@ -20,7 +20,6 @@ def mapFunction(labels, splits):
 	return torch.LongTensor(m_l).to(params.DEVICE)
 
 def trainfunction(task, train_loader, train_splits):
-	pars_epoch = [] #clean the pars_epoch after visualizations
 	print(f'task = {task} ')
 	resNet = torch.load('resNet_task' + str(task) + '.pt')
 	old_resNet = torch.load('resNet_task' + str(task) + '.pt')
@@ -36,14 +35,14 @@ def trainfunction(task, train_loader, train_splits):
 	for epoch in range(params.NUM_EPOCHS):
 		lenght = 0
 		scheduler.step() #update the learning rate
-		#print(scheduler.get_lr(), "   ", scheduler.get_last_lr()) #check if the lr is okay
 		running_corrects = 0
 
 		for images, labels in train_loader:
 			images = images.float().to(params.DEVICE)
 			labels = labels.to(params.DEVICE)
-			
+			print(labels)
 			mappedLabels = mapFunction(labels, col)
+			print(mappedLabels)
 			onehot_labels = torch.eye(100)[labels].to(params.DEVICE)#it creates the one-hot-encoding list for the labels; needed for BCELoss
 			
 			optimizer.zero_grad() # Zero-ing the gradients
@@ -51,17 +50,15 @@ def trainfunction(task, train_loader, train_splits):
 			# Forward pass to the network
 			old_outputs = old_resNet(images)
 			outputs = resNet(images)
-			#classLoss, distLoss = calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits )
 			loss = calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits )
 			
-			#loss = classLoss + distLoss
 			
 			# Get predictions
 			
 			cut_outputs = np.take_along_axis(outputs, col[None, :], axis = 1)
 			
 			_, preds = torch.max(cut_outputs.data, 1)
-			
+			print(preds)
 			# Update Corrects
 			running_corrects += torch.sum(preds == mappedLabels.data).data.item()
 			loss.backward()  # backward pass: computes gradients
@@ -91,19 +88,18 @@ def evaluationTest(task, test_loader, test_splits):
 	for images, labels in test_loader:
 		images = images.float().to(params.DEVICE)
 		labels = labels.to(params.DEVICE)
-		
+		print(labels)
 		mappedLabels = mapFunction(labels, col)
-		
+		print(mappedLabels)
 		onehot_labels = torch.eye(task + params.TASK_SIZE)[mappedLabels].to(params.DEVICE) #it creates the one-hot-encoding list for the labels; neede for BCELoss
 		# Forward Pass
 		outputs = resNet(images)
 		# Get predictions
 		
 		cut_outputs = np.take_along_axis(outputs, col[None, :], axis = 1)
-		#cut_outputs = outputs[..., 0 : task + params.TASK_SIZE]
 		_, preds = torch.max(cut_outputs.data, 1)
 		# Update Corrects
-		
+		print(preds)
 		running_corrects += torch.sum(preds == mappedLabels.data).data.item()
 		print(running_corrects)
 		t_l += len(images)
@@ -131,11 +127,7 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits):
 		loss = F.binary_cross_entropy_with_logits(outputs,onehot_labels)
 		
 	if( task > 0 ):
-		
-		print("col = ", col)
 		target = onehot_labels.clone()
-		print("target.shape = ", target.shape)
 		target[col] = m(old_outputs[col])
-		print("target.shape = ", target.shape)
 		loss = F.binary_cross_entropy_with_logits( input=outputs, target=target )
 	return loss
