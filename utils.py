@@ -14,8 +14,9 @@ import matplotlib.pyplot as plt
 
 def mapFunction(labels, splits):
 	m_l = []
+	l_splits = list(splits)
 	for el in labels:
-		m_l.append( splits.index(el) )
+		m_l.append( l_splits.index(el) )
 	return m_l
 
 def trainfunction(task, train_loader, train_splits):
