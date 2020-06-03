@@ -13,7 +13,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def mapFunction(labels, splits):
-	print(labels.dtype)
 	m_l = []
 	l_splits = list(splits)
 	for el in labels:
