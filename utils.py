@@ -13,10 +13,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def mapFunction(labels, splits):
-	lab = labels.clone()
-	for i, x in enumerate(splits):
-		lab[lab == x] = i
-	return lab
+	m_l = []
+	for el in lab:
+		m_l.append( splits.index(el) )
+	return m_l
 
 def trainfunction(task, train_loader, train_splits):
 	pars_epoch = [] #clean the pars_epoch after visualizations
@@ -130,11 +130,7 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits):
 		loss = F.binary_cross_entropy_with_logits(outputs,onehot_labels)
 		
 	if( task > 0 ):
-		print(col)
 		target = onehot_labels.clone()
-		print(target)
 		target[col] = m(old_outputs[col])
-		print(target)
 		loss = F.binary_cross_entropy_with_logits( input=outputs, target=target )
-
 	return loss
