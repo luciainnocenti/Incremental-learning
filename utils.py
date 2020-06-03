@@ -125,11 +125,12 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits):
 		v = np.array(x)
 		col = np.concatenate( (col,v), axis = None)
 	col = np.array(col).astype(int)
-	print(col)
+	
 	if( task == 0):
 		loss = F.binary_cross_entropy_with_logits(outputs,onehot_labels)
 		
 	if( task > 0 ):
+		print(col)
 		target = onehot_labels.clone()
 		print(target)
 		target[col] = m(old_outputs[col])
