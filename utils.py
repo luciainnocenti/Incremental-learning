@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 
 def mapFunction(labels, splits):
 	m_l = []
-	for el in lab:
+	for el in labels:
 		m_l.append( splits.index(el) )
 	return m_l
 
