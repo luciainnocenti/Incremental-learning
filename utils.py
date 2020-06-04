@@ -53,11 +53,17 @@ def trainfunction(task, train_loader, train_splits):
 			loss = calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits )
 			
 			
-			# Get predictions
+			# Get predictions		
 			
 			cut_outputs = np.take_along_axis(outputs, col[None, :], axis = 1)
-			if( epoch == 12 and task == 10):
+			if( epoch == 10 and task == 10):
+				print("outputs = ", outputs)
 				print("cut outputs= ", cut_outputs)
+				print("old outputs =", old_outputs)	
+			if( epoch == 12 and task == 10):
+				print("outputs = ", outputs)
+				print("cut outputs= ", cut_outputs)
+				print("old outputs =", old_outputs)
 			_, preds = torch.max(cut_outputs.data, 1)
 			#print(preds)
 			
@@ -90,9 +96,7 @@ def evaluationTest(task, test_loader, test_splits):
 	for images, labels in test_loader:
 		images = images.float().to(params.DEVICE)
 		labels = labels.to(params.DEVICE)
-		print(labels)
 		mappedLabels = mapFunction(labels, col)
-		print(mappedLabels)
 		onehot_labels = torch.eye(task + params.TASK_SIZE)[mappedLabels].to(params.DEVICE) #it creates the one-hot-encoding list for the labels; neede for BCELoss
 		# Forward Pass
 		outputs = resNet(images)
@@ -101,9 +105,7 @@ def evaluationTest(task, test_loader, test_splits):
 		cut_outputs = np.take_along_axis(outputs, col[None, :], axis = 1)
 		_, preds = torch.max(cut_outputs.data, 1)
 		# Update Corrects
-		print(preds)
 		running_corrects += torch.sum(preds == mappedLabels.data).data.item()
-		print(running_corrects)
 		t_l += len(images)
 	# Calculate Accuracy
 	accuracy = running_corrects / float(t_l)
