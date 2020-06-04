@@ -15,7 +15,7 @@ WEIGHT_DECAY = 0.00001
 LR = 2
 STEP_SIZE = [20,30,40,50]
 GAMMA = 1/5
-SEED = 42
+SEED = 0
 
 def returnSplits():
 	el = np.linspace(0,99,100)
