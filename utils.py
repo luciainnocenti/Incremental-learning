@@ -29,7 +29,8 @@ def trainfunction(task, train_loader, train_splits):
 	scheduler = optim.lr_scheduler.MultiStepLR(optimizer, params.STEP_SIZE, gamma=params.GAMMA) #allow to change the LR at predefined epochs
 	current_step = 0
 	
-	col = np.array(train_splits[int(task/10)]).astype(int)
+	col = np.array(train_splits[int(task/10)]).astype(int).to(params.DEVICE)
+
 	print("train col = ", col)
 	print("train col = ", col[None, :])
 	##Train phase
@@ -84,7 +85,8 @@ def evaluationTest(task, test_loader, test_splits):
 	for i,x in enumerate( test_splits[ :int(task/10) + 1]):
 		 v = np.array(x)
 		 col = np.concatenate( (col,v), axis = None)
-	col = col.astype(int)	
+	col = col.astype(int).to(params.DEVICE)
+	
 	print(col)
 	for images, labels in test_loader:
 		images = images.float().to(params.DEVICE)
@@ -118,7 +120,7 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits):
 	for i,x in enumerate( train_splits[ :int(task/10) ]):
 		v = np.array(x)
 		col = np.concatenate( (col,v), axis = None)
-	col = np.array(col).astype(int)
+	col = np.array(col).astype(int).to(params.DEVICE)
 	
 	if( task == 0):
 		loss = F.binary_cross_entropy_with_logits(outputs,onehot_labels)
