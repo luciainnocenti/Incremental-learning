@@ -86,7 +86,6 @@ def evaluationTest(task, test_loader, test_splits):
 		 col = np.concatenate( (col,v), axis = None)
 	col = col.astype(int)
 	
-	print(col)
 	for images, labels in test_loader:
 		images = images.float().to(params.DEVICE)
 		labels = labels.to(params.DEVICE)
