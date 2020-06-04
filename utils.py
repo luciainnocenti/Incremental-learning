@@ -31,6 +31,7 @@ def trainfunction(task, train_loader, train_splits):
 	
 	col = np.array(train_splits[int(task/10)]).astype(int)
 	print("train col = ", col)
+	print("train col = ", col[None, :])
 	##Train phase
 	for epoch in range(params.NUM_EPOCHS):
 		lenght = 0
@@ -55,15 +56,7 @@ def trainfunction(task, train_loader, train_splits):
 			
 			# Get predictions		
 			
-			cut_outputs = np.take_along_axis(outputs, col[None, :], axis = 1)
-			if( epoch == 10 and task == 10):
-				print("outputs = ", outputs)
-				print("cut outputs= ", cut_outputs)
-				print("old outputs =", old_outputs)	
-			if( epoch == 12 and task == 10):
-				print("outputs = ", outputs)
-				print("cut outputs= ", cut_outputs)
-				print("old outputs =", old_outputs)
+			cut_outputs = np.take_along_axis(outputs.to(params.DEVICE), col[None, :], axis = 1)
 			_, preds = torch.max(cut_outputs.data, 1)
 			#print(preds)
 			
