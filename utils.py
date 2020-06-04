@@ -56,7 +56,7 @@ def trainfunction(task, train_loader, train_splits):
 			
 			# Get predictions		
 			
-			cut_outputs = np.take_along_axis(outputs.to(params.DEVICE), col[None, :], axis = 1)
+			cut_outputs = np.take_along_axis(outputs.to(params.DEVICE), col[None, :], axis = 1).to(params.DEVICE)
 			_, preds = torch.max(cut_outputs.data, 1)
 			#print(preds)
 			
@@ -95,7 +95,7 @@ def evaluationTest(task, test_loader, test_splits):
 		outputs = resNet(images)
 		# Get predictions
 		
-		cut_outputs = np.take_along_axis(outputs, col[None, :], axis = 1)
+		cut_outputs = np.take_along_axis(outputs.to(params.DEVICE), col[None, :], axis = 1).to(params.DEVICE)
 		_, preds = torch.max(cut_outputs.data, 1)
 		# Update Corrects
 		running_corrects += torch.sum(preds == mappedLabels.data).data.item()
