@@ -29,8 +29,7 @@ def trainfunction(task, train_loader, train_splits):
 	scheduler = optim.lr_scheduler.MultiStepLR(optimizer, params.STEP_SIZE, gamma=params.GAMMA) #allow to change the LR at predefined epochs
 	current_step = 0
 	
-	col = np.array(train_splits[int(task/10)]).astype(int).to(params.DEVICE)
-
+	col = np.array(train_splits[int(task/10)]).astype(int)
 	print("train col = ", col)
 	print("train col = ", col[None, :])
 	##Train phase
@@ -85,7 +84,7 @@ def evaluationTest(task, test_loader, test_splits):
 	for i,x in enumerate( test_splits[ :int(task/10) + 1]):
 		 v = np.array(x)
 		 col = np.concatenate( (col,v), axis = None)
-	col = col.astype(int).to(params.DEVICE)
+	col = col.astype(int)
 	
 	print(col)
 	for images, labels in test_loader:
@@ -96,8 +95,10 @@ def evaluationTest(task, test_loader, test_splits):
 		# Forward Pass
 		outputs = resNet(images)
 		# Get predictions
+		outputs = outputs.to(params.DEVICE)
 		
-		cut_outputs = np.take_along_axis(outputs.to(params.DEVICE), col[None, :], axis = 1).to(params.DEVICE)
+		cut_outputs = np.take_along_axis(outputs, col[None, :], axis = 1)
+		cut_outputs = cut_outputs.to(params.DEVICE)
 		_, preds = torch.max(cut_outputs.data, 1)
 		# Update Corrects
 		running_corrects += torch.sum(preds == mappedLabels.data).data.item()
@@ -120,13 +121,13 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits):
 	for i,x in enumerate( train_splits[ :int(task/10) ]):
 		v = np.array(x)
 		col = np.concatenate( (col,v), axis = None)
-	col = np.array(col).astype(int).to(params.DEVICE)
+	col = np.array(col).astype(int)
 	
 	if( task == 0):
 		loss = F.binary_cross_entropy_with_logits(outputs,onehot_labels)
 		
 	if( task > 0 ):
 		target = onehot_labels.clone().to(params.DEVICE)
-		target[col] = m(old_outputs[col])
+		target[col] = m(old_outputs[col]).to(params.DEVICE)
 		loss = F.binary_cross_entropy_with_logits( input=outputs, target=target )
 	return loss
