@@ -15,7 +15,7 @@ WEIGHT_DECAY = 0.00001
 LR = 2
 STEP_SIZE = [49,63]
 GAMMA = 1/5
-SEED = 100
+SEED = 33
 MOMENTUM = 0.9
 
 def returnSplits():
