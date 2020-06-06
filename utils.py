@@ -81,7 +81,7 @@ def trainfunction(task, train_loader, train_splits, test_loader, test_splits):
 		 v = np.array(x)
 		 colVal = np.concatenate( (colVal,v), axis = None)
 	colVal = colVal.astype(int)
-	
+	t_l = 0
 	for imagesVal, labelsVal in test_loader:
 		imagesVal = imagesVal.float().to(params.DEVICE)
 		labelsVal = labelsVal.to(params.DEVICE)
