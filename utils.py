@@ -25,7 +25,7 @@ def trainfunction(task, train_loader, train_splits):
 	old_resNet = torch.load('resNet_task' + str(task) + '.pt')
 
 	#Define the parameters for traininig:
-	optimizer = torch.optim.SGD(resNet.parameters(), lr=params.LR, weight_decay=params.WEIGHT_DECAY)
+	optimizer = torch.optim.SGD(resNet.parameters(), lr=params.LR, momentum=params.MOMENTUM, weight_decay=params.WEIGHT_DECAY)
 	scheduler = optim.lr_scheduler.MultiStepLR(optimizer, params.STEP_SIZE, gamma=params.GAMMA) #allow to change the LR at predefined epochs
 	current_step = 0
 	
