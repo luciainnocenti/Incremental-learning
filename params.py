@@ -16,6 +16,7 @@ LR = 2
 STEP_SIZE = [49,63]
 GAMMA = 1/5
 SEED = 1
+MOMENTUM = 0.9
 
 def returnSplits():
 	el = np.linspace(0,99,100)
