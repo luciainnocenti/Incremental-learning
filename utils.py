@@ -74,6 +74,7 @@ def trainfunction(task, train_loader, train_splits):
 
 
 def evaluationTest(task, test_loader, test_splits):
+	criterion = torch.nn.BCEWithLogitsLoss()
 	t_l = 0
 	resNet = torch.load('resNet_task' + str(task + 10) + '.pt')
 	resNet.eval() # Set Network to evaluation mode
@@ -110,12 +111,13 @@ def evaluationTest(task, test_loader, test_splits):
 	#Calculate Loss
 	
 	#M1 loss = F.binary_cross_entropy_with_logits(cut_outputs,onehot_labels)
-	loss = nn.BCEWithLogitsLoss(outputs,onehot_labels)
+	loss = criterion(outputs,onehot_labels)
 	print('Validation Loss: {} Validation Accuracy : {}'.format(loss.item(),accuracy) )
 	return(accuracy, loss.item())	  
 
 
 def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits):
+	criterion = torch.nn.BCEWithLogitsLoss()
 	m = nn.Sigmoid()
 	
 	outputs, old_outputs, onehot_labels = outputs.to(params.DEVICE), old_outputs.to(params.DEVICE), onehot_labels.to(params.DEVICE)
@@ -127,10 +129,10 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits):
 	col = np.array(col).astype(int)
 	
 	if( task == 0):
-		loss = nn.BCEWithLogitsLoss(outputs,onehot_labels)
+		loss = criterion(outputs,onehot_labels)
 		
 	if( task > 0 ):
 		target = onehot_labels.clone().to(params.DEVICE)
 		target[:, col] = m(old_outputs[:,col]).to(params.DEVICE)
-		loss = nn.BCEWithLogitsLoss( input=outputs, target=target )
+		loss = criterion( input=outputs, target=target )
 	return loss
