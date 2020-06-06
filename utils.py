@@ -37,7 +37,7 @@ def trainfunction(task, train_loader, train_splits, test_loader, test_splits):
 		lenght = 0
 		scheduler.step() #update the learning rate
 		running_corrects = 0
-
+		resNet.train(True)
 		for images, labels in train_loader:
 			images = images.float().to(params.DEVICE)
 			labels = labels.to(params.DEVICE)
@@ -71,38 +71,40 @@ def trainfunction(task, train_loader, train_splits, test_loader, test_splits):
 		accuracy = running_corrects / float(lenght)
 		print("At step ", str(task), " and at epoch = ", epoch, " the loss is = ", loss.item(), " and accuracy is = ", accuracy)
 
-		resNet.eval() # Set Network to evaluation mode
-		running_correctsVal = 0
+
+	resNet.eval() # Set Network to evaluation mode
+	running_correctsVal = 0
 	
-		colVal = []
-		#in fase di test verifico su tutti le classi viste fino ad ora, quindi prendo da test splits gli indici dei gruppi da 0 a task
-		for i,x in enumerate( test_splits[ :int(task/10) + 1]):
-			 v = np.array(x)
-			 colVal = np.concatenate( (colVal,v), axis = None)
-		colVal = colVal.astype(int)
-		t_l = 0
-		for imagesVal, labelsVal in test_loader:
-			imagesVal = imagesVal.float().to(params.DEVICE)
-			labelsVal = labelsVal.to(params.DEVICE)
-			mappedLabelsVal = mapFunction(labelsVal, colVal)
-			onehot_labelsVal = torch.eye(task + params.TASK_SIZE)[mappedLabelsVal].to(params.DEVICE) #it creates the one-hot-encoding list for the labels; neede for BCELoss
-			# Forward Pass
-			outputsVal = resNet(imagesVal)
-			# Get predictions
-			outputsVal = outputsVal.to(params.DEVICE)
-			
-			cut_outputsVal = np.take_along_axis(outputsVal, colVal[None, :], axis = 1)
-			cut_outputsVal = cut_outputsVal.to(params.DEVICE)
-			_, predsVal = torch.max(cut_outputsVal.data, 1)
-			# Update Corrects
-			running_correctsVal += torch.sum(predsVal == mappedLabelsVal.data).data.item()
-			t_l += len(imagesVal)
-		# Calculate Accuracy
-		accuracyVal = running_correctsVal / float(t_l)
+	colVal = []
+	#in fase di test verifico su tutti le classi viste fino ad ora, quindi prendo da test splits gli indici dei gruppi da 0 a task
+	for i,x in enumerate( test_splits[ :int(task/10) + 1]):
+		 v = np.array(x)
+		 colVal = np.concatenate( (colVal,v), axis = None)
+	colVal = colVal.astype(int)
 	
+	for imagesVal, labelsVal in test_loader:
+		imagesVal = imagesVal.float().to(params.DEVICE)
+		labelsVal = labelsVal.to(params.DEVICE)
+		mappedLabelsVal = mapFunction(labelsVal, colVal)
+		onehot_labelsVal = torch.eye(task + params.TASK_SIZE)[mappedLabelsVal].to(params.DEVICE) #it creates the one-hot-encoding list for the labels; neede for BCELoss
+		# Forward Pass
+		outputsVal = resNet(imagesVal)
+		# Get predictions
+		outputsVal = outputsVal.to(params.DEVICE)
+		
+		cut_outputsVal = np.take_along_axis(outputsVal, colVal[None, :], axis = 1)
+		cut_outputsVal = cut_outputsVal.to(params.DEVICE)
+		_, predsVal = torch.max(cut_outputsVal.data, 1)
+		# Update Corrects
+		running_correctsVal += torch.sum(predsVal == mappedLabelsVal.data).data.item()
+		t_l += len(imagesVal)
+	# Calculate Accuracy
+	accuracyVal = running_correctsVal / float(t_l)
 	#Calculate Loss
 	lossVal = F.binary_cross_entropy_with_logits(cut_outputsVal,onehot_labelsVal)
+
 	print('Validation Loss: {} Validation Accuracy : {}'.format(lossVal.item(),accuracyVal) )
+	resNet.train(True)
 	torch.save(resNet, 'resNet_task{0}.pt'.format(task + 10))  
 
 
