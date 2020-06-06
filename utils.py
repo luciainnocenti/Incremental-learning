@@ -90,7 +90,8 @@ def evaluationTest(task, test_loader, test_splits):
 		images = images.float().to(params.DEVICE)
 		labels = labels.to(params.DEVICE)
 		mappedLabels = mapFunction(labels, col)
-		onehot_labels = torch.eye(task + params.TASK_SIZE)[mappedLabels].to(params.DEVICE) #it creates the one-hot-encoding list for the labels; neede for BCELoss
+		#M1 onehot_labels = torch.eye(task + params.TASK_SIZE)[mappedLabels].to(params.DEVICE) #it creates the one-hot-encoding list for the labels; neede for BCELoss
+		onehot_labels = torch.eye(task + params.TASK_SIZE)[labels].to(params.DEVICE)
 		# Forward Pass
 		outputs = resNet(images)
 		# Get predictions
@@ -101,12 +102,15 @@ def evaluationTest(task, test_loader, test_splits):
 		_, preds = torch.max(cut_outputs.data, 1)
 		# Update Corrects
 		running_corrects += torch.sum(preds == mappedLabels.data).data.item()
+		print(len(images))
 		t_l += len(images)
 	# Calculate Accuracy
 	accuracy = running_corrects / float(t_l)
 	
 	#Calculate Loss
-	loss = F.binary_cross_entropy_with_logits(cut_outputs,onehot_labels)
+	
+	#M1 loss = F.binary_cross_entropy_with_logits(cut_outputs,onehot_labels)
+	loss = F.binary_cross_entropy_with_logits(outputs,onehot_labels)
 	print('Validation Loss: {} Validation Accuracy : {}'.format(loss.item(),accuracy) )
 	return(accuracy, loss.item())	  
 
