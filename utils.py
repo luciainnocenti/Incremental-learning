@@ -12,14 +12,15 @@ from torch.nn import functional as F
 import numpy as np
 import matplotlib.pyplot as plt
 
-def mapFunction(labels, splits):
+def mapFunction(labels, splits, t = None):
 	m_l = []
 	l_splits = list(splits)
 	for el in labels:
 		m_l.append( l_splits.index(el) )
-	print(splits)
-	print(l_splits)
-	print(set(labels.data))
+	if( t == 3):
+		print(splits)
+		print(l_splits)
+		print(set(labels.data))
 	return torch.LongTensor(m_l).to(params.DEVICE)
 
 def trainfunction(task, train_loader, train_splits):
@@ -93,7 +94,7 @@ def evaluationTest(task, test_loader, test_splits):
 	for images, labels in test_loader:
 		images = images.float().to(params.DEVICE)
 		labels = labels.to(params.DEVICE)
-		mappedLabels = mapFunction(labels, col)
+		mappedLabels = mapFunction(labels, col, t = 3)
 		#M1 onehot_labels = torch.eye(task + params.TASK_SIZE)[mappedLabels].to(params.DEVICE) #it creates the one-hot-encoding list for the labels; neede for BCELoss
 		onehot_labels = torch.eye(100)[labels].to(params.DEVICE)
 		# Forward Pass
