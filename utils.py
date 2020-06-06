@@ -1,3 +1,4 @@
+
 from DatasetCIFAR.data_set import Dataset 
 from DatasetCIFAR import ResNet
 from DatasetCIFAR import params
@@ -19,7 +20,7 @@ def mapFunction(labels, splits):
 		m_l.append( l_splits.index(el) )
 	return torch.LongTensor(m_l).to(params.DEVICE)
 
-def trainfunction(task, train_loader, train_splits, test_loader, test_splits):
+def trainfunction(task, train_loader, train_splits):
 	print(f'task = {task} ')
 	resNet = torch.load('resNet_task' + str(task) + '.pt')
 	old_resNet = torch.load('resNet_task' + str(task) + '.pt')
@@ -37,7 +38,7 @@ def trainfunction(task, train_loader, train_splits, test_loader, test_splits):
 		lenght = 0
 		scheduler.step() #update the learning rate
 		running_corrects = 0
-		resNet.train(True)
+
 		for images, labels in train_loader:
 			images = images.float().to(params.DEVICE)
 			labels = labels.to(params.DEVICE)
@@ -70,42 +71,49 @@ def trainfunction(task, train_loader, train_splits, test_loader, test_splits):
 		# Calculate Accuracy
 		accuracy = running_corrects / float(lenght)
 		print("At step ", str(task), " and at epoch = ", epoch, " the loss is = ", loss.item(), " and accuracy is = ", accuracy)
+	torch.save(resNet, 'resNet_task{0}.pt'.format(task + 10))
 
 
+def evaluationTest(task, test_loader, test_splits):
+	t_l = 0
+	resNet = torch.load('resNet_task' + str(task + 10) + '.pt')
 	resNet.eval() # Set Network to evaluation mode
-	running_correctsVal = 0
+	running_corrects = 0
 	
-	colVal = []
+	col = []
 	#in fase di test verifico su tutti le classi viste fino ad ora, quindi prendo da test splits gli indici dei gruppi da 0 a task
 	for i,x in enumerate( test_splits[ :int(task/10) + 1]):
 		 v = np.array(x)
-		 colVal = np.concatenate( (colVal,v), axis = None)
-	colVal = colVal.astype(int)
-	t_l = 0
-	for imagesVal, labelsVal in test_loader:
-		imagesVal = imagesVal.float().to(params.DEVICE)
-		labelsVal = labelsVal.to(params.DEVICE)
-		mappedLabelsVal = mapFunction(labelsVal, colVal)
-		onehot_labelsVal = torch.eye(task + params.TASK_SIZE)[mappedLabelsVal].to(params.DEVICE) #it creates the one-hot-encoding list for the labels; neede for BCELoss
+		 col = np.concatenate( (col,v), axis = None)
+	col = col.astype(int)
+	
+	for images, labels in test_loader:
+		images = images.float().to(params.DEVICE)
+		labels = labels.to(params.DEVICE)
+		mappedLabels = mapFunction(labels, col)
+		#M1 onehot_labels = torch.eye(task + params.TASK_SIZE)[mappedLabels].to(params.DEVICE) #it creates the one-hot-encoding list for the labels; neede for BCELoss
+		onehot_labels = torch.eye(100)[labels].to(params.DEVICE)
 		# Forward Pass
-		outputsVal = resNet(imagesVal)
+		outputs = resNet(images)
 		# Get predictions
-		outputsVal = outputsVal.to(params.DEVICE)
+		outputs = outputs.to(params.DEVICE)
 		
-		cut_outputsVal = np.take_along_axis(outputsVal, colVal[None, :], axis = 1)
-		cut_outputsVal = cut_outputsVal.to(params.DEVICE)
-		_, predsVal = torch.max(cut_outputsVal.data, 1)
+		cut_outputs = np.take_along_axis(outputs, col[None, :], axis = 1)
+		cut_outputs = cut_outputs.to(params.DEVICE)
+		_, preds = torch.max(cut_outputs.data, 1)
 		# Update Corrects
-		running_correctsVal += torch.sum(predsVal == mappedLabelsVal.data).data.item()
-		t_l += len(imagesVal)
+		running_corrects += torch.sum(preds == mappedLabels.data).data.item()
+		print(len(images))
+		t_l += len(images)
 	# Calculate Accuracy
-	accuracyVal = running_correctsVal / float(t_l)
+	accuracy = running_corrects / float(t_l)
+	
 	#Calculate Loss
-	lossVal = F.binary_cross_entropy_with_logits(cut_outputsVal,onehot_labelsVal)
-
-	print('Validation Loss: {} Validation Accuracy : {}'.format(lossVal.item(),accuracyVal) )
-	resNet.train(True)
-	torch.save(resNet, 'resNet_task{0}.pt'.format(task + 10))  
+	
+	#M1 loss = F.binary_cross_entropy_with_logits(cut_outputs,onehot_labels)
+	loss = F.binary_cross_entropy_with_logits(outputs,onehot_labels)
+	print('Validation Loss: {} Validation Accuracy : {}'.format(loss.item(),accuracy) )
+	return(accuracy, loss.item())	  
 
 
 def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits):
