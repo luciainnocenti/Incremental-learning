@@ -91,7 +91,7 @@ def evaluationTest(task, test_loader, test_splits):
 		labels = labels.to(params.DEVICE)
 		mappedLabels = mapFunction(labels, col)
 		#M1 onehot_labels = torch.eye(task + params.TASK_SIZE)[mappedLabels].to(params.DEVICE) #it creates the one-hot-encoding list for the labels; neede for BCELoss
-		onehot_labels = torch.eye(task + params.TASK_SIZE)[labels].to(params.DEVICE)
+		onehot_labels = torch.eye(100)[labels].to(params.DEVICE)
 		# Forward Pass
 		outputs = resNet(images)
 		# Get predictions
