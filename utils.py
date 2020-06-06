@@ -19,7 +19,7 @@ def mapFunction(labels, splits):
 		m_l.append( l_splits.index(el) )
 	print(splits)
 	print(l_splits)
-	print(set(labels))
+	print(set(labels.data))
 	return torch.LongTensor(m_l).to(params.DEVICE)
 
 def trainfunction(task, train_loader, train_splits):
