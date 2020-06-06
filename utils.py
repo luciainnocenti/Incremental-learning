@@ -21,8 +21,8 @@ def mapFunction(labels, splits):
 
 def trainfunction(task, train_loader, train_splits):
 	print(f'task = {task} ')
-	resNet = torch.load('resNet_task' + str(task) + '.pt')
-	old_resNet = torch.load('resNet_task' + str(task) + '.pt')
+	resNet = torch.load('resNet_task' + str(task) + '.pt').train(True)
+	old_resNet = torch.load('resNet_task' + str(task) + '.pt').train(False)
 
 	#Define the parameters for traininig:
 	optimizer = torch.optim.SGD(resNet.parameters(), lr=params.LR, momentum=params.MOMENTUM, weight_decay=params.WEIGHT_DECAY)
@@ -76,8 +76,7 @@ def trainfunction(task, train_loader, train_splits):
 def evaluationTest(task, test_loader, test_splits):
 	criterion = torch.nn.BCEWithLogitsLoss()
 	t_l = 0
-	resNet = torch.load('resNet_task' + str(task + 10) + '.pt')
-	resNet.eval() # Set Network to evaluation mode
+	resNet = torch.load('resNet_task' + str(task + 10) + '.pt').eval()# Set Network to evaluation mode
 	running_corrects = 0
 	
 	col = []
