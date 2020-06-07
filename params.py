@@ -1,3 +1,4 @@
+import pandas as pd
 import numpy as np
 import torch
 from torchvision import transforms
@@ -18,12 +19,22 @@ GAMMA = 1/5
 SEED = 12
 MOMENTUM = 0.9
 
+#def returnSplits():
+#	el = np.linspace(0,99,100)
+#	splits  = [None] * 10
+#	for i in range(0,10):
+#		random.seed(SEED)
+#		n = random.sample(set(el), k=10)
+#		splits[i] = n
+#		el = list( set(el) - set(n) )
+#	return splits 
+
 def returnSplits():
-	el = np.linspace(0,99,100)
-	splits  = [None] * 10
-	for i in range(0,10):
-		random.seed(SEED)
-		n = random.sample(set(el), k=10)
-		splits[i] = n
-		el = list( set(el) - set(n) )
-	return splits 
+	url = 'https://raw.githubusercontent.com/fcdl94/ICL/master/data/cifar_order.csv'
+	data = pd.read_csv(url, header=None)
+
+	splits = [None]*10
+	classi = list(data.loc[0])
+	for i in range(0,100,10):
+	  splits[ int(i/10)] = classi[i:i+10]
+	return splits
