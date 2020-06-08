@@ -19,7 +19,7 @@ GAMMA = 1/5
 SEED = 653 # 12
 MOMENTUM = 0.9
 
-def returnSplits():
+def returnSplits_v2():
 	el = np.linspace(0,99,100)
 	splits  = [None] * 10
 	for i in range(0,10):
@@ -29,12 +29,12 @@ def returnSplits():
 		el = list( set(el) - set(n) )
 	return splits 
 
-def returnSplits_V2():
+def returnSplits():
 	url = 'https://raw.githubusercontent.com/fcdl94/ICL/master/data/cifar_order.csv'
 	data = pd.read_csv(url, header=None)
 
 	splits = [None]*10
-	classi = list(data.loc[5])
+	classi = list(data.loc[1])
 	for i in range(0,100,10):
 	  splits[ int(i/10)] = classi[i:i+10]
 	return splits
