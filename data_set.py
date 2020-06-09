@@ -33,7 +33,7 @@ class Dataset(CIFAR100):
 
 	def __init__(self, root = 'Dataset', classes=range(10), train=True, transform=None, target_transform=None, download=True):
 		
-		super(Cifar100, self).__init__(root, train=train, transform=transform, target_transform=target_transform, download=download)
+		super(Dataset, self).__init__(root, train=train, transform=transform, target_transform=target_transform, download=download)
 
 		# Select subset of classes
 		
