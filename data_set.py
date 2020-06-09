@@ -11,6 +11,9 @@ import numpy as np
 import torch
 from torchvision import transforms
 from torchvision import datasets
+from DatasetCIFAR import params
+import random
+random.seed(42)
 
 class Dataset(torch.utils.data.Dataset):
   '''
@@ -41,11 +44,12 @@ class Dataset(torch.utils.data.Dataset):
     self._dataset = datasets.cifar.CIFAR100( 'data', train=train, download=True, transform= transform, target_transform = target_transform )
     self._targets = np.array(self._dataset.targets) #Essendo CIFAR100 una sottoclasse di CIFAR10, qui fa riferimento a quell'implementazione.
     self._data = np.array(self._dataset.data)
+    self.splits = params.returnSplits()
 
-  def __getIndexesGroups__(self, startIndex = 0):
+  def __getIndexesGroups__(self, index = 0):
     #This method returns a list containing the indexes of all the images belonging to classes [starIndex, startIndex + 10]
     indexes = []
-    self.searched_classes = np.linspace(startIndex, startIndex + 9, 10)
+    self.searched_classes = self.splits[int(index/10)]
     i = 0
     for el in self._targets:
       if (el in self.searched_classes):
