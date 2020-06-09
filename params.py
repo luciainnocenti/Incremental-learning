@@ -34,7 +34,7 @@ def returnSplits():
 	data = pd.read_csv(url, header=None)
 
 	splits = [None]*10
-	classi = list(data.loc[2])
+	classi = list(data.loc[3])
 	for i in range(0,100,10):
 	  splits[ int(i/10)] = classi[i:i+10]
 	return splits
