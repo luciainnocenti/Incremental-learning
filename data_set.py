@@ -12,18 +12,17 @@ class Dataset(CIFAR100):
 	'''
 	The class Dataset define methods and attributes to manage a CIFAR100 dataset
 	Attributes:
-	    train = Bool, default value = True
-	    Transform
-	    Target_Transform
+		train = Bool, default value = True
+		Transform
+		Target_Transform
 
-	    _dataset = contains the pythorch dataset CIFAR100 defined by hyperparameters passes by input
-	    _targets = contains a lisf of 60000 elements, and each one referred to an image of the dataset. The value of each element is an integer in [0,99] that explicit the label for that image
-	                E.g. _targets[100] get the label of the 100th image in the dataset
-	    _data = contains a list of 60000 imagest, each one represented by a [32]x[32]x[3] vector that define pixels 
-	    _labelNames = contains a list of 100 elements, each one represent a class; it maps integer indexes to human readable labels
-	    
+		_dataset = contains the pythorch dataset CIFAR100 defined by hyperparameters passes by input
+		_targets = contains a lisf of 60000 elements, and each one referred to an image of the dataset. The value of each element is an integer in [0,99] that explicit the label for that image
+		            E.g. _targets[100] get the label of the 100th image in the dataset
+		_data = contains a list of 60000 imagest, each one represented by a [32]x[32]x[3] vector that define pixels 
+		_labelNames = contains a list of 100 elements, each one represent a class; it maps integer indexes to human readable labels
 	'''
-  	def __getClassesNames__(self):
+	def __getClassesNames__(self):
 		#This method returns a list mapping the 100 classes into a human readable label. E.g. names[0] is the label that maps the class 0
 		names = []
 		classi = list(self._dataset.class_to_idx.keys())
@@ -69,4 +68,4 @@ class Dataset(CIFAR100):
 		return image, label
 
 	def __len__(self):
-	 	return len(self._targets)
+		return len(self._targets)
