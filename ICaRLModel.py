@@ -58,14 +58,11 @@ class ICaRLStruct (nn.Module):
       features.append(feature[0]) 
     features = np.array(features)
     mu = np.mean(features, axis=0)
-    print(mu)
     phiExemplaresY = []
     exemplaresY = []
     for k in range(0,m): #k parte da 0: ricorda di sommare 1 per media
       phiX = features #le features di tutte le immagini della classe Y
       phiP = np.sum(phiExemplaresY, axis = 0) #ad ogni step K, ho già collezionato K-1 examplars
-      
-      pK = np.argmin( np.sqrt( mu))
       mu1 = 1/(k+1)* ( phiX + phiP)
       idxEx = np.argmin(np.sqrt(np.sum((mu - mu1) ** 2, axis=1))) #execute the euclidean norm among all the rows in phiX
 
@@ -77,19 +74,16 @@ class ICaRLStruct (nn.Module):
 
   def reduceExemplars(self, m):
     for i in range(0, len(self.exemplars)):
-      print('i: ', i)
       if(self.exemplars[i] is not None):
         self.exemplars[i] = np.array(self.exemplars[i])[:m]
 
 
   def updateRep(self, task, trainDataSet, splits, transformer):
     #torch.cuda.empty_cache()
-    
     '''
     trainDataSet is the subset obtained by extracting all the data having as label those contained into train splits
     '''
     D = Dataset(transform=transformer)
-
     print(f'task = {task} ')
     #Define the parameters for traininig:
     optimizer = torch.optim.SGD(self.parameters(), lr=params.LR, momentum=params.MOMENTUM, weight_decay=params.WEIGHT_DECAY)
@@ -105,7 +99,6 @@ class ICaRLStruct (nn.Module):
           D.append(exImages, exLabels)
 
     loader = DataLoader( D, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE, shuffle = True)
-    print('I\'m here')
     #Now D contains both images and examplers for classes in analysis
     old_outputs = torch.zeros( len(D), 100).to(params.DEVICE)
     #torch.cuda.empty_cache()
@@ -116,7 +109,6 @@ class ICaRLStruct (nn.Module):
         old_outputs[idx,:] = self.forward(img)
 
     col = np.array(splits[int(task/10)]).astype(int)
-    print(col)
     for epoch in range(params.NUM_EPOCHS):
       for images, labels, idx in loader:
         images = images.float().to(params.DEVICE)
