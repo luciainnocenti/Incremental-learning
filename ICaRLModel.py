@@ -6,6 +6,7 @@ import numpy as np
 from torch.autograd import Variable
 from PIL import Image
 from DatasetCIFAR import params
+from DatasetCIFAR import utils
 from DatasetCIFAR import ResNet
 from DatasetCIFAR import data_set
 from DatasetCIFAR.data_set import Dataset 
