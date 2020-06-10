@@ -104,8 +104,9 @@ class ICaRLStruct (nn.Module):
 
     #Now D contains both images and examplers for classes in analysis
     old_output = torch.zeros( len(D), 100).to(params.DEVICE)
+    
     for img, lbl, idx in loader:
-      img = img.to(params.DEVICE)
+      img = img.float().to(params.DEVICE)
       idx = idx.to(params.DEVICE)
       old_output[idx,:] = self.forward(img)
 
