@@ -89,6 +89,8 @@ class ICaRLStruct (nn.Module):
     current_step = 0
 
     for y in splits:
+      print('y = ' , y)
+      print('len ex = ', len(self.exemplars))
       if(self.exemplars[y] is not None):
         length = len(self.exemplars[y])
         exLabels = [y]*lenght #dovrebbe crearmi un vettore di dimensione lenght tutto composto da y ovvero la classe
