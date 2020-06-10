@@ -10,6 +10,7 @@ from DatasetCIFAR import utils
 from DatasetCIFAR import ResNet
 from DatasetCIFAR import data_set
 from DatasetCIFAR.data_set import Dataset 
+from torchvision import transforms
 from torch.utils.data import Subset, DataLoader
 
 class ICaRLStruct (nn.Module):
