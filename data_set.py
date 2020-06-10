@@ -61,7 +61,7 @@ class Dataset(torch.utils.data.Dataset):
     #Given an index, this method return the image and the class corresponding to that index
     image = np.transpose(self._data[idx])
     label = self._targets[idx]
-    return image, label
+    return image, label, idx
 
   def __len__(self):
     return len(self._targets)
