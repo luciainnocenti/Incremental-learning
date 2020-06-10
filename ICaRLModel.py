@@ -106,7 +106,7 @@ class ICaRLStruct (nn.Module):
     for img, lbl, idx in loader:
       img = img.to(params.DEVICE)
       idx = idx.to(params.DEVICE)
-      old_output[idx,:] = old_resNet(img)
+      old_output[idx,:] = self.forward(img)
 
     col = np.array(splits[int(task/10)]).astype(int)
 
@@ -121,5 +121,6 @@ class ICaRLStruct (nn.Module):
 
         output = self.forward(images)
         loss = utils.calculateLoss(outputs, old_outputs[idx,:], onehot_labels, task, splits )
+        print('epoch = ', epoch, ' loss = ', loss.item()) 
         loss.backward()  # backward pass: computes gradients
         optimizer.step() 
