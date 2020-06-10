@@ -75,11 +75,11 @@ class ICaRLStruct (nn.Module):
       self.exemplar[i] = np.array(self.exemplar[i])[:m]
 
 
-  def updateRep(self, task, trainDataSet, splits):
+  def updateRep(self, task, trainDataSet, splits, transformer):
     '''
     trainDataSet is the subset obtained by extracting all the data having as label those contained into train splits
     '''
-    D = Dataset(transform=trainDataSet.transform)
+    D = Dataset(transform=transformer)
 
     print(f'task = {task} ')
     #Define the parameters for traininig:
