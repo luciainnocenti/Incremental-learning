@@ -66,8 +66,54 @@ class ICaRLStruct (nn.Module):
 
       exemplaresY.append(images[idxEx])
       phiExemplaresY.append(features[idxEx])
-    
-    '''
-    Put into the exemplar array, at position related to the Y class, the elements obtained during this task
-    '''
+    #Put into the exemplar array, at position related to the Y class, the elements obtained during this task
     self.exemplar[idxY] = np.array(exemplaresY)
+
+
+  def reduceExemplars(self, m):
+    for i in range(0, len(self.exemplar)):
+      self.exemplar[i] = np.array(self.exemplar[i])[:m]
+
+
+  def updateRep(self, task, trainDataSet, splits):
+    '''
+    trainDataSet is the subset obtained by extracting all the data having as label those contained into train splits
+    '''
+    D = Dataset(transform=trainDataSet.transform)
+
+    print(f'task = {task} ')
+    #Define the parameters for traininig:
+    optimizer = torch.optim.SGD(resNet.parameters(), lr=params.LR, momentum=params.MOMENTUM, weight_decay=params.WEIGHT_DECAY)
+    scheduler = optim.lr_scheduler.MultiStepLR(optimizer, params.STEP_SIZE, gamma=params.GAMMA) #allow to change the LR at predefined epochs
+    current_step = 0
+
+    for y in splits:
+      length = len(self.exemplars[y])
+      exLabels = [y]*lenght #dovrebbe crearmi un vettore di dimensione lenght tutto composto da y ovvero la classe
+      exImages = self.exemplars[y]
+      D.append(exImages, exLabels)
+
+    loader = DataLoader( D, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE, shuffle = True)
+
+    #Now D contains both images and examplers for classes in analysis
+    old_output = torch.zeros( len(D), 100).to(params.DEVICE)
+    for img, lbl, idx in loader:
+      img = img.to(params.DEVICE)
+      idx = idx.to(params.DEVICE)
+      old_output[idx,:] = old_resNet(img)
+
+    col = np.array(splits[int(task/10)]).astype(int)
+
+    for epoch in range(params.NUM_EPOCHS):
+      for images, labels, idx in loader:
+        images = images.float().to(params.DEVICE)
+        labels = labels.to(params.DEVICE)
+
+        onehot_labels = torch.eye(100)[labels].to(params.DEVICE)
+
+        optimizer.zero_grad()
+
+        output = self.forward(images)
+        loss = utils.calculateLoss(outputs, old_outputs[idx,:], onehot_labels, task, splits )
+        loss.backward()  # backward pass: computes gradients
+        optimizer.step() 
