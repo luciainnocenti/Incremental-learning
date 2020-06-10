@@ -27,6 +27,7 @@ class ICaRLStruct (nn.Module):
     #ogni lista avrà dimentsione M (variante di task in task dunque)
     #Così per ottenere la lista di exemplar in analisi ogni volta posso usare col come con LWF
     self.means = {}
+    self.cuda()
 
   def forward(self, x):
     x = self.features_extractor(x)
