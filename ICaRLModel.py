@@ -106,11 +106,12 @@ class ICaRLStruct (nn.Module):
 
     #Now D contains both images and examplers for classes in analysis
     old_output = torch.zeros( len(D), 100).to(params.DEVICE)
-    
-    for img, lbl, idx in loader:
-      img = img.float().to(params.DEVICE)
-      idx = idx.to(params.DEVICE)
-      old_output[idx,:] = self.forward(img)
+    torch.cuda.empty_cache()
+    with torch.no_grad():
+      for img, lbl, idx in loader:
+        img = img.float().to(params.DEVICE)
+        idx = idx.to(params.DEVICE)
+        old_output[idx,:] = self.forward(img)
 
     col = np.array(splits[int(task/10)]).astype(int)
 
