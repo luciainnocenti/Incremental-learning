@@ -126,4 +126,6 @@ class ICaRLStruct (nn.Module):
         outputs = self.forward(images)
         loss = utils.calculateLoss(outputs, old_outputs[idx,:], onehot_labels, task, splits )
         loss.backward()  # backward pass: computes gradients
-        optimizer.step() 
+        optimizer.step()
+      print('Task: ' , task, ' epoch: ', epoch, ' loss: ', loss.item())
+      
