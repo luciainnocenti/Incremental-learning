@@ -103,7 +103,7 @@ class ICaRLStruct (nn.Module):
           D.append(exImages, exLabels)
 
     loader = DataLoader( D, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE, shuffle = True)
-
+    print('I\'m here')
     #Now D contains both images and examplers for classes in analysis
     old_outputs = torch.zeros( len(D), 100).to(params.DEVICE)
     #torch.cuda.empty_cache()
@@ -114,7 +114,7 @@ class ICaRLStruct (nn.Module):
         old_outputs[idx,:] = self.forward(img)
 
     col = np.array(splits[int(task/10)]).astype(int)
-
+    print(col)
     for epoch in range(params.NUM_EPOCHS):
       for images, labels, idx in loader:
         images = images.float().to(params.DEVICE)
