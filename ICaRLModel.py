@@ -106,13 +106,13 @@ class ICaRLStruct (nn.Module):
     loader = DataLoader( D, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE, shuffle = True)
 
     #Now D contains both images and examplers for classes in analysis
-    old_output = torch.zeros( len(D), 100).to(params.DEVICE)
+    old_outputs = torch.zeros( len(D), 100).to(params.DEVICE)
     torch.cuda.empty_cache()
     with torch.no_grad():
       for img, lbl, idx in loader:
         img = img.float().to(params.DEVICE)
         idx = idx.to(params.DEVICE)
-        old_output[idx,:] = self.forward(img)
+        old_outputs[idx,:] = self.forward(img)
 
     col = np.array(splits[int(task/10)]).astype(int)
 
@@ -125,7 +125,7 @@ class ICaRLStruct (nn.Module):
 
         optimizer.zero_grad()
 
-        output = self.forward(images)
+        outputs = self.forward(images)
         loss = utils.calculateLoss(outputs, old_outputs[idx,:], onehot_labels, task, splits )
         print('epoch = ', epoch, ' loss = ', loss.item()) 
         loss.backward()  # backward pass: computes gradients
