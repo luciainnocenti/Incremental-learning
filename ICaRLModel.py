@@ -2,13 +2,14 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from torch.autograd import Variable
 import numpy as np
+from torch.autograd import Variable
 from PIL import Image
 from DatasetCIFAR import params
 from DatasetCIFAR import ResNet
 from DatasetCIFAR import data_set
 from DatasetCIFAR.data_set import Dataset 
+from torch.utils.data import Subset, DataLoader
 
 class ICaRLStruct (nn.Module):
   def __init__(self, n_classes = 100, dataset = None):
