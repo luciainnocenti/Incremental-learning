@@ -79,7 +79,7 @@ class ICaRLStruct (nn.Module):
 
 
   def updateRep(self, task, trainDataSet, splits, transformer):
-    Torch.cuda.empty_cache()
+    torch.cuda.empty_cache()
     
     '''
     trainDataSet is the subset obtained by extracting all the data having as label those contained into train splits
