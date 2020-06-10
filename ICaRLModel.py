@@ -58,6 +58,7 @@ class ICaRLStruct (nn.Module):
       features.append(feature[0]) 
     features = np.array(features)
     mu = np.mean(features, axis=0)
+    print(mu)
     phiExemplaresY = []
     exemplaresY = []
     for k in range(0,m): #k parte da 0: ricorda di sommare 1 per media
@@ -76,6 +77,7 @@ class ICaRLStruct (nn.Module):
 
   def reduceExemplars(self, m):
     for i in range(0, len(self.exemplars)):
+      print('i: ', i)
       if(self.exemplars[i] is not None):
         self.exemplars[i] = np.array(self.exemplars[i])[:m]
 
