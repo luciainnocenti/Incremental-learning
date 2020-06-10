@@ -72,7 +72,8 @@ class ICaRLStruct (nn.Module):
 
   def reduceExemplars(self, m):
     for i in range(0, len(self.exemplars)):
-      self.exemplars[i] = np.array(self.exemplars[i])[:m]
+      if(self.exemplars[i] is not None):
+        self.exemplars[i] = np.array(self.exemplars[i])[:m]
 
 
   def updateRep(self, task, trainDataSet, splits, transformer):
