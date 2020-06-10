@@ -94,8 +94,6 @@ class ICaRLStruct (nn.Module):
     current_step = 0
     with torch.no_grad():
       for y in splits:
-        print('y = ' , int(y))
-        print('len ex = ', len(self.exemplars))
         y = int(y)
         if(self.exemplars[y] is not None):
           length = len(self.exemplars[y])
