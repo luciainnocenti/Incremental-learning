@@ -79,6 +79,8 @@ class ICaRLStruct (nn.Module):
 
 
   def updateRep(self, task, trainDataSet, splits, transformer):
+    Torch.cuda.empty_cache()
+    
     '''
     trainDataSet is the subset obtained by extracting all the data having as label those contained into train splits
     '''
@@ -89,16 +91,16 @@ class ICaRLStruct (nn.Module):
     optimizer = torch.optim.SGD(self.parameters(), lr=params.LR, momentum=params.MOMENTUM, weight_decay=params.WEIGHT_DECAY)
     scheduler = optim.lr_scheduler.MultiStepLR(optimizer, params.STEP_SIZE, gamma=params.GAMMA) #allow to change the LR at predefined epochs
     current_step = 0
-
-    for y in splits:
-      print('y = ' , int(y))
-      print('len ex = ', len(self.exemplars))
-      y = int(y)
-      if(self.exemplars[y] is not None):
-        length = len(self.exemplars[y])
-        exLabels = [y]*lenght #dovrebbe crearmi un vettore di dimensione lenght tutto composto da y ovvero la classe
-        exImages = self.exemplars[y]
-        D.append(exImages, exLabels)
+    with torch.no_grad():
+      for y in splits:
+        print('y = ' , int(y))
+        print('len ex = ', len(self.exemplars))
+        y = int(y)
+        if(self.exemplars[y] is not None):
+          length = len(self.exemplars[y])
+          exLabels = [y]*lenght #dovrebbe crearmi un vettore di dimensione lenght tutto composto da y ovvero la classe
+          exImages = self.exemplars[y]
+          D.append(exImages, exLabels)
 
     loader = DataLoader( D, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE, shuffle = True)
 
