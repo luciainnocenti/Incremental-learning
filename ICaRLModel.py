@@ -83,7 +83,7 @@ class ICaRLStruct (nn.Module):
 
     print(f'task = {task} ')
     #Define the parameters for traininig:
-    optimizer = torch.optim.SGD(resNet.parameters(), lr=params.LR, momentum=params.MOMENTUM, weight_decay=params.WEIGHT_DECAY)
+    optimizer = torch.optim.SGD(self.parameters(), lr=params.LR, momentum=params.MOMENTUM, weight_decay=params.WEIGHT_DECAY)
     scheduler = optim.lr_scheduler.MultiStepLR(optimizer, params.STEP_SIZE, gamma=params.GAMMA) #allow to change the LR at predefined epochs
     current_step = 0
 
