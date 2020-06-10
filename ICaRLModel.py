@@ -17,7 +17,7 @@ class ICaRLStruct (nn.Module):
     self.classifier = nn.Linear(self.features_extractor.fc.out_features, n_classes)
 
     self.k = 2000
-    self.exemplar = [None]*n_classes #lista di vettori; ha 100 elementi, ognuno di dimensione m che contiene gli m examplars
+    self.exemplars = [None]*n_classes #lista di vettori; ha 100 elementi, ognuno di dimensione m che contiene gli m examplars
     self.m = 0
     self.dataset = dataset
     self.exemplar_means = None
@@ -67,12 +67,12 @@ class ICaRLStruct (nn.Module):
       exemplaresY.append(images[idxEx])
       phiExemplaresY.append(features[idxEx])
     #Put into the exemplar array, at position related to the Y class, the elements obtained during this task
-    self.exemplar[idxY] = np.array(exemplaresY)
+    self.exemplars[idxY] = np.array(exemplaresY)
 
 
   def reduceExemplars(self, m):
-    for i in range(0, len(self.exemplar)):
-      self.exemplar[i] = np.array(self.exemplar[i])[:m]
+    for i in range(0, len(self.exemplars)):
+      self.exemplars[i] = np.array(self.exemplars[i])[:m]
 
 
   def updateRep(self, task, trainDataSet, splits, transformer):
