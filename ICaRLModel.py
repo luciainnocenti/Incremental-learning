@@ -80,7 +80,7 @@ class ICaRLStruct (nn.Module):
 
 
   def updateRep(self, task, trainDataSet, splits, transformer):
-    torch.cuda.empty_cache()
+    #torch.cuda.empty_cache()
     
     '''
     trainDataSet is the subset obtained by extracting all the data having as label those contained into train splits
@@ -105,7 +105,7 @@ class ICaRLStruct (nn.Module):
 
     #Now D contains both images and examplers for classes in analysis
     old_outputs = torch.zeros( len(D), 100).to(params.DEVICE)
-    torch.cuda.empty_cache()
+    #torch.cuda.empty_cache()
     with torch.no_grad():
       for img, lbl, idx in loader:
         img = img.float().to(params.DEVICE)
