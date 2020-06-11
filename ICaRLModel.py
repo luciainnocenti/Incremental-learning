@@ -135,14 +135,16 @@ class ICaRLStruct (nn.Module):
       examplars = self.exemplars
       phi = self.features_extractor
       features = []
-      for P_y in col:
+      for P_y in col: #itero per tutte le classi in analisi
         P_y = int(P_y)
-        #itero per tutte le classi in analisi
         #in P_y io ho m elementi, ovvero gli exemplars per quella specifica classe
         if(self.exemplars[P_y] is not None):
           #exemplar contine gli indici delle immagini di riferiemnto
           for ex in self.exemplars[P_y]:
-            ex = dataSet._data[ex]
+            ex = self.dataset.__getitem__[ex]
+            print('label of ex = ', ex[1])
+            print('P_y = ', P_y)
+            ex = ex[0]
             feature = phi(ex)
             feature = feature.squeeze()
             feature.data /= feature.data.norm()
