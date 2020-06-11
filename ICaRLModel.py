@@ -141,11 +141,11 @@ class ICaRLStruct (nn.Module):
       exemplar_means = []
       for P_y in col: #itero per tutte le classi in analisi
         P_y = int(P_y)
-        print('Y = ', P_y)
+        #print('Y = ', P_y)
         features = []
         #in P_y io ho m elementi, ovvero gli exemplars per quella specifica classe
         if(self.exemplars[P_y] is not None):
-          print('Not none P_y = ', P_y)
+          #print('Not none P_y = ', P_y)
           #exemplar contine gli indici delle immagini di riferiemnto
           for ex in self.exemplars[P_y]:
             image, label, idx = self.dataset.__getitem__(ex)
@@ -181,6 +181,6 @@ class ICaRLStruct (nn.Module):
     #print('10: ', feature.size())
     
     dists = (feature - means).pow(2).sum(1).squeeze() #(batch_size, n_classes)
+    print('dists = ', dists)
     _, preds = dists.min(1)
-
     return preds
