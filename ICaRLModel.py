@@ -177,7 +177,7 @@ class ICaRLStruct (nn.Module):
           #print('5:', mu_y.size())
           exemplar_means.append(mu_y)
     self.exemplar_means = exemplar_means
-    print('em = ', exemplar_means)
+    #print('em = ', exemplar_means)
     means = torch.stack(exemplar_means) 
     #print('6: ', means.size())
     means = torch.stack([means] * len(x)) #meglio usare len(x) che batch size per ultimo batch?
