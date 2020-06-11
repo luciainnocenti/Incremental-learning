@@ -36,6 +36,7 @@ class ICaRLStruct (nn.Module):
     x = self.classifier(x)
     return x
 
+
   def generateExemplars(self, images, m, idxY):
     '''
     images --> indexes of image from a class (Y) belonging to dataSet
@@ -126,11 +127,13 @@ class ICaRLStruct (nn.Module):
         optimizer.step()
       print('Task: ' , task, ' epoch: ', epoch, ' loss: ', loss.item())
 
+
   def classify(self, x, col):
     '''
     x -> [BATCH SIZE] images to be classified
     col -> list classes see until now
     '''
+    print('col = ', col)
     with torch.no_grad() :
       transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.5,0.5,0.5), (0.5, 0.5, 0.5)),])
       examplars = self.exemplars
@@ -139,8 +142,10 @@ class ICaRLStruct (nn.Module):
       exemplar_means = []
       for P_y in col: #itero per tutte le classi in analisi
         P_y = int(P_y)
+        print('Y = ', P_y)
         #in P_y io ho m elementi, ovvero gli exemplars per quella specifica classe
         if(self.exemplars[P_y] is not None):
+          print('Not none P_y = ', P_y)
           #exemplar contine gli indici delle immagini di riferiemnto
           for ex in self.exemplars[P_y]:
             image, label, idx = self.dataset.__getitem__(ex)
@@ -165,17 +170,17 @@ class ICaRLStruct (nn.Module):
     means = torch.stack(exemplar_means) 
     print('6: ', means.size())
     means = torch.stack([means] * params.BATCH_SIZE) #meglio usare len(x) che batch size per ultimo batch?
-    print('6: ', means.size())
-    means = means.transpose(1, 2) 
     print('7: ', means.size())
+    means = means.transpose(1, 2) 
+    print('8: ', means.size())
     with torch.no_grad():
       feature = self.features_extractor(x) # (batch_size, feature_size)
     for i in range(feature.size(0)): # Normalize
       feature.data[i] = feature.data[i] / feature.data[i].norm()
     feature = feature.unsqueeze(2) # (batch_size, feature_size, 1)
-    print('8: ', feature.size())
-    feature = feature.expand_as(means) # (batch_size, feature_size, n_classes)
     print('9: ', feature.size())
+    feature = feature.expand_as(means) # (batch_size, feature_size, n_classes)
+    print('10: ', feature.size())
     
     dists = (feature - means).pow(2).sum(1).squeeze() #(batch_size, n_classes)
     _, preds = dists.min(1)
