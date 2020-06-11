@@ -42,7 +42,7 @@ class ICaRLStruct (nn.Module):
     m --> num of elements to be selected for the class Y 
     '''
     #transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),])
-    transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.5,0.5,0,5), (0.5, 0.5, 0.5)),])
+    transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.5,0.5,0.5), (0.5, 0.5, 0.5)),])
     features = []
 
     for idx in images:
@@ -71,6 +71,7 @@ class ICaRLStruct (nn.Module):
       phiExemplaresY.append(features[idxEx])
     #Put into the exemplar array, at position related to the Y class, the elements obtained during this task
     self.exemplars[idxY] = np.array(exemplaresY)
+    print('len exemplars[', idxY, '] = ', len(self.exemplars[idxY])
 
 
   def reduceExemplars(self, m):
