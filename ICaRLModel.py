@@ -160,9 +160,9 @@ class ICaRLStruct (nn.Module):
           exemplar_means.append(mu_y)
     self.exemplar_means = exemplar_means
 
-    means = torch.stack(exemplar_means) # (n_classes, feature_size)
-    means = torch.stack([means] * batch_size) # (batch_size, n_classes, feature_size)
-    means = means.transpose(1, 2) # (batch_size, feature_size, n_classes)
+    means = torch.stack(exemplar_means) 
+    means = torch.stack([means] * params.BATCH_SIZE)
+    means = means.transpose(1, 2)
     with torch.no_grad():
       feature = self.features_extractor(x) # (batch_size, feature_size)
     for i in xrange(feature.size(0)): # Normalize
