@@ -141,7 +141,6 @@ class ICaRLStruct (nn.Module):
     x -> [BATCH SIZE] images to be classified
     col -> list classes see until now
     '''
-    print('col = ', col)
     with torch.no_grad() :
       transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.5,0.5,0.5), (0.5, 0.5, 0.5)),])
       examplars = self.exemplars
@@ -155,8 +154,12 @@ class ICaRLStruct (nn.Module):
         if(self.exemplars[P_y] is not None):
           #print('Not none P_y = ', P_y)
           #exemplar contine gli indici delle immagini di riferiemnto
+          indiceMerda = 0
           for ex in self.exemplars[P_y]:
-            image, label, idx = self.dataset.__getitem__(ex)
+            if(indiceMerda %20 == 0):
+              image, label, idx = self.dataset.__getitem__(ex)
+            indiceMerda += 1
+            print('label =', label, ' idx = ', idx, ' ex = ', ex)
             img = self.dataset._data[ex]
             img = Variable(transform(Image.fromarray(img))).cuda()
 
@@ -172,7 +175,7 @@ class ICaRLStruct (nn.Module):
           #print('5:', mu_y.size())
           exemplar_means.append(mu_y)
     self.exemplar_means = exemplar_means
-
+    print('em = ', exemplar_means)
     means = torch.stack(exemplar_means) 
     #print('6: ', means.size())
     means = torch.stack([means] * len(x)) #meglio usare len(x) che batch size per ultimo batch?
