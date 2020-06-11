@@ -141,10 +141,12 @@ class ICaRLStruct (nn.Module):
         if(self.exemplars[P_y] is not None):
           #exemplar contine gli indici delle immagini di riferiemnto
           for ex in self.exemplars[P_y]:
-            ex = self.dataset.__getitem__(ex)
-            print('label of ex = ', ex[1])
+            image, label, idx = self.dataset.__getitem__(ex)
+            print('label of ex = ', label)
             print('P_y = ', P_y)
-            ex = ex[0]
+            ex = image
+            print(image)
+            #ex = Variable(transform(Image.fromarray(ex)), volatile=True).cuda()
             feature = phi(ex)
             feature = feature.squeeze()
             feature.data /= feature.data.norm()
