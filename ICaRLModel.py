@@ -156,29 +156,29 @@ class ICaRLStruct (nn.Module):
             feature = feature.squeeze() # squeeze needed beacause phi return a matrix of features, on row for each img. But i have only 1 img
             feature.data /= feature.data.norm()
             features.append(feature)
-          print('3:', len(features))
+          #print('3:', len(features))
           features = torch.stack(features)
-          print('4:', features.size())
+          #print('4:', features.size())
           mu_y = features.mean(0).squeeze()
           mu_y.data = mu_y.data / mu_y.data.norm() # Normalize
-          print('5:', mu_y.size())
+          #print('5:', mu_y.size())
           exemplar_means.append(mu_y)
     self.exemplar_means = exemplar_means
 
     means = torch.stack(exemplar_means) 
-    print('6: ', means.size())
+    #print('6: ', means.size())
     means = torch.stack([means] * len(x)) #meglio usare len(x) che batch size per ultimo batch?
-    print('7: ', means.size())
+    #print('7: ', means.size())
     means = means.transpose(1, 2) 
-    print('8: ', means.size())
+    #print('8: ', means.size())
     with torch.no_grad():
       feature = self.features_extractor(x) # (batch_size, feature_size)
     for i in range(feature.size(0)): # Normalize
       feature.data[i] = feature.data[i] / feature.data[i].norm()
     feature = feature.unsqueeze(2) # (batch_size, feature_size, 1)
-    print('9: ', feature.size())
+    #print('9: ', feature.size())
     feature = feature.expand_as(means) # (batch_size, feature_size, n_classes)
-    print('10: ', feature.size())
+    #print('10: ', feature.size())
     
     dists = (feature - means).pow(2).sum(1).squeeze() #(batch_size, n_classes)
     _, preds = dists.min(1)
