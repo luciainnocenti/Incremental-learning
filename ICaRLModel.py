@@ -138,11 +138,11 @@ class ICaRLStruct (nn.Module):
       transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.5,0.5,0.5), (0.5, 0.5, 0.5)),])
       examplars = self.exemplars
       phi = self.features_extractor
-      features = []
       exemplar_means = []
       for P_y in col: #itero per tutte le classi in analisi
         P_y = int(P_y)
         print('Y = ', P_y)
+        features = []
         #in P_y io ho m elementi, ovvero gli exemplars per quella specifica classe
         if(self.exemplars[P_y] is not None):
           print('Not none P_y = ', P_y)
@@ -153,9 +153,7 @@ class ICaRLStruct (nn.Module):
             img = Variable(transform(Image.fromarray(img))).cuda()
 
             feature = phi(img.unsqueeze(0)) #unsqueeze add a dimension; i need it because feat ext expects a vector of imgs, not a single img
-            print('1: ', feature.size())
             feature = feature.squeeze() # squeeze needed beacause phi return a matrix of features, on row for each img. But i have only 1 img
-            print('2:', feature.size())
             feature.data /= feature.data.norm()
             features.append(feature)
           print('3:', len(features))
