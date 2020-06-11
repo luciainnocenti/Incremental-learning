@@ -146,7 +146,7 @@ class ICaRLStruct (nn.Module):
             print('P_y = ', P_y)
             ex = image
             print(image)
-            #ex = Variable(transform(Image.fromarray(ex)), volatile=True).cuda()
+            ex = Variable(transform(Image.fromarray(ex))).cuda()
             feature = phi(ex)
             feature = feature.squeeze()
             feature.data /= feature.data.norm()
