@@ -149,7 +149,7 @@ class ICaRLStruct (nn.Module):
             img = self.dataset._data[ex]
             img = Variable(transform(Image.fromarray(img))).cuda()
 
-            feature = phi(img)
+            feature = phi(img.unsqueeze(0))
             feature = feature.squeeze()
             feature.data /= feature.data.norm()
             features.append(feature)
