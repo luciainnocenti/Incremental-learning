@@ -58,10 +58,14 @@ class Dataset(torch.utils.data.Dataset):
     return indexes
   
   def __getitem__(self, idx):
-    #Given an index, this method return the image and the class corresponding to that index
+   #Given an index, this method return the image and the class corresponding to that index
     image = np.transpose(self._data[idx])
     label = self._targets[idx]
     return image, label, idx
 
+  def append(self, images, labels):
+        self.train_data = np.concatenate((self.train_data, images), axis=0)
+        self.train_labels = self.train_labels + labels
+ 
   def __len__(self):
     return len(self._targets)
