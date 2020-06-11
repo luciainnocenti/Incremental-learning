@@ -72,7 +72,7 @@ class ICaRLStruct (nn.Module):
       phiExemplaresY.append(features[idxEx])
     #Put into the exemplar array, at position related to the Y class, the elements obtained during this task
     self.exemplars[idxY] = np.array(exemplaresY)
-    print('len exemplars[', idxY, '] = ', len(self.exemplars[idxY]))
+    #print('len exemplars[', idxY, '] = ', len(self.exemplars[idxY]))
 
 
   def reduceExemplars(self, m):
