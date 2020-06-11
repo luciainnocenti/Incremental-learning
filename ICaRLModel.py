@@ -131,32 +131,33 @@ class ICaRLStruct (nn.Module):
     x -> [BATCH SIZE] images to be classified
     col -> list classes see until now
     '''
-    examplars = self.exemplar
-    phi = self.features_extractor
-    features = []
-    for P_y in col:
-      P_y = int(P_y)
-      #itero per tutte le classi in analisi
-      #in P_y io ho m elementi, ovvero gli exemplars per quella specifica classe
-      if(self.exemplar[P_y] is not None):
-        #exemplar contine gli indici delle immagini di riferiemnto
-        for ex in self.exemplar[P_y]:
-          ex = dataSet._data[ex]
-          feature = phi(ex)
-          feature = feature.squeeze()
-          feature.data /= feature.data.norm()
-          features.append(feature)
-        features = torch.stack(features)
-        mu_y = features.mean(0).squeeze()
-        mu_y.data = mu_y.data / mu_y.data.norm() # Normalize
-        exemplar_means.append(mu_y)
+    with torch.no_grad() :
+      examplars = self.exemplars
+      phi = self.features_extractor
+      features = []
+      for P_y in col:
+        P_y = int(P_y)
+        #itero per tutte le classi in analisi
+        #in P_y io ho m elementi, ovvero gli exemplars per quella specifica classe
+        if(self.exemplars[P_y] is not None):
+          #exemplar contine gli indici delle immagini di riferiemnto
+          for ex in self.exemplars[P_y]:
+            ex = dataSet._data[ex]
+            feature = phi(ex)
+            feature = feature.squeeze()
+            feature.data /= feature.data.norm()
+            features.append(feature)
+          features = torch.stack(features)
+          mu_y = features.mean(0).squeeze()
+          mu_y.data = mu_y.data / mu_y.data.norm() # Normalize
+          exemplar_means.append(mu_y)
     self.exemplar_means = exemplar_means
 
     means = torch.stack(exemplar_means) # (n_classes, feature_size)
     means = torch.stack([means] * batch_size) # (batch_size, n_classes, feature_size)
     means = means.transpose(1, 2) # (batch_size, feature_size, n_classes)
-
-    feature = self.features_extractor(x) # (batch_size, feature_size)
+    with torch.no_grad():
+      feature = self.features_extractor(x) # (batch_size, feature_size)
     for i in xrange(feature.size(0)): # Normalize
       feature.data[i] = feature.data[i] / feature.data[i].norm()
     feature = feature.unsqueeze(2) # (batch_size, feature_size, 1)
