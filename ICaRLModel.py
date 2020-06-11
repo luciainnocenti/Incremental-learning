@@ -99,6 +99,7 @@ class ICaRLStruct (nn.Module):
           length = len(self.exemplars[y])
           exLabels = [y]*length #dovrebbe crearmi un vettore di dimensione lenght tutto composto da y ovvero la classe
           exImages = self.exemplars[y]
+          exImages = self.dataset._data[exImages]
           D.append(exImages, exLabels)
 
     loader = DataLoader( D, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE, shuffle = True)
