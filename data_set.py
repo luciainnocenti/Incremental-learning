@@ -65,7 +65,7 @@ class Dataset(torch.utils.data.Dataset):
 
   def append(self, images, labels):
         print('images: ', images.shape)
-        print('labels: ', labels.shape)
+        print('labels: ', len(labels))
         self._data = np.concatenate((self._data, images), axis=0)
         self._targets = self._targets + labels
  
