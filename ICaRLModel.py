@@ -33,6 +33,8 @@ class ICaRLStruct (nn.Module):
 
   def forward(self, x):
     x = self.features_extractor(x)
+    x = self.bn(x)
+    x = self.ReLU(x)
     x = self.classifier(x)
     return x
 
