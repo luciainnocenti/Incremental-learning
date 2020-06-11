@@ -111,9 +111,9 @@ class ICaRLStruct (nn.Module):
         idx = idx.to(params.DEVICE)
         old_outputs[idx,:] = self.forward(img)
 
-    for p in self.features_extractor.features.parameters():
+    for p in self.features_extractor.parameters():
             p.requires_grad = True
-    for p in self.classifier.features.parameters():
+    for p in self.classifier.parameters():
             p.requires_grad = True
     col = np.array(splits[int(task/10)]).astype(int)
     for epoch in range(params.NUM_EPOCHS):
