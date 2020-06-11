@@ -16,9 +16,7 @@ from torch.utils.data import Subset, DataLoader
 class ICaRLStruct (nn.Module):
   def __init__(self, n_classes = 100, dataset = None):
     super(ICaRLStruct, self).__init__()
-    self.features_extractor = ResNet.resnet32(num_classes = 10)
-    self.bn = nn.BatchNorm1d(10, momentum=0.01)
-    self.ReLU = nn.ReLU()    
+    self.features_extractor = ResNet.resnet32(num_classes = 10) 
     self.classifier = nn.Linear(self.features_extractor.fc.out_features, n_classes)
 
     self.k = 2000
@@ -35,8 +33,6 @@ class ICaRLStruct (nn.Module):
 
   def forward(self, x):
     x = self.features_extractor(x)
-    x = self.bn(x)
-    x = self.ReLU(x)
     x = self.classifier(x)
     return x
 
@@ -76,7 +72,10 @@ class ICaRLStruct (nn.Module):
       phiExemplaresY.append(features[idxEx])
     #Put into the exemplar array, at position related to the Y class, the elements obtained during this task
     self.exemplars[idxY] = np.array(exemplaresY)
-    #print('len exemplars[', idxY, '] = ', len(self.exemplars[idxY]))
+    print('len exemplars[', idxY, '] = ', len(self.exemplars[idxY]))
+    for el in self.exemplars[idxY]:
+      if( self.dataset.__getitem__(el)[1] != idxY):
+        print("Problema!")
 
 
   def reduceExemplars(self, m):
