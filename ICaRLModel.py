@@ -97,7 +97,7 @@ class ICaRLStruct (nn.Module):
         y = int(y)
         if(self.exemplars[y] is not None):
           length = len(self.exemplars[y])
-          exLabels = [y]*lenght #dovrebbe crearmi un vettore di dimensione lenght tutto composto da y ovvero la classe
+          exLabels = [y]*length #dovrebbe crearmi un vettore di dimensione lenght tutto composto da y ovvero la classe
           exImages = self.exemplars[y]
           D.append(exImages, exLabels)
 
