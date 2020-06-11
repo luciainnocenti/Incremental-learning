@@ -13,7 +13,7 @@ from torchvision import transforms
 from torchvision import datasets
 from DatasetCIFAR import params
 import random
-random.seed(42)
+random.seed(params.SEED)
 
 class Dataset(torch.utils.data.Dataset):
   '''
