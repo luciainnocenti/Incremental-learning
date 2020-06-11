@@ -145,10 +145,11 @@ class ICaRLStruct (nn.Module):
             image, label, idx = self.dataset.__getitem__(ex)
             print('label of ex = ', label)
             print('P_y = ', P_y)
-            ex = image
-            print(image)
-            ex = Variable(transform(Image.fromarray(ex))).cuda()
-            feature = phi(ex)
+            
+            img = self.dataset._data[ex]
+            img = Variable(transform(Image.fromarray(img))).cuda()
+
+            feature = phi(img)
             feature = feature.squeeze()
             feature.data /= feature.data.norm()
             features.append(feature)
