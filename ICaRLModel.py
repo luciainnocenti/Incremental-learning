@@ -136,6 +136,7 @@ class ICaRLStruct (nn.Module):
       examplars = self.exemplars
       phi = self.features_extractor
       features = []
+      exemplar_means = []
       for P_y in col: #itero per tutte le classi in analisi
         P_y = int(P_y)
         #in P_y io ho m elementi, ovvero gli exemplars per quella specifica classe
