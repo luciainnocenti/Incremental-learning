@@ -165,7 +165,7 @@ class ICaRLStruct (nn.Module):
     means = means.transpose(1, 2)
     with torch.no_grad():
       feature = self.features_extractor(x) # (batch_size, feature_size)
-    for i in xrange(feature.size(0)): # Normalize
+    for i in range(feature.size(0)): # Normalize
       feature.data[i] = feature.data[i] / feature.data[i].norm()
     feature = feature.unsqueeze(2) # (batch_size, feature_size, 1)
     feature = feature.expand_as(means) # (batch_size, feature_size, n_classes)
