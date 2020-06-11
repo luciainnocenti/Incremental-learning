@@ -144,8 +144,8 @@ class ICaRLStruct (nn.Module):
           #exemplar contine gli indici delle immagini di riferiemnto
           for ex in self.exemplars[P_y]:
             image, label, idx = self.dataset.__getitem__(ex)
-            print('label of ex = ', label)
-            print('P_y = ', P_y)
+            #print('label of ex = ', label)
+            #print('P_y = ', P_y)
             
             img = self.dataset._data[ex]
             img = Variable(transform(Image.fromarray(img))).cuda()
