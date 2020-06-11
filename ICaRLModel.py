@@ -67,9 +67,11 @@ class ICaRLStruct (nn.Module):
       phiP = np.sum(phiExemplaresY, axis = 0) #ad ogni step K, ho già collezionato K-1 examplars
       mu1 = 1/(k+1)* ( phiX + phiP)
       idxEx = np.argmin(np.sqrt(np.sum((mu - mu1) ** 2, axis=1))) #execute the euclidean norm among all the rows in phiX
-
+      
       exemplaresY.append(images[idxEx])
+      np.delete(images, idxEx, 0)
       phiExemplaresY.append(features[idxEx])
+      np.delete(features, idxEx, 0)
     #Put into the exemplar array, at position related to the Y class, the elements obtained during this task
     self.exemplars[idxY] = np.array(exemplaresY)
     print('len exemplars[', idxY, '] = ', len(self.exemplars[idxY]))
@@ -136,11 +138,14 @@ class ICaRLStruct (nn.Module):
       print('Task: ' , task, ' epoch: ', epoch, ' loss: ', loss.item())
 
 
-  def classify(self, x, col):
+  def classify(self, x, col, ds = None):
     '''
     x -> [BATCH SIZE] images to be classified
     col -> list classes see until now
     '''
+    if( ds is None):
+      ds = self.dataset
+    
     with torch.no_grad() :
       transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.5,0.5,0.5), (0.5, 0.5, 0.5)),])
       examplars = self.exemplars
@@ -154,14 +159,10 @@ class ICaRLStruct (nn.Module):
         if(self.exemplars[P_y] is not None):
           #print('Not none P_y = ', P_y)
           #exemplar contine gli indici delle immagini di riferiemnto
-          indiceMerda = 0
           for ex in self.exemplars[P_y]:
-            image, label, idx = self.dataset.__getitem__(ex)
-            if(indiceMerda%20 == 0):
-              print('label =', label, ' idx = ', idx, ' ex = ', ex)
-            indiceMerda += 1
+            image, label, idx = ds.__getitem__(ex)
             
-            img = self.dataset._data[ex]
+            img = ds._data[ex]
             img = Variable(transform(Image.fromarray(img))).cuda()
 
             feature = phi(img.unsqueeze(0)) #unsqueeze add a dimension; i need it because feat ext expects a vector of imgs, not a single img
