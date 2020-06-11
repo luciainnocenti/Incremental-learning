@@ -141,7 +141,7 @@ class ICaRLStruct (nn.Module):
         if(self.exemplars[P_y] is not None):
           #exemplar contine gli indici delle immagini di riferiemnto
           for ex in self.exemplars[P_y]:
-            ex = self.dataset.__getitem__[ex]
+            ex = self.dataset.__getitem__(ex)
             print('label of ex = ', ex[1])
             print('P_y = ', P_y)
             ex = ex[0]
