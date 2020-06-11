@@ -64,8 +64,8 @@ class Dataset(torch.utils.data.Dataset):
     return image, label, idx
 
   def append(self, images, labels):
-        self.train_data = np.concatenate((self.train_data, images), axis=0)
-        self.train_labels = self.train_labels + labels
+        self._data = np.concatenate((self._data, images), axis=0)
+        self._targets = self._targets + labels
  
   def __len__(self):
     return len(self._targets)
