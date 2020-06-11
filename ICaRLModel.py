@@ -156,10 +156,11 @@ class ICaRLStruct (nn.Module):
           #exemplar contine gli indici delle immagini di riferiemnto
           indiceMerda = 0
           for ex in self.exemplars[P_y]:
-            if(indiceMerda %20 == 0):
-              image, label, idx = self.dataset.__getitem__(ex)
+            image, label, idx = self.dataset.__getitem__(ex)
+            if(indiceMerda%20 == 0):
+              print('label =', label, ' idx = ', idx, ' ex = ', ex)
             indiceMerda += 1
-            print('label =', label, ' idx = ', idx, ' ex = ', ex)
+            
             img = self.dataset._data[ex]
             img = Variable(transform(Image.fromarray(img))).cuda()
 
