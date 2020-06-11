@@ -132,6 +132,7 @@ class ICaRLStruct (nn.Module):
     col -> list classes see until now
     '''
     with torch.no_grad() :
+      transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.5,0.5,0.5), (0.5, 0.5, 0.5)),])
       examplars = self.exemplars
       phi = self.features_extractor
       features = []
