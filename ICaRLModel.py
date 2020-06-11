@@ -181,6 +181,6 @@ class ICaRLStruct (nn.Module):
     #print('10: ', feature.size())
     
     dists = (feature - means).pow(2).sum(1).squeeze() #(batch_size, n_classes)
-    print('dists = ', dists)
+    #print('dists = ', dists)
     _, preds = dists.min(1)
     return preds
