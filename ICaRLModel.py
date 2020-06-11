@@ -147,13 +147,13 @@ class ICaRLStruct (nn.Module):
             img = self.dataset._data[ex]
             img = Variable(transform(Image.fromarray(img))).cuda()
 
-            feature = phi(img.unsqueeze(0))
+            feature = phi(img.unsqueeze(0)) #unsqueeze add a dimension; i need it because feat ext expects a vector of imgs, not a single img
             print('1: ', feature.size())
-            feature = feature.squeeze()
+            feature = feature.squeeze() # squeeze needed beacause phi return a matrix of features, on row for each img. But i have only 1 img
             print('2:', feature.size())
             feature.data /= feature.data.norm()
             features.append(feature)
-          print('3:', features.size())
+          print('3:', len(features))
           features = torch.stack(features)
           print('4:', features.size())
           mu_y = features.mean(0).squeeze()
