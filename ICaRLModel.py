@@ -144,32 +144,39 @@ class ICaRLStruct (nn.Module):
           #exemplar contine gli indici delle immagini di riferiemnto
           for ex in self.exemplars[P_y]:
             image, label, idx = self.dataset.__getitem__(ex)
-            #print('label of ex = ', label)
-            #print('P_y = ', P_y)
-            
             img = self.dataset._data[ex]
             img = Variable(transform(Image.fromarray(img))).cuda()
 
             feature = phi(img.unsqueeze(0))
+            print('1: ', feature.size())
             feature = feature.squeeze()
+            print('2:', feature.size())
             feature.data /= feature.data.norm()
             features.append(feature)
+          print('3:', features.size())
           features = torch.stack(features)
+          print('4:', features.size())
           mu_y = features.mean(0).squeeze()
           mu_y.data = mu_y.data / mu_y.data.norm() # Normalize
+          print('5:', mu_y.size())
           exemplar_means.append(mu_y)
     self.exemplar_means = exemplar_means
 
     means = torch.stack(exemplar_means) 
-    means = torch.stack([means] * params.BATCH_SIZE)
-    means = means.transpose(1, 2)
+    print('6: ', means.size())
+    means = torch.stack([means] * params.BATCH_SIZE) #meglio usare len(x) che batch size per ultimo batch?
+    print('6: ', means.size())
+    means = means.transpose(1, 2) 
+    print('7: ', means.size())
     with torch.no_grad():
       feature = self.features_extractor(x) # (batch_size, feature_size)
     for i in range(feature.size(0)): # Normalize
       feature.data[i] = feature.data[i] / feature.data[i].norm()
     feature = feature.unsqueeze(2) # (batch_size, feature_size, 1)
+    print('8: ', feature.size())
     feature = feature.expand_as(means) # (batch_size, feature_size, n_classes)
-
+    print('9: ', feature.size())
+    
     dists = (feature - means).pow(2).sum(1).squeeze() #(batch_size, n_classes)
     _, preds = dists.min(1)
 
