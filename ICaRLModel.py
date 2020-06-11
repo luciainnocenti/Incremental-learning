@@ -17,6 +17,8 @@ class ICaRLStruct (nn.Module):
   def __init__(self, n_classes = 100, dataset = None):
     super(ICaRLStruct, self).__init__()
     self.features_extractor = ResNet.resnet32(num_classes = 10)
+    self.bn = nn.BatchNorm1d(10, momentum=0.01)
+    self.ReLU = nn.ReLU()    
     self.classifier = nn.Linear(self.features_extractor.fc.out_features, n_classes)
 
     self.k = 2000
