@@ -28,7 +28,6 @@ class ICaRLStruct (nn.Module):
     #ogni elemento corrisponde alla lista di exemplar presente per quella specifica classe (l'indice di exemplar indica la classe)
     #ogni lista avrà dimentsione M (variante di task in task dunque)
     #Così per ottenere la lista di exemplar in analisi ogni volta posso usare col come con LWF
-    self.means = {}
     self.cuda()
 
   def forward(self, x):
@@ -126,6 +125,7 @@ class ICaRLStruct (nn.Module):
       
     col = np.array(splits[int(task/10)]).astype(int)
     for epoch in range(params.NUM_EPOCHS):
+      scheduler.step()
       for images, labels, idx in loader:
         images = images.float().to(params.DEVICE)
         labels = labels.to(params.DEVICE)
