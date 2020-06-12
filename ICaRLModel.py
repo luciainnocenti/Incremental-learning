@@ -152,7 +152,7 @@ class ICaRLStruct (nn.Module):
     '''
     
     exemplar_means = []
-    if(self.computeMeans == True)
+    if(self.computeMeans == True):
       with torch.no_grad() :
 
         self.features_extractor.train(False)
