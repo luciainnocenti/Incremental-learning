@@ -172,7 +172,7 @@ class ICaRLStruct (nn.Module):
             #print('Not none P_y = ', P_y)
             #exemplar contine gli indici delle immagini di riferiemnto
             for ex in self.exemplars[P_y]:
-              image, label, idx = ds.__getitem__(ex)
+              #image, label, idx = self.dataset.__getitem__(ex)
               
               img = self.dataset._data[ex]
               img = Variable(transform(Image.fromarray(img))).cuda()
@@ -202,7 +202,6 @@ class ICaRLStruct (nn.Module):
 
     with torch.no_grad():
       self.features_extractor.train(False) 
-
       feature = self.features_extractor(x) # (batch_size, feature_size)
 
     for i in range(feature.size(0)): # Normalize
