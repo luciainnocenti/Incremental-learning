@@ -24,11 +24,11 @@ class ICaRLStruct (nn.Module):
     self.m = 0
     self.dataset = dataset
     self.exemplar_means = None
-    self.computeMeans = True
     #Costruisco exemplar come un vettore di liste: 
     #ogni elemento corrisponde alla lista di exemplar presente per quella specifica classe (l'indice di exemplar indica la classe)
     #ogni lista avrà dimentsione M (variante di task in task dunque)
     #Così per ottenere la lista di exemplar in analisi ogni volta posso usare col come con LWF
+    self.means = {}
     self.cuda()
 
   def forward(self, x):
@@ -36,20 +36,19 @@ class ICaRLStruct (nn.Module):
     x = self.classifier(x)
     return x
 
-  def generateExemplars(self, images, m, idxY, dataset):
+
+  def generateExemplars(self, images, m, idxY):
     '''
     images --> indexes of image from a class (Y) belonging to dataSet
     m --> num of elements to be selected for the class Y 
     '''
-
-    self.features_extractor.train(False)
-    
+    #transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),])
     transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.5,0.5,0.5), (0.5, 0.5, 0.5)),])
     features = []
 
     for idx in images:
       self.cuda()
-      img = dataset._data[idx]
+      img = self.dataset._data[idx]
       img = Variable(transform(Image.fromarray(img))).cuda()
       feature = self.features_extractor(img.unsqueeze(0)).data.cpu().numpy()
       '''
@@ -64,37 +63,35 @@ class ICaRLStruct (nn.Module):
     phiExemplaresY = []
     exemplaresY = []
     for k in range(0,m): #k parte da 0: ricorda di sommare 1 per media
-      phiX = np.copy(features) #le features di tutte le immagini della classe Y
+      phiX = features #le features di tutte le immagini della classe Y
       phiP = np.sum(phiExemplaresY, axis = 0) #ad ogni step K, ho già collezionato K-1 examplars
       mu1 = 1/(k+1)* ( phiX + phiP)
       idxEx = np.argmin(np.sqrt(np.sum((mu - mu1) ** 2, axis=1))) #execute the euclidean norm among all the rows in phiX
       
       exemplaresY.append(images[idxEx])
-      #np.delete(images, idxEx, 0)
+      np.delete(images, idxEx, 0)
       phiExemplaresY.append(features[idxEx])
       np.delete(features, idxEx, 0)
     #Put into the exemplar array, at position related to the Y class, the elements obtained during this task
     self.exemplars[idxY] = np.array(exemplaresY)
+    print('len exemplars[', idxY, '] = ', len(self.exemplars[idxY]))
     for el in self.exemplars[idxY]:
-      if(dataset.__getitem__(el)[1] != idxY):
+      if( self.dataset.__getitem__(el)[1] != idxY):
         print("Problema!")
-    print('Exemplars builded!')
 
 
   def reduceExemplars(self, m):
     for i in range(0, len(self.exemplars)):
       if(self.exemplars[i] is not None):
         self.exemplars[i] = np.array(self.exemplars[i])[:m]
-    print('Exemplars reduced')
 
 
   def updateRep(self, task, trainDataSet, splits, transformer):
-    self.compute_means = True
     #torch.cuda.empty_cache()
     '''
     trainDataSet is the subset obtained by extracting all the data having as label those contained into train splits
     '''
-    D = Dataset(train=True, transform=transformer)
+    D = Dataset(transform=transformer)
     print(f'task = {task} ')
     #Define the parameters for traininig:
     optimizer = torch.optim.SGD(self.parameters(), lr=params.LR, momentum=params.MOMENTUM, weight_decay=params.WEIGHT_DECAY)
@@ -113,16 +110,17 @@ class ICaRLStruct (nn.Module):
     loader = DataLoader( D, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE, shuffle = True)
     #Now D contains both images and examplers for classes in analysis
     old_outputs = torch.zeros( len(D), 100).to(params.DEVICE)
+    #torch.cuda.empty_cache()
     with torch.no_grad():
       for img, lbl, idx in loader:
         img = img.float().to(params.DEVICE)
         idx = idx.to(params.DEVICE)
         old_outputs[idx,:] = self.forward(img)
 
-    self.features_extractor.train(True) 
+    for p in self.features_extractor.parameters():
+            p.requires_grad = True
     for p in self.classifier.parameters():
-      p.requires_grad = True
-      
+            p.requires_grad = True
     col = np.array(splits[int(task/10)]).astype(int)
     for epoch in range(params.NUM_EPOCHS):
       for images, labels, idx in loader:
@@ -137,61 +135,48 @@ class ICaRLStruct (nn.Module):
         loss = utils.calculateLoss(outputs, old_outputs[idx,:], onehot_labels, task, splits )
         loss.backward()  # backward pass: computes gradients
         optimizer.step()
-      scheduler.step()
       print('Task: ' , task, ' epoch: ', epoch, ' loss: ', loss.item())
 
-    self.features_extractor.train(False) 
-    for p in self.classifier.parameters():
-      p.requires_grad = False
 
-
-  def classify(self, x, col):
+  def classify(self, x, col, ds = None):
     '''
     x -> [BATCH SIZE] images to be classified
     col -> list classes see until now
     '''
+    if( ds is None):
+      ds = self.dataset
     
-    exemplar_means = []
-    if(self.computeMeans == True):
-      with torch.no_grad() :
+    with torch.no_grad() :
+      transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.5,0.5,0.5), (0.5, 0.5, 0.5)),])
+      examplars = self.exemplars
+      phi = self.features_extractor
+      exemplar_means = []
+      for P_y in col: #itero per tutte le classi in analisi
+        P_y = int(P_y)
+        #print('Y = ', P_y)
+        features = []
+        #in P_y io ho m elementi, ovvero gli exemplars per quella specifica classe
+        if(self.exemplars[P_y] is not None):
+          #print('Not none P_y = ', P_y)
+          #exemplar contine gli indici delle immagini di riferiemnto
+          for ex in self.exemplars[P_y]:
+            image, label, idx = ds.__getitem__(ex)
+            
+            img = ds._data[ex]
+            img = Variable(transform(Image.fromarray(img))).cuda()
 
-        self.features_extractor.train(False)
-        for p in self.classifier.parameters():
-          p.requires_grad = False
-
-        transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.5,0.5,0.5), (0.5, 0.5, 0.5)),])
-        examplars = self.exemplars
-        phi = self.features_extractor
-
-        for P_y in col: #itero per tutte le classi in analisi
-          P_y = int(P_y)
-          #print('Y = ', P_y)
-          features = []
-          #in P_y io ho m elementi, ovvero gli exemplars per quella specifica classe
-          if(self.exemplars[P_y] is not None):
-            #print('Not none P_y = ', P_y)
-            #exemplar contine gli indici delle immagini di riferiemnto
-            for ex in self.exemplars[P_y]:
-              #image, label, idx = self.dataset.__getitem__(ex)
-              
-              img = self.dataset._data[ex]
-              img = Variable(transform(Image.fromarray(img))).cuda()
-
-              feature = phi(img.unsqueeze(0)) #unsqueeze add a dimension; i need it because feat ext expects a vector of imgs, not a single img
-              feature = feature.squeeze() # squeeze needed beacause phi return a matrix of features, on row for each img. But i have only 1 img
-              feature.data /= feature.data.norm()
-              features.append(feature)
-            #print('3:', len(features))
-            features = torch.stack(features)
-            #print('4:', features.size())
-            mu_y = features.mean(0).squeeze()
-            mu_y.data = mu_y.data / mu_y.data.norm() # Normalize
-            #print('5:', mu_y.size())
-            exemplar_means.append(mu_y)
-      self.exemplar_means = exemplar_means
-      self.compute_means = False
-    print('computeFlag = ', self.compute_means)  
-    exemplar_means = self.exemplar_means
+            feature = phi(img.unsqueeze(0)) #unsqueeze add a dimension; i need it because feat ext expects a vector of imgs, not a single img
+            feature = feature.squeeze() # squeeze needed beacause phi return a matrix of features, on row for each img. But i have only 1 img
+            feature.data /= feature.data.norm()
+            features.append(feature)
+          #print('3:', len(features))
+          features = torch.stack(features)
+          #print('4:', features.size())
+          mu_y = features.mean(0).squeeze()
+          mu_y.data = mu_y.data / mu_y.data.norm() # Normalize
+          #print('5:', mu_y.size())
+          exemplar_means.append(mu_y)
+    self.exemplar_means = exemplar_means
     #print('em = ', exemplar_means)
     means = torch.stack(exemplar_means) 
     #print('6: ', means.size())
@@ -199,11 +184,8 @@ class ICaRLStruct (nn.Module):
     #print('7: ', means.size())
     means = means.transpose(1, 2) 
     #print('8: ', means.size())
-
     with torch.no_grad():
-      self.features_extractor.train(False) 
       feature = self.features_extractor(x) # (batch_size, feature_size)
-
     for i in range(feature.size(0)): # Normalize
       feature.data[i] = feature.data[i] / feature.data[i].norm()
     feature = feature.unsqueeze(2) # (batch_size, feature_size, 1)
