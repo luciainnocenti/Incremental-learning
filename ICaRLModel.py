@@ -190,7 +190,7 @@ class ICaRLStruct (nn.Module):
             exemplar_means.append(mu_y)
       self.exemplar_means = exemplar_means
       self.compute_means = False
-
+    print('computeFlag = ', self.compute_means)  
     exemplar_means = self.exemplar_means
     #print('em = ', exemplar_means)
     means = torch.stack(exemplar_means) 
