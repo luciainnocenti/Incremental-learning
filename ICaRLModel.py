@@ -64,7 +64,7 @@ class ICaRLStruct (nn.Module):
     phiExemplaresY = []
     exemplaresY = []
     for k in range(0,m): #k parte da 0: ricorda di sommare 1 per media
-      phiX = features.deepcopy() #le features di tutte le immagini della classe Y
+      phiX = np.copy(features) #le features di tutte le immagini della classe Y
       phiP = np.sum(phiExemplaresY, axis = 0) #ad ogni step K, ho già collezionato K-1 examplars
       mu1 = 1/(k+1)* ( phiX + phiP)
       idxEx = np.argmin(np.sqrt(np.sum((mu - mu1) ** 2, axis=1))) #execute the euclidean norm among all the rows in phiX
