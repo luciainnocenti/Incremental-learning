@@ -74,7 +74,6 @@ class ICaRLStruct (nn.Module):
       np.delete(features, idxEx, 0)
     #Put into the exemplar array, at position related to the Y class, the elements obtained during this task
     self.exemplars[idxY] = np.array(exemplaresY)
-    print('len exemplars[', idxY, '] = ', len(self.exemplars[idxY]))
     for el in self.exemplars[idxY]:
       if( self.dataset.__getitem__(el)[1] != idxY):
         print("Problema!")
@@ -118,9 +117,13 @@ class ICaRLStruct (nn.Module):
         old_outputs[idx,:] = self.forward(img)
 
     for p in self.features_extractor.parameters():
-            p.requires_grad = True
+      p.requires_grad = True
+      print('weights: ', p.data)
+        
     for p in self.classifier.parameters():
-            p.requires_grad = True
+      p.requires_grad = True
+      print('weights: ', p.data)
+      
     col = np.array(splits[int(task/10)]).astype(int)
     for epoch in range(params.NUM_EPOCHS):
       for images, labels, idx in loader:
