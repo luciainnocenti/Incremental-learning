@@ -117,11 +117,9 @@ class ICaRLStruct (nn.Module):
 
     for p in self.features_extractor.parameters():
       p.requires_grad = True
-      print('weights: ', p.data)
         
     for p in self.classifier.parameters():
       p.requires_grad = True
-      print('weights: ', p.data)
       
     col = np.array(splits[int(task/10)]).astype(int)
     for epoch in range(params.NUM_EPOCHS):
