@@ -38,7 +38,7 @@ def trainfunction(task, train_loader, train_splits):
 		scheduler.step() #update the learning rate
 		running_corrects = 0
 
-		for images, labels in train_loader:
+		for images, labels, _ in train_loader:
 			images = images.float().to(params.DEVICE)
 			labels = labels.to(params.DEVICE)
 			#print(labels)
@@ -86,7 +86,7 @@ def evaluationTest(task, test_loader, test_splits):
 		 col = np.concatenate( (col,v), axis = None)
 	col = col.astype(int)
 	
-	for images, labels in test_loader:
+	for images, labels, _ in test_loader:
 		images = images.float().to(params.DEVICE)
 		labels = labels.to(params.DEVICE)
 		mappedLabels = mapFunction(labels, col)
