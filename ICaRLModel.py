@@ -136,6 +136,7 @@ def constructExemplars(idxsImages, m, ICaRL):
 	means = torch.zeros( (1, 64)).to(params.DEVICE)
 	for i, (image, label, idx) in enumerate(loader):
 		with torch.no_grad():
+			image = image.float().to(params.DEVICE)
 			x = ICaRL( image, features = True)
 		for s in x:
 			features.append(np.array(s.data.cpu()))
@@ -161,7 +162,7 @@ def classify(images, exemplars, ICaRL, task):
 	means = torch.zeros( ( nClasses, 64)).to(params.DEVICE)
 
 	ICaRL.train(False)
-
+	images = images.float().to(params.DEVICE)
 	phiX = ICaRL(images, features = True)
 
 	transformer = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
@@ -178,6 +179,7 @@ def classify(images, exemplars, ICaRL, task):
 		loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE)
 		for img, lbl, idx in loader:
 			with torch.no_grad:
+				img = img.float().to(params.DEVICE)
 				x = ICaRL(img, features = True)
 			ma = torch.sum(x, dim=0)
 			means[y] += ma
