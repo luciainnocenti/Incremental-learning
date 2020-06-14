@@ -50,7 +50,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits):
 	for classe in exemplars:
 		if( classe is not None):
 			print('classe = ', classe)
-			dataIdx = np.concatenate(dataIdx, classe)
+			dataIdx = np.concatenate( (dataIdx, classe) )
 
 	#dataIdx contiene gli indici delle immagini, in train DS, delle nuove classi e dei vecchi exemplars
 
