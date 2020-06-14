@@ -188,7 +188,8 @@ def classify(images, exemplars, ICaRL, task):
 	print('means = ', means.shape)
 	for data in phiX:
 		print('shape data = ', data.shape)
-		pred = np.argmin(np.sqrt( np.sum((data - means)**2, axis=1)  ) )
+		pred = np.argmin(np.sqrt( np.sum((data.data.cpu().numpy() - means.data.cpu().numpy())**2, axis = 1 )   ) )
+		
 		preds.append(pred)
 
 	return torch.tensor(preds)
