@@ -40,7 +40,7 @@ def incrementalTrain(task, trainDS, ICaRL, exemplars):
 	m = int(m+1) #arrotondo per eccesso; preferisco avere max 100 exemplars in più che non 100 in meno
 	exemplars = reduceExemplars(exemplars,m)
 
-	exemplars = generateNewExemplars(exemplars, m, col[:10], trainDS, train_indexes, ICaRL)
+	exemplars = generateNewExemplars(exemplars, m, col[task:], trainDS, train_indexes, ICaRL)
 
 	return ICaRL, exemplars
 
@@ -120,6 +120,7 @@ def generateNewExemplars(exemplars, m, col, trainDS, train_indexes, ICaRL):
 			image, label, idx = trainDS.__getitem__(i)
 			if( label == classe ):
 				idxsImages.append(idx)
+		print('immagini nuova classe ', classe, ' sono: ', idxsImages.size)
 		exemplars[classe] = constructExemplars(idxsImages, m, ICaRL)
 	return exemplars
 
