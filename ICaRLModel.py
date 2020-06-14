@@ -152,7 +152,7 @@ def constructExemplars(idxsImages, m, ICaRL):
 		mu1 = 1/(k+1)* ( phiX + phiP)
 		idxEx = np.argmin(np.sqrt(np.sum((means - mu1) ** 2, axis=1))) #compute the euclidean norm among all the rows in phiX
 		newExs.append(idxsImages[idxEx])
-		phiExemplaresY.append(features[idxEx])
+		phiNewEx.append(features[idxEx])
 	return newExs
 
 def classify(images, exemplars, ICaRL, task):
