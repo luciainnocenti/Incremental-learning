@@ -159,7 +159,7 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 		newExs.append(idxsImages[mapFeatures[idxEx]])
 		phiNewEx.append(features[mapFeatures[idxEx]])
 		features.pop(idxEx)
-		mapFeatures.pop(idxEx)
+		mapFeatures = np.delete(mapFeatures, idxEx) 
 		
 	return newExs
 
