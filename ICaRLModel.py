@@ -1,3 +1,21 @@
+from DatasetCIFAR.data_set import Dataset 
+from DatasetCIFAR import ResNet
+from DatasetCIFAR import utils
+from DatasetCIFAR import params
+from DatasetCIFAR import ICaRLModel
+from torchvision import models
+import torch.nn as nn
+import torch
+import torch.optim as optim
+import torchvision
+import numpy as np
+
+from torchvision import transforms
+from torch.utils.data import Subset, DataLoader
+from torch.nn import functional as F
+import random
+random.seed(params.SEED)
+
 def incrementalTrain(task, trainDS, ICaRL, exemplars):
 	trainSplits = trainDS.splits
 
