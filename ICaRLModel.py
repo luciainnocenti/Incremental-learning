@@ -126,7 +126,6 @@ def generateNewExemplars(exemplars, m, col, trainDS, train_indexes, ICaRL):
 
 def constructExemplars(idxsImages, m, ICaRL, trainDS):
 	ICaRL = deepcopy(ICaRL).train(False)
-	transformer = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)) ])
 
 	ds = trainDS
 	ss = Subset(ds, idxsImages)
@@ -159,7 +158,7 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 		phiNewEx.append(features[idxEx])
 	return newExs
 
-def classify(images, exemplars, ICaRL, task):
+def classify(images, exemplars, ICaRL, task, trainDS):
 	preds = []
 
 	nClasses = task + params.TASK_SIZE
@@ -170,8 +169,9 @@ def classify(images, exemplars, ICaRL, task):
 	phiX = ICaRL(images, features = True)
 	phiX =  f.normalize(phiX,dim=0,p=2)
 	
-	transformer = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-	ds = Dataset(train=True, transform = transformer)
+	#transformer = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+	#ds = Dataset(train=True, transform = transformer)
+	ds = trainDS
 	classiAnalizzate = []
 
 	for i in range( 0, int(task/10) + 1) :
