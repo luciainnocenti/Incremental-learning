@@ -37,7 +37,7 @@ def incrementalTrain(task, trainDS, ICaRL, exemplars):
 	ICaRL = updateRep(task, trainDS, train_indexes, ICaRL, exemplars, trainSplits)
 
 	m = params.K/(task + params.TASK_SIZE)
-
+	m = int(m+1) #arrotondo per eccesso; preferisco avere max 100 exemplars in più che non 100 in meno
 	exemplars = reduceExemplars(exemplars,m)
 
 	exemplars = generateNewExemplars(exemplars, m, col[:10], trainDS, train_indexes, ICaRL)
