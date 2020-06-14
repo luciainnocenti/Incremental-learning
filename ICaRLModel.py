@@ -141,7 +141,7 @@ def constructExemplars(idxsImages, m, ICaRL):
 		for s in x:
 			features.append(np.array(s.data.cpu()))
 		print(' features dovrebbe avere dimensione i*batchSize, 64')
-		print('shape = ', features.shape)
+		print('shape = ', len(features), '  ', features[0].size)
 		ma = torch.sum(x, dim=0) #sommo sulle colonne, ovvero sulle features
 		means += ma
 	means = means/ len(idxsImages) # medio
