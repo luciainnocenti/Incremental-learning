@@ -150,7 +150,7 @@ def constructExemplars(idxsImages, m, ICaRL):
 		phiX = features #le features di tutte le immagini della classe Y
 		phiP = np.sum(phiNewEx, axis = 0) #ad ogni step k, ho già collezionato k-1 examplars
 		mu1 = 1/(k+1)* ( phiX + phiP)
-		idxEx = np.argmin(np.sqrt(np.sum((mu - mu1) ** 2, axis=1))) #compute the euclidean norm among all the rows in phiX
+		idxEx = np.argmin(np.sqrt(np.sum((means - mu1) ** 2, axis=1))) #compute the euclidean norm among all the rows in phiX
 		newExs.append(idxsImages[idxEx])
 		phiExemplaresY.append(features[idxEx])
 	return newExs
