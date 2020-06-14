@@ -32,12 +32,7 @@ def incrementalTrain(task, trainDS, ICaRL, exemplars):
 	print('col = ', col)
 	print('col[:10]',  np.array(col[:10]))
 
-	train_ds = Dataset(train=True, transform = transformer)
-	train_ds._data = trainDS._data[train_indexes]
-	train_ds._targets = trainDS._targets[train_indexes]
-	
-	current_exemplars = exemplars[  np.array(col[:10]).astype(int)  ]
-	ICaRL = updateRep(task, train_ds, ICaRL, exemplars, trainSplits)
+	ICaRL = updateRep(task, trainDS, train_indexes, ICaRL, exemplars, trainSplits)
 
 	m = params.K/(task + params.TASK_SIZE)
 
@@ -47,7 +42,7 @@ def incrementalTrain(task, trainDS, ICaRL, exemplars):
 
 	return ICaRL, exemplars
 
-def updateRep(task, train_indexes, ICaRL, exemplars, splits):
+def (task, trainDS, train_indexes, ICaRL, exemplars, splits):
 
 	dataIdx = np.array(train_indexes)
 	for classe in exemplars:
