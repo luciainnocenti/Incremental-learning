@@ -9,6 +9,7 @@ import torch
 import torch.optim as optim
 import torchvision
 import numpy as np
+from copy import deepcopy
 
 from torchvision import transforms
 from torch.utils.data import Subset, DataLoader
