@@ -13,11 +13,6 @@ from DatasetCIFAR.data_set import Dataset
 from torchvision import transforms
 from torch.utils.data import Subset, DataLoader
 
-#utils.py
-PARAMS = {
-	K = 2000
-	...
-}
 
 def classify(images, exemplars, ICaRL, task):
 
@@ -60,11 +55,6 @@ def classify(images, exemplars, ICaRL, task):
 		preds.append(pred)
 
 	return torch.tensor(preds)
-
-
-
-
-
 
 
 def incrementalTrain(task, trainDS, ICaRL, exemplars):
