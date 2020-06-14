@@ -17,7 +17,7 @@ LR = 2
 STEP_SIZE = [49,63]
 GAMMA = 1/5
 SEED = 653 
-
+K = 2000
 MOMENTUM = 0.9
 
 def returnSplits():
