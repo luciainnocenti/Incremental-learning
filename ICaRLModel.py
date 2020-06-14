@@ -120,15 +120,14 @@ def generateNewExemplars(exemplars, m, col, trainDS, train_indexes, ICaRL):
 			if( label == classe ):
 				idxsImages.append(idx)
 		##print('immagini nuova classe ', classe, ' sono: ', len(idxsImages))
-		exemplars[classe] = constructExemplars(idxsImages, m, ICaRL)
+		exemplars[classe] = constructExemplars(idxsImages, m, ICaRL, trainDS)
 	return exemplars
 
-def constructExemplars(idxsImages, m, ICaRL):
+def constructExemplars(idxsImages, m, ICaRL, trainDS):
 	ICaRL = deepcopy(ICaRL).train(False)
 	transformer = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)) ])
 
-	ds = Dataset(train = True, transform = transformer)
-
+	ds = trainDS
 	ss = Subset(ds, idxsImages)
 
 	loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE)
