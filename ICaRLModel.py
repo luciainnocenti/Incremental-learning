@@ -61,15 +61,12 @@ def incrementalTrain(task, trainDS, ICaRL, exemplars):
 	trainSplits = trainDS.splits
 
 	train_indexes = trainDS.__getIndexesGroups__(task)
-
-
-  	col = []
-  	for i,x in enumerate( trainSplits[ :int(task/10) + 1]) : #comprende le 10 classi di questo task
-  	  v = np.array(x)
-  	  col = np.concatenate( (col,v), axis = None)
-  	  col = col.astype(int)
-  	print('col = ', col)
-
+	col = []
+	for i,x in enumerate( trainSplits[ :int(task/10) + 1]) : #comprende le 10 classi di questo task
+		v = np.array(x)
+		col = np.concatenate( (col,v), axis = None)
+		col = col.astype(int)
+		print('col = ', col)
 
   	train_ds = Dataset(train=True, transform = train_transformer)
   	train_ds._data = trainDS._data[train_indexes]
