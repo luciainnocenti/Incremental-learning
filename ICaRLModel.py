@@ -108,7 +108,7 @@ def reduceExemplars(exemplars,m):
 	
 	for i, el in enumerate(exemplars):
 		if el is not None:
-			exemplars[i] = el[:m,]
+			exemplars[i] = el[:m]
 	return exemplars	
 
 def generateNewExemplars(exemplars, m, col, trainDS, train_indexes, ICaRL):
