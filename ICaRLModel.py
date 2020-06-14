@@ -18,6 +18,8 @@ random.seed(params.SEED)
 
 def incrementalTrain(task, trainDS, ICaRL, exemplars):
 	trainSplits = trainDS.splits
+	
+	transformer = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
 	train_indexes = trainDS.__getIndexesGroups__(task)
 
@@ -30,7 +32,7 @@ def incrementalTrain(task, trainDS, ICaRL, exemplars):
 	print('col = ', col)
 
 
-	train_ds = Dataset(train=True, transform = train_transformer)
+	train_ds = Dataset(train=True, transform = transformer)
 	train_ds._data = trainDS._data[train_indexes]
 	train_ds._targets = trainDS._targets[train_indexes]
 	
