@@ -120,7 +120,7 @@ def generateNewExemplars(exemplars, m, col, trainDS, train_indexes, ICaRL):
 			image, label, idx = trainDS.__getitem__(i)
 			if( label == classe ):
 				idxsImages.append(idx)
-		print('immagini nuova classe ', classe, ' sono: ', len(idxsImages))
+		##print('immagini nuova classe ', classe, ' sono: ', len(idxsImages))
 		exemplars[classe] = constructExemplars(idxsImages, m, ICaRL)
 	return exemplars
 
@@ -141,8 +141,8 @@ def constructExemplars(idxsImages, m, ICaRL):
 			x = ICaRL( image, features = True)
 		for s in x:
 			features.append(np.array(s.data.cpu()))
-		print(' features dovrebbe avere dimensione i*batchSize, 64')
-		print('shape = ', len(features), '  ', features[0].size)
+		##print(' features dovrebbe avere dimensione i*batchSize, 64')
+		##print('shape = ', len(features), '  ', features[0].size)
 		ma = torch.sum(x, dim=0) #sommo sulle colonne, ovvero sulle features
 		means += ma
 	means = means/ len(idxsImages) # medio
@@ -173,9 +173,9 @@ def classify(images, exemplars, ICaRL, task):
 	classiAnalizzate = []
 
 	for i in range( 0, int(task/10) + 1) :
-		print('split i = ', ds.splits[i])
+		##print('split i = ', ds.splits[i])
 		classiAnalizzate = np.concatenate( (classiAnalizzate, ds.splits[i]) )
-	print('classi = ', classiAnalizzate)
+	##print('classi = ', classiAnalizzate)
 	for y in range (0, task + params.TASK_SIZE):
 		#now idxsImages contains the list of all the images selected as exemplars
 		classY = int(classiAnalizzate[y])
