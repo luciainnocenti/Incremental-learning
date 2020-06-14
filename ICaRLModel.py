@@ -178,7 +178,7 @@ def classify(images, exemplars, ICaRL, task):
 		ss = Subset(ds, exemplars[classY])
 		loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE)
 		for img, lbl, idx in loader:
-			with torch.no_grad:
+			with torch.no_grad():
 				img = img.float().to(params.DEVICE)
 				x = ICaRL(img, features = True)
 			ma = torch.sum(x, dim=0)
