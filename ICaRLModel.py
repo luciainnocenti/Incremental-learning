@@ -64,7 +64,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits):
 	optimizer = torch.optim.SGD(ICaRL.parameters(), lr=params.LR, momentum=params.MOMENTUM, weight_decay=params.WEIGHT_DECAY)
 	scheduler = optim.lr_scheduler.MultiStepLR(optimizer, params.STEP_SIZE, gamma=params.GAMMA) #allow to change the LR at predefined epochs
 	current_step = 0
-
+	col = []
 	for i,x in enumerate( splits[ :int(task/10) + 1]):
 		v = np.array(x)
 		col = np.concatenate( (col,v), axis = None)
