@@ -169,8 +169,8 @@ def classify(images, exemplars, ICaRL, task):
 	classiAnalizzate = []
 
 	for i in range( 0, int(task/10) + 1) :
-		classiAnalizzate.append(ds.trainSplits[i])
-
+		classiAnalizzate.append(ds.splits[i])
+	print('classi = ', classiAnalizzate)
 	for y in range (0, task + params.TASK_SIZE):
 		#now idxsImages contains the list of all the images selected as exemplars
 		classY = classiAnalizzate[y]
