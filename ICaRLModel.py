@@ -174,7 +174,7 @@ def classify(images, exemplars, ICaRL, task):
 	print('classi = ', classiAnalizzate)
 	for y in range (0, task + params.TASK_SIZE):
 		#now idxsImages contains the list of all the images selected as exemplars
-		classY = classiAnalizzate[y]
+		classY = int(classiAnalizzate[y])
 		ss = Subset(ds, exemplars[classY])
 		loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE)
 		for img, lbl, idx in loader:
