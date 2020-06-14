@@ -8,9 +8,10 @@ import torch.nn as nn
 import torch
 import torch.optim as optim
 import torchvision
+import torch.nn.functional as f
+import copy
 import numpy as np
 from copy import deepcopy
-import copy
 
 from torchvision import transforms
 from torch.utils.data import Subset, DataLoader
@@ -137,6 +138,7 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 		with torch.no_grad():
 			image = image.float().to(params.DEVICE)
 			x = ICaRL( image, features = True)
+			x =  f.normalize(x,dim=0,p=2)
 		for s in x:
 			features.append(np.array(s.data.cpu()))
 		##print(' features dovrebbe avere dimensione i*batchSize, 64')
@@ -165,7 +167,8 @@ def classify(images, exemplars, ICaRL, task):
 	ICaRL.train(False)
 	images = images.float().to(params.DEVICE)
 	phiX = ICaRL(images, features = True)
-
+	phiX =  f.normalize(phiX,dim=0,p=2)
+	
 	transformer = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 	ds = Dataset(train=True, transform = transformer)
 	classiAnalizzate = []
@@ -183,6 +186,7 @@ def classify(images, exemplars, ICaRL, task):
 			with torch.no_grad():
 				img = img.float().to(params.DEVICE)
 				x = ICaRL(img, features = True)
+				x =  f.normalize(x,dim=0,p=2)
 			ma = torch.sum(x, dim=0)
 			means[y] += ma
 
