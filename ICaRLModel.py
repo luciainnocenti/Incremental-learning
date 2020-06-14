@@ -10,6 +10,7 @@ import torch.optim as optim
 import torchvision
 import numpy as np
 from copy import deepcopy
+import copy
 
 from torchvision import transforms
 from torch.utils.data import Subset, DataLoader
@@ -102,7 +103,8 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits):
 	return ICaRL
 
 def reduceExemplars(exemplars,m):
-	exemplars = exemplars.copy
+	exemplars = copy.deepcopy(exemplars)
+	
 	for i, el in enumerate(exemplars):
 		if el is not None:
 			exemplars[i] = el[:m,]
