@@ -28,9 +28,9 @@ def incrementalTrain(task, trainDS, ICaRL, exemplars):
 	for i,x in enumerate( trainSplits[ :int(task/10) + 1]) : #comprende le 10 classi di questo task
 		v = np.array(x)
 		col = np.concatenate( (col,v), axis = None)
-		col = col.astype(int)
+	col = col.astype(int)
 	print('col = ', col)
-
+	print('col[:10]',  col[:10])
 
 	train_ds = Dataset(train=True, transform = transformer)
 	train_ds._data = trainDS._data[train_indexes]
