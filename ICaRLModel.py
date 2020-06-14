@@ -49,7 +49,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits):
 	dataIdx = np.array(train_indexes)
 	for classe in exemplars:
 		if( classe is not None):
-			print('classe = ', classe)
+			#print('classe = ', classe)
 			dataIdx = np.concatenate( (dataIdx, classe) )
 
 	#dataIdx contiene gli indici delle immagini, in train DS, delle nuove classi e dei vecchi exemplars
@@ -77,30 +77,29 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits):
 		running_corrects = 0
   	  
 
-	for images, labels, idx in loader:
-		images = images.float().to(params.DEVICE)
-		labels = labels.to(params.DEVICE)
-		onehot_labels = torch.eye(100)[labels].to(params.DEVICE)
-		mappedLabels = utils.mapFunction(labels, col)
-		
-		optimizer.zero_grad()
-		
-		outputs = ICaRL(images, features = False)
-		old_outputs = old_ICaRL(images, features = False)
-		
-		loss = utils.calculateLoss(outputs, old_outputs, onehot_labels, task, splits )
-		
-		cut_outputs = np.take_along_axis(outputs.to(params.DEVICE), col[None,:], axis = 1).to(params.DEVICE)
-		_ , preds = torch.max(cut_outputs.data, 1)
-		
-		running_corrects += torch.sum(preds == mappedLabels.data).data.item()
-		lenght += len(images)
-		
-		loss.backward()  # backward pass: computes gradients
-		optimizer.step()
-	accuracy = running_corrects / float(lenght)
-	print("At step ", str(task), " and at epoch = ", epoch, " the loss is = ", loss.item(), " and accuracy is = ", accuracy)
-	
+		for images, labels, idx in loader:
+			images = images.float().to(params.DEVICE)
+			labels = labels.to(params.DEVICE)
+			onehot_labels = torch.eye(100)[labels].to(params.DEVICE)
+			mappedLabels = utils.mapFunction(labels, col)
+			
+			optimizer.zero_grad()
+			
+			outputs = ICaRL(images, features = False)
+			old_outputs = old_ICaRL(images, features = False)
+			
+			loss = utils.calculateLoss(outputs, old_outputs, onehot_labels, task, splits )
+			
+			cut_outputs = np.take_along_axis(outputs.to(params.DEVICE), col[None,:], axis = 1).to(params.DEVICE)
+			_ , preds = torch.max(cut_outputs.data, 1)
+			
+			running_corrects += torch.sum(preds == mappedLabels.data).data.item()
+			lenght += len(images)
+			
+			loss.backward()  # backward pass: computes gradients
+			optimizer.step()
+		accuracy = running_corrects / float(lenght)
+		print("At step ", str(task), " and at epoch = ", epoch, " the loss is = ", loss.item(), " and accuracy is = ", accuracy)
 	return ICaRL
 
 def reduceExemplars(exemplars,m):
