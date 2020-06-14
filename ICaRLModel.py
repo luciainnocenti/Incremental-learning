@@ -143,7 +143,7 @@ def constructExemplars(idxsImages, m, ICaRL):
 		ma = torch.sum(x, dim=0) #sommo sulle colonne, ovvero sulle features
 		means += ma
 	means = means/ len(idxsImages) # medio
-
+	means = means.data.cpu().numpy()
 	newExs = []
 	phiNewEx = []
 	for k in range (0, m):
