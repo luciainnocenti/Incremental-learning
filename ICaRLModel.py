@@ -146,6 +146,7 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 		ma = torch.sum(x, dim=0) #sommo sulle colonne, ovvero sulle features
 		means += ma
 	means = means/ len(idxsImages) # medio
+	means = means / means.norm()
 	means = means.data.cpu().numpy()
 	newExs = []
 	phiNewEx = []
@@ -191,6 +192,7 @@ def classify(images, exemplars, ICaRL, task):
 			means[y] += ma
 
 		means[y] = means[y]/ len(idx) # medio
+		means[y] = means[y] / means[y].norm()
 	#print('means = ', means.shape)
 	for data in phiX:
 		#print('shape data = ', data.shape)
