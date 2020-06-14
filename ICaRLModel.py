@@ -120,7 +120,7 @@ def generateNewExemplars(exemplars, m, col, trainDS, train_indexes, ICaRL):
 			image, label, idx = trainDS.__getitem__(i)
 			if( label == classe ):
 				idxsImages.append(idx)
-		print('immagini nuova classe ', classe, ' sono: ', idxsImages.size)
+		print('immagini nuova classe ', classe, ' sono: ', len(idxsImages))
 		exemplars[classe] = constructExemplars(idxsImages, m, ICaRL)
 	return exemplars
 
