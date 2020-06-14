@@ -49,6 +49,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits):
 	dataIdx = np.array(train_indexes)
 	for classe in exemplars:
 		if( classe is not None):
+			print('classe = ', classe)
 			dataIdx = np.concatenate(dataIdx, classe)
 
 	#dataIdx contiene gli indici delle immagini, in train DS, delle nuove classi e dei vecchi exemplars
@@ -139,6 +140,8 @@ def constructExemplars(idxsImages, m, ICaRL):
 			x = ICaRL( image, features = True)
 		for s in x:
 			features.append(np.array(s.data.cpu()))
+		print(' features dovrebbe avere dimensione i*batchSize, 64')
+		print('shape = ', features.shape)
 		ma = torch.sum(x, dim=0) #sommo sulle colonne, ovvero sulle features
 		means += ma
 	means = means/ len(idxsImages) # medio
@@ -146,8 +149,8 @@ def constructExemplars(idxsImages, m, ICaRL):
 	newExs = []
 	phiNewEx = []
 	for k in range (0, m):
-		phiX = features #le features di tutte le immagini della classe Y
-		phiP = np.sum(phiNewEx, axis = 0) #ad ogni step k, ho già collezionato k-1 examplars
+		phiX = features #le features di tutte le immagini della classe Y ---> rige = len(ss); colonne = #features
+		phiP = np.sum(phiNewEx, axis = 0) #somma su tutte le colonne degli exemplars esistenti. Quindi ogni colonna di phiP sarà la somma del valore di quella feature per ognuna degli exemplars
 		mu1 = 1/(k+1)* ( phiX + phiP)
 		idxEx = np.argmin(np.sqrt(np.sum((means - mu1) ** 2, axis=1))) #compute the euclidean norm among all the rows in phiX
 		newExs.append(idxsImages[idxEx])
