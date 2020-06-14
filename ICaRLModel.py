@@ -112,9 +112,8 @@ def reduceExemplars(exemplars,m):
 
 def generateNewExemplars(exemplars, m, col, trainDS, train_indexes, ICaRL):
 	#col contiene i valori delle 10 classi in analisi in questo momento
-	exemplars = exemplars.copy
+	exemplars = deepcopy(exemplars)
 	for classe in col:
-
 		idxsImages = []
 		for i in train_indexes:
 			image, label, idx = trainDS.__getitem__(i)
