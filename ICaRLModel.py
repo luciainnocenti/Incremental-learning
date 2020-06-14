@@ -185,9 +185,10 @@ def classify(images, exemplars, ICaRL, task):
 			means[y] += ma
 
 		means[y] = means[y]/ len(idx) # medio
-
+	print('means = ', means)
 	for data in phiX:
-		pred = np.argmin(np.sqrt( np.sum((phiX - means)**2, axis=1)  ) )
+		print('shape data = ', data.shape)
+		pred = np.argmin(np.sqrt( np.sum((data - means)**2, axis=1)  ) )
 		preds.append(pred)
 
 	return torch.tensor(preds)
