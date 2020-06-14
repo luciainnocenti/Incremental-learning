@@ -42,7 +42,7 @@ def incrementalTrain(task, trainDS, ICaRL, exemplars):
 
 	return ICaRL, exemplars
 
-def (task, trainDS, train_indexes, ICaRL, exemplars, splits):
+def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits):
 
 	dataIdx = np.array(train_indexes)
 	for classe in exemplars:
