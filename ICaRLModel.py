@@ -160,7 +160,7 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 		phiNewEx.append(features[mapFeatures[idxEx]])
 		features.pop(idxEx)
 		mapFeatures = np.delete(mapFeatures, idxEx) 
-		
+	print('exemplars addded = ', newExs)
 	return newExs
 
 def classify(images, exemplars, ICaRL, task, trainDS):
