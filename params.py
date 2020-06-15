@@ -18,8 +18,8 @@ STEP_SIZE = [49,63]
 GAMMA = 1/5
 
 #SEED = 999 #pessima, 71
-SEED = 135
-#SEED = 291
+#SEED = 135
+SEED = 291
 K = 2000
 MOMENTUM = 0.9
 
