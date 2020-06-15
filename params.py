@@ -19,17 +19,20 @@ GAMMA = 1/5
 #SEED = 999 #pessima, 71
 #SEED = 135
 #SEED = 291
-SEED = 653
+#SEED = 653
+
+SEED = 765
+
 #NUM_WORKERS = 4
-NUM_WORKERS = 1
-#NUM_WORKERS = 10
+#NUM_WORKERS = 1
+NUM_WORKERS = 10
 
 K = 2000
 MOMENTUM = 0.9
 
 
 
-def returnSplits_v2():
+def returnSplits():
 	el = np.linspace(0,99,100)
 	splits  = [None] * 10
 	for i in range(0,10):
@@ -39,7 +42,7 @@ def returnSplits_v2():
 		el = list( set(el) - set(n) )
 	return splits 
 
-def returnSplits():
+def returnSplits_v2():
 	url = 'https://raw.githubusercontent.com/fcdl94/ICL/master/data/cifar_order.csv'
 	data = pd.read_csv(url, header=None)
 
