@@ -17,8 +17,9 @@ LR = 2
 STEP_SIZE = [49,63]
 GAMMA = 1/5
 #SEED = 653 
-#SEED = 999 best = 0.81
-SEED = 135
+SEED = 999 #in run
+#SEED = 135
+#SEED 291
 K = 2000
 MOMENTUM = 0.9
 
