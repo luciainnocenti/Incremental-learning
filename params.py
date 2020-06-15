@@ -7,7 +7,6 @@ import random
 
 DEVICE = 'cuda' # 'cuda' or 'cpu'
 BATCH_SIZE = 128
-NUM_WORKERS = 4
 TASK_SIZE = 10
 
 NUM_EPOCHS = 70
@@ -19,13 +18,16 @@ GAMMA = 1/5
 
 #SEED = 999 #pessima, 71
 #SEED = 135
-SEED = 291
+#SEED = 291
+#NUM_WORKERS = 4
+NUM_WORKERS = 1
+
 K = 2000
 MOMENTUM = 0.9
 
 
 
-def returnSplits():
+def returnSplits_v2():
 	el = np.linspace(0,99,100)
 	splits  = [None] * 10
 	for i in range(0,10):
@@ -35,7 +37,7 @@ def returnSplits():
 		el = list( set(el) - set(n) )
 	return splits 
 
-def returnSplits_v2():
+def returnSplits():
 	url = 'https://raw.githubusercontent.com/fcdl94/ICL/master/data/cifar_order.csv'
 	data = pd.read_csv(url, header=None)
 
