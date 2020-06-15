@@ -7,7 +7,7 @@ import random
 
 DEVICE = 'cuda' # 'cuda' or 'cpu'
 BATCH_SIZE = 128
-#NUM_WORKERS = 10
+NUM_WORKERS = 10
 TASK_SIZE = 10
 
 NUM_EPOCHS = 70
@@ -18,13 +18,11 @@ STEP_SIZE = [49,63]
 GAMMA = 1/5
 
 #SEED = 999 #pessima, 71
-#SEED = 135
+SEED = 135
 #SEED = 291
 K = 2000
 MOMENTUM = 0.9
 
-SEED = 653 
-NUM_WORKERS = 4
 
 
 def returnSplits():
