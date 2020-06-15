@@ -16,13 +16,9 @@ LR = 2
 STEP_SIZE = [49,63]
 GAMMA = 1/5
 
-#SEED = 999 #pessima, 71
-#SEED = 135
-#SEED = 291
-#SEED = 653
+SEED = 653
 
-#SEED = 765
-SEED = 12
+
 
 #NUM_WORKERS = 4
 #NUM_WORKERS = 1
