@@ -157,10 +157,11 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 		mu1 = 1/(k+1)* ( phiX + phiP)
 		idxEx = np.argmin(np.sqrt(np.sum((means - mu1) ** 2, axis=1))) #compute the euclidean norm among all the rows in phiX
 		print("idx = ", idxEx)
+		print("map feautres[idx] = ", mapFeatures[idxEx])
 		newExs.append(idxsImages[mapFeatures[idxEx]])
 		phiNewEx.append(features[mapFeatures[idxEx]])
-		print("len features = ", len(features))
 		features.pop(idxEx)
+		print("len features = ", len(features))
 		mapFeatures = np.delete(mapFeatures, idxEx) 
 	return newExs
 
