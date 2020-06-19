@@ -88,7 +88,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits):
 			
 			outputs = ICaRL(images, features = False)
 			old_outputs = old_ICaRL(images, features = False)
-			weights = torch.sum( onehot_labels, dim=0)/torch.sum(onehot_labels)
+			weights = torch.sum( onehot_labels, dim=0)/torch.sum(onehot_labels) #prova con media fatta sul batch corrente
 			print(weights)
 			loss = utils.calculateLoss(outputs, old_outputs, onehot_labels, task, splits )
 			
