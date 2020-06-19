@@ -156,13 +156,13 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 		phiP = np.sum(phiNewEx, axis = 0) #somma su tutte le colonne degli exemplars esistenti. Quindi ogni colonna di phiP sarà la somma del valore di quella feature per ognuna degli exemplars
 		mu1 = 1/(k+1)* ( phiX + phiP)
 		idxEx = np.argmin(np.sqrt(np.sum((means - mu1) ** 2, axis=1))) #compute the euclidean norm among all the rows in phiX
-		print("idx = ", idxEx)
-		print("map feautres[idx] = ", mapFeatures[idxEx])
+		#print("idx = ", idxEx)
+		#print("map feautres[idx] = ", mapFeatures[idxEx])
 		newExs.append(idxsImages[mapFeatures[idxEx]])
 		phiNewEx.append(features[idxEx])
 		features.pop(idxEx)
 		mapFeatures = np.delete(mapFeatures, idxEx) 
-		print("len features = ", len(features))
+		#print("len features = ", len(features))
 	return newExs
 
 def classify(images, exemplars, ICaRL, task, trainDS):
