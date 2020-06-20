@@ -119,7 +119,7 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits, typeL
         'BCE': [torch.nn.BCEWithLogitsLoss(), nn.Sigmoid()], 
         'WBCE': [torch.nn.BCEWithLogitsLoss(pos_weight = weights), nn.Sigmoid()], 
         'LogLoss':[torch.nn.NLLLoss(pos_weight = weights), nn.LogSoftmax(dim=1)], 
-        'MSELoss' : ,
+        #'MSELoss' : ,
     	} 
 
     	criterion, m = switcher(typeLoss)
