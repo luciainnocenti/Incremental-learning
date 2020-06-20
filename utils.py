@@ -114,13 +114,17 @@ def evaluationTest(task, test_loader, test_splits):
 	print('Validation Loss: {} Validation Accuracy : {}'.format(loss.item(),accuracy) )
 	return(accuracy, loss.item())	  
 
+def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits, typeLoss = 'BCE', weights = None):
+	switcher = { 
+        'BCE': [torch.nn.BCEWithLogitsLoss(), nn.Sigmoid()], 
+        'WBCE': [torch.nn.BCEWithLogitsLoss(pos_weight = weights), nn.Sigmoid()], 
+        'LogLoss':[torch.nn.NLLLoss(pos_weight = weights), nn.LogSoftmax(dim=1)], 
+        'MSELoss' : ,
+    	} 
 
-def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits):
-	criterion = torch.nn.BCEWithLogitsLoss()
-	m = nn.Sigmoid()
-	
+    	criterion, m = switcher(typeLoss)
+
 	outputs, old_outputs, onehot_labels = outputs.to(params.DEVICE), old_outputs.to(params.DEVICE), onehot_labels.to(params.DEVICE)
-
 	col = []
 	for i,x in enumerate( train_splits[ :int(task/10) ]):
 		v = np.array(x)
@@ -128,7 +132,6 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits):
 	col = np.array(col).astype(int)
 	
 	if( task == 0):
-		#loss = criterion(outputs,onehot_labels)
 		loss = criterion(outputs,onehot_labels)
 	if( task > 0 ):
 		target = onehot_labels.clone().to(params.DEVICE)
