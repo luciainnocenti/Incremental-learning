@@ -90,7 +90,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits):
 			old_outputs = old_ICaRL(images, features = False)
 			weights = torch.sum( onehot_labels, dim=0)/torch.sum(onehot_labels) #prova con media fatta sul batch corrente
 			#print(weights)
-			loss = utils.calculateLoss(outputs, old_outputs, onehot_labels, task, splits )
+			loss = utils.calculateLoss(outputs, old_outputs, onehot_labels, task, splits, typeLoss = 'WBCE', weights = weights)
 			
 			cut_outputs = np.take_along_axis(outputs.to(params.DEVICE), col[None,:], axis = 1).to(params.DEVICE)
 			_ , preds = torch.max(cut_outputs.data, 1)
