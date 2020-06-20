@@ -122,7 +122,7 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits, typeL
         #'MSELoss' : ,
     	}
 	
-	criterion, m = switcher(typeLoss)
+	criterion, m = switcher[typeLoss]
 
 	outputs, old_outputs, onehot_labels = outputs.to(params.DEVICE), old_outputs.to(params.DEVICE), onehot_labels.to(params.DEVICE)
 	col = []
