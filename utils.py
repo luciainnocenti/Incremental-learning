@@ -120,9 +120,9 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits, typeL
         'WBCE': [torch.nn.BCEWithLogitsLoss(pos_weight = weights), nn.Sigmoid()], 
         'LogLoss':[torch.nn.NLLLoss(pos_weight = weights), nn.LogSoftmax(dim=1)], 
         #'MSELoss' : ,
-    	} 
-
-    	criterion, m = switcher(typeLoss)
+    	}
+	
+	criterion, m = switcher(typeLoss)
 
 	outputs, old_outputs, onehot_labels = outputs.to(params.DEVICE), old_outputs.to(params.DEVICE), onehot_labels.to(params.DEVICE)
 	col = []
