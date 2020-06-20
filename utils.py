@@ -109,7 +109,6 @@ def evaluationTest(task, test_loader, test_splits):
 	
 	#Calculate Loss
 	
-	#M1 loss = F.binary_cross_entropy_with_logits(cut_outputs,onehot_labels)
 	loss = criterion(outputs,onehot_labels)
 	print('Validation Loss: {} Validation Accuracy : {}'.format(loss.item(),accuracy) )
 	return(accuracy, loss.item())	  
@@ -128,7 +127,6 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits):
 	col = np.array(col).astype(int)
 	
 	if( task == 0):
-		#loss = criterion(outputs,onehot_labels)
 		loss = criterion(outputs,onehot_labels)
 	if( task > 0 ):
 		target = onehot_labels.clone().to(params.DEVICE)
