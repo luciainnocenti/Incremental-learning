@@ -137,7 +137,6 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 		with torch.no_grad():
 			image = image.float().to(params.DEVICE)
 			x = ICaRL( image, features = True)
-			#x =  f.normalize(x,dim=0,p=2)
 			x /= torch.norm(x, p=2)
 		for s in x:
 			features.append(np.array(s.data.cpu()))
@@ -174,11 +173,8 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 	ICaRL.train(False)
 	images = images.float().to(params.DEVICE)
 	phiX = ICaRL(images, features = True)
-	#phiX =  f.normalize(phiX,dim=0,p=2)
-	phiX /= torch.norm(phiX, p=2)
 
-	#transformer = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-	#ds = Dataset(train=True, transform = transformer)
+	phiX /= torch.norm(phiX, p=2)
 	ds = trainDS
 	classiAnalizzate = []
 	if(mean == None):
