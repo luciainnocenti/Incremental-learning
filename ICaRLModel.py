@@ -178,7 +178,7 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 	
 	ds = trainDS
 	
-	if(mean == None):
+	if(mean is None):
 		nClasses = task + params.TASK_SIZE
 		classiAnalizzate = []
 		means = torch.zeros( ( nClasses, 64)).to(params.DEVICE)
