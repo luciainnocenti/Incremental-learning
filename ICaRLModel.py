@@ -137,16 +137,18 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 		with torch.no_grad():
 			image = image.float().to(params.DEVICE)
 			x = ICaRL( image, features = True)
-			x /= torch.norm(x, p=2)
 		for s in x:
-			features.append(np.array(s.data.cpu()))
+			s = s.data.cpu().numpy()
+			s /= np.linalg.norm(s)
+			features.append(s))
 		##print(' features dovrebbe avere dimensione i*batchSize, 64')
 		##print('shape = ', len(features), '  ', features[0].size)
-		ma = torch.sum(x, dim=0) #sommo sulle colonne, ovvero sulle features
+		ma = x.sum(axis = 0) #sommo sulle colonne, ovvero sulle features
 		means += ma
-	means = means/ len(idxsImages) # medio
-	means = means / means.norm()
-	means = means.data.cpu().numpy()
+	means /= len(idxsImages) # medio
+	#means = means / means.norm()
+	
+	means /= np.linalg.norm(means)
 	newExs = []
 	phiNewEx = []
 	mapFeatures = np.arange( len(features) )
@@ -167,17 +169,18 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 	preds = []
 
-	nClasses = task + params.TASK_SIZE
-	means = torch.zeros( ( nClasses, 64)).to(params.DEVICE)
-
 	ICaRL.train(False)
 	images = images.float().to(params.DEVICE)
 	phiX = ICaRL(images, features = True)
-
-	phiX /= torch.norm(phiX, p=2)
+	phiX = phiX.data.cpu().numpy()
+	phiX /= np.linalg.norm(phiX)
+	
 	ds = trainDS
-	classiAnalizzate = []
+	
 	if(mean == None):
+		nClasses = task + params.TASK_SIZE
+		classiAnalizzate = []
+		means = torch.zeros( ( nClasses, 64)).to(params.DEVICE)
 		for i in range( 0, int(task/10) + 1) :
 			##print('split i = ', ds.splits[i])
 			classiAnalizzate = np.concatenate( (classiAnalizzate, ds.splits[i]) )
@@ -197,13 +200,12 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 				means[y] += ma
 			means[y] = means[y]/ len(idx) # medio
 			means[y] = means[y] / means[y].norm()
+		means = means.data.cpu().numpy()
 
 	else:
 		means = mean
+	
 	for data in phiX:
-		#print('shape data = ', data.shape)
-		pred = np.argmin(np.sqrt( np.sum((data.data.cpu().numpy() - means.data.cpu().numpy())**2, axis = 1 )   ) )
-		
+		pred = np.argmin(np.sqrt( np.sum( (data - means)**2, axis = 1 )   ) )
 		preds.append(pred)
-
 	return (torch.tensor(preds), means)
