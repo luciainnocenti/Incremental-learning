@@ -82,7 +82,7 @@ class Subset(Dataset):
         self.transform = transform
 
     def __getitem__(self, idx):
-        im, labels = self.dataset[self.indices[idx]]
+        im, labels, _ = self.dataset[self.indices[idx]]
         return self.transform(im), labels, idx
 
     def __len__(self):
