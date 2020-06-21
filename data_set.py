@@ -50,11 +50,9 @@ class Dataset(torch.utils.data.Dataset):
     #This method returns a list containing the indexes of all the images belonging to classes [starIndex, startIndex + 10]
     indexes = []
     self.searched_classes = self.splits[int(index/10)]
-    i = 0
-    for el in self._targets:
+    for i, el in enumerate(self._targets):
       if (el in self.searched_classes):
         indexes.append(i)
-      i+=1
     return indexes
   
   def __getitem__(self, idx):
