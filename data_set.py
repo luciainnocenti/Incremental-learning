@@ -79,7 +79,7 @@ class Subset(Dataset):
 
     def __getitem__(self, idx):
         im, labels, _ = self.dataset[self.indices[idx]]
-        return self.transform(im.convert('RGB')), labels, idx
+        return self.transform( Image.fromarray(im)), labels, idx
     
     def __len__(self):
         return len(self.indices)
