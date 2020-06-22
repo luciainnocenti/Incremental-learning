@@ -175,7 +175,7 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 	#phiX =  f.normalize(phiX,dim=0,p=2)
 	phiX /= torch.norm(phiX, p=2)
 
-	#transformer = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+	transformer = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 	#ds = Dataset(train=True, transform = transformer)
 	ds = trainDS
 	classiAnalizzate = []
@@ -187,7 +187,7 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 		for y in range (0, task + params.TASK_SIZE):
 			#now idxsImages contains the list of all the images selected as exemplars
 			classY = int(classiAnalizzate[y])
-			ss = StdSubset(ds, exemplars[classY])
+			ss = Subset(ds, exemplars[classY], transformer)
 			loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE)
 			for img, lbl, idx in loader:
 				with torch.no_grad():
