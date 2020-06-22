@@ -1,4 +1,5 @@
 from DatasetCIFAR.data_set import Dataset 
+from DatasetCIFAR.data_set import Subset 
 from DatasetCIFAR import ResNet
 from DatasetCIFAR import utils
 from DatasetCIFAR import params
@@ -12,18 +13,16 @@ import torch.nn.functional as f
 import copy
 import numpy as np
 from copy import deepcopy
-
-from torchvision import transforms
-from torch.utils.data import Subset, DataLoader
+from torch.utils.data import Subset as StdSubset
+from torch.utils.data import DataLoader
 from torch.nn import functional as F
+from torchvision import transforms
 import random
 random.seed(params.SEED)
 
-def incrementalTrain(task, trainDS, ICaRL, exemplars):
+def incrementalTrain(task, trainDS, ICaRL, exemplars, transformer):
 	trainSplits = trainDS.splits
 	
-	transformer = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-
 	train_indexes = trainDS.__getIndexesGroups__(task)
 
 
@@ -35,7 +34,7 @@ def incrementalTrain(task, trainDS, ICaRL, exemplars):
 	print('col = ', col)
 	print('col[:10]',  np.array(col[:10]))
 
-	ICaRL = updateRep(task, trainDS, train_indexes, ICaRL, exemplars, trainSplits)
+	ICaRL = updateRep(task, trainDS, train_indexes, ICaRL, exemplars, trainSplits, transformer)
 
 	m = params.K/(task + params.TASK_SIZE)
 	m = int(m+1) #arrotondo per eccesso; preferisco avere max 100 exemplars in più che non 100 in meno
@@ -45,7 +44,7 @@ def incrementalTrain(task, trainDS, ICaRL, exemplars):
 
 	return ICaRL, exemplars
 
-def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits):
+def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transformer):
 
 	dataIdx = np.array(train_indexes)
 	for classe in exemplars:
@@ -55,7 +54,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits):
 
 	#dataIdx contiene gli indici delle immagini, in train DS, delle nuove classi e dei vecchi exemplars
 
-	D = Subset(trainDS, dataIdx)
+	D = Subset(trainDS, dataIdx, transformer)
 
 	loader = DataLoader( D, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE, shuffle = True)
 
@@ -88,8 +87,9 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits):
 			
 			outputs = ICaRL(images, features = False)
 			old_outputs = old_ICaRL(images, features = False)
-			
-			loss = utils.calculateLoss(outputs, old_outputs, onehot_labels, task, splits )
+			weights = torch.sum( onehot_labels, dim=0)/torch.sum(onehot_labels) #prova con media fatta sul batch corrente
+			#print(weights)
+			loss = utils.calculateLoss(outputs, old_outputs, onehot_labels, task, splits)#, typeLoss = 'WBCE', weights = weights)
 			
 			cut_outputs = np.take_along_axis(outputs.to(params.DEVICE), col[None,:], axis = 1).to(params.DEVICE)
 			_ , preds = torch.max(cut_outputs.data, 1)
@@ -128,7 +128,7 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 	ICaRL = deepcopy(ICaRL).train(False)
 
 	ds = trainDS
-	ss = Subset(ds, idxsImages)
+	ss = StdSubset(ds, idxsImages)
 
 	loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE)
 	features = []
@@ -137,6 +137,7 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 		with torch.no_grad():
 			image = image.float().to(params.DEVICE)
 			x = ICaRL( image, features = True)
+			#x =  f.normalize(x,dim=0,p=2)
 			x /= torch.norm(x, p=2)
 		for s in x:
 			features.append(np.array(s.data.cpu()))
@@ -155,13 +156,11 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 		phiP = np.sum(phiNewEx, axis = 0) #somma su tutte le colonne degli exemplars esistenti. Quindi ogni colonna di phiP sarà la somma del valore di quella feature per ognuna degli exemplars
 		mu1 = 1/(k+1)* ( phiX + phiP)
 		idxEx = np.argmin(np.sqrt(np.sum((means - mu1) ** 2, axis=1))) #compute the euclidean norm among all the rows in phiX
-		#print("idx = ", idxEx)
-		#print("map feautres[idx] = ", mapFeatures[idxEx])
 		newExs.append(idxsImages[mapFeatures[idxEx]])
 		phiNewEx.append(features[idxEx])
 		features.pop(idxEx)
 		mapFeatures = np.delete(mapFeatures, idxEx) 
-		#print("len features = ", len(features))
+		
 	return newExs
 
 def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
@@ -173,8 +172,11 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 	ICaRL.train(False)
 	images = images.float().to(params.DEVICE)
 	phiX = ICaRL(images, features = True)
-
+	#phiX =  f.normalize(phiX,dim=0,p=2)
 	phiX /= torch.norm(phiX, p=2)
+
+	transformer = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+	#ds = Dataset(train=True, transform = transformer)
 	ds = trainDS
 	classiAnalizzate = []
 	if(mean == None):
@@ -185,7 +187,7 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 		for y in range (0, task + params.TASK_SIZE):
 			#now idxsImages contains the list of all the images selected as exemplars
 			classY = int(classiAnalizzate[y])
-			ss = Subset(ds, exemplars[classY])
+			ss = Subset(ds, exemplars[classY], transformer)
 			loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE)
 			for img, lbl, idx in loader:
 				with torch.no_grad():
