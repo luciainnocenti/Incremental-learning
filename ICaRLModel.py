@@ -89,7 +89,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 			old_outputs = old_ICaRL(images, features = False)
 			weights = torch.sum( onehot_labels, dim=0)/torch.sum(onehot_labels) #prova con media fatta sul batch corrente
 			#print(weights)
-			loss = utils.calculateLoss(outputs, old_outputs, onehot_labels, task, splits)#, typeLoss = 'WBCE', weights = weights)
+			loss = utils.calculateLoss(outputs, old_outputs, onehot_labels, task, splits)
 			
 			cut_outputs = np.take_along_axis(outputs.to(params.DEVICE), col[None,:], axis = 1).to(params.DEVICE)
 			_ , preds = torch.max(cut_outputs.data, 1)
@@ -137,7 +137,6 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 		with torch.no_grad():
 			image = image.float().to(params.DEVICE)
 			x = ICaRL( image, features = True)
-			#x =  f.normalize(x,dim=0,p=2)
 			x /= torch.norm(x, p=2)
 		for s in x:
 			features.append(np.array(s.data.cpu()))
@@ -172,11 +171,9 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 	ICaRL.train(False)
 	images = images.float().to(params.DEVICE)
 	phiX = ICaRL(images, features = True)
-	#phiX =  f.normalize(phiX,dim=0,p=2)
 	phiX /= torch.norm(phiX, p=2)
 
 	transformer = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-	#ds = Dataset(train=True, transform = transformer)
 	ds = trainDS
 	classiAnalizzate = []
 	if(mean == None):
@@ -193,7 +190,6 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 				with torch.no_grad():
 					img = img.float().to(params.DEVICE)
 					x = ICaRL(img, features = True)
-					#x =  f.normalize(x,dim=0,p=2)
 					x /= torch.norm(x, p=2)
 				ma = torch.sum(x, dim=0)
 				means[y] += ma
