@@ -87,7 +87,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 			
 			outputs = ICaRL(images, features = False)
 			old_outputs = old_ICaRL(images, features = False)
-			weights = torch.sum( onehot_labels, dim=0)/torch.sum(onehot_labels) #prova con media fatta sul batch corrente
+			#weights = torch.sum( onehot_labels, dim=0)/torch.sum(onehot_labels) #prova con media fatta sul batch corrente
 			#print(weights)
 			loss = utils.calculateLoss(outputs, old_outputs, onehot_labels, task, splits)
 			
@@ -100,6 +100,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 			loss.backward()  # backward pass: computes gradients
 			optimizer.step()
 		accuracy = running_corrects / float(lenght)
+		scheduler.step()
 		print("At step ", str(task), " and at epoch = ", epoch, " the loss is = ", loss.item(), " and accuracy is = ", accuracy)
 	return ICaRL
 
