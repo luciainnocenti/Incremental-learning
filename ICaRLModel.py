@@ -191,17 +191,12 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 					img = img.float().to(params.DEVICE)
 					x = ICaRL(img, features = True)
 					x /= torch.norm(x, p=2)
-				ma = torch.sum(x, dim=0)
-				means[y] += ma
-			means[y] = means[y]/ len(idx) # medio
-			means[y] = means[y] / means[y].norm()
-
+					X_train.append(x.cpu().numpy())
+					y_train.append(y)
 	else:
 		means = mean
-	for data in phiX:
-		#print('shape data = ', data.shape)
-		pred = np.argmin(np.sqrt( np.sum((data.data.cpu().numpy() - means.data.cpu().numpy())**2, axis = 1 )   ) )
-		
-		preds.append(pred)
+	model = KNeighborsClassifier(n_neighbors=3)
+	model.fit(X_train, y_train)
+	preds = self.model.predict(phiX)
 
 	return (torch.tensor(preds), means)
