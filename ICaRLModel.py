@@ -137,10 +137,11 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS, classe):
 		for image, label, idx in loader:
 			image = image.float().to(params.DEVICE)
 			x = ICaRL( image, features = True)
-			x /= torch.norm(x, p=2)
 			for s in x:
 				#print('shape s = ', s.shape)
-				features.append(np.array(s.data.cpu()))
+				s = np.array(s.data.cpu())
+				s = s / np.linalg.norm(s) 
+				features.append(s)
 	#print('features shape = ', len(features) )
 	means = np.mean(features, axis=0)
 	means = means / np.linalg.norm(means)
