@@ -20,7 +20,7 @@ from torchvision import transforms
 import random
 random.seed(params.SEED)
 
-def incrementalTrain(task, trainDS, ICaRL, exemplars, transformer):
+def incrementalTrain(task, trainDS, ICaRL, exemplars, transformer, random = False):
 	trainSplits = trainDS.splits
 	
 	train_indexes = trainDS.__getIndexesGroups__(task)
@@ -40,7 +40,7 @@ def incrementalTrain(task, trainDS, ICaRL, exemplars, transformer):
 	m = int(m+1) #arrotondo per eccesso; preferisco avere max 100 exemplars in più che non 100 in meno
 	exemplars = reduceExemplars(exemplars,m)
 
-	exemplars = generateNewExemplars(exemplars, m, col[task:], trainDS, train_indexes, ICaRL)
+	exemplars = generateNewExemplars(exemplars, m, col[task:], trainDS, train_indexes, ICaRL, random = random)
 
 	return ICaRL, exemplars
 
@@ -112,7 +112,7 @@ def reduceExemplars(exemplars,m):
 			exemplars[i] = el[:m]
 	return exemplars	
 
-def generateNewExemplars(exemplars, m, col, trainDS, train_indexes, ICaRL, random = None):
+def generateNewExemplars(exemplars, m, col, trainDS, train_indexes, ICaRL, random = False):
 	#col contiene i valori delle 10 classi in analisi in questo momento
 	exemplars = deepcopy(exemplars)
 	for classe in col:
@@ -122,7 +122,7 @@ def generateNewExemplars(exemplars, m, col, trainDS, train_indexes, ICaRL, rando
 			if( label == classe ):
 				idxsImages.append(idx)
 		##print('immagini nuova classe ', classe, ' sono: ', len(idxsImages))
-		if(random is None):
+		if(random is not True):
 			exemplars[classe] = constructExemplars(idxsImages, m, ICaRL, trainDS)
 		else:
 			exemplars[classe] = random.sample(idxsImages, m)
