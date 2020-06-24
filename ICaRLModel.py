@@ -126,9 +126,10 @@ def generateNewExemplars(exemplars, m, col, trainDS, train_indexes, ICaRL, rando
 
 def constructExemplars(idxsImages, m, ICaRL, trainDS, classe):
 	ICaRL = ICaRL.train(False)
+	
+	trs = transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)) ])
+	ss = Subset(trainDS, idxsImages, trs)
 
-	ss = StdSubset(trainDS, idxsImages)
-	print("idxImages = ", idxImages)
 	loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=1024)
 	features = []
 	with torch.no_grad():
