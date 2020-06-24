@@ -1,0 +1,2 @@
+Random exemplars selection:
+acc = [.87, .81, .76, .70, .65, .60, .55, .54, .49, .47]
