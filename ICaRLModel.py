@@ -136,7 +136,6 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 			image = image.float().to(params.DEVICE)
 			x = ICaRL( image, features = True)
 			x /= torch.norm(x, p=2)
-			print("x shape = ", x.shape)
 			for s in x:
 				features.append(np.array(s.data.cpu()))
 
@@ -150,6 +149,7 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 		phiX = features #le features di tutte le immagini della classe Y ---> rige = len(ss); colonne = #features
 		phiP = np.sum(phiNewEx, axis = 0) #somma su tutte le colonne degli exemplars esistenti. Quindi ogni colonna di phiP sarà la somma del valore di quella feature per ognuna degli exemplars
 		mu1 = 1/(k+1)* ( phiX + phiP)
+		mu1 = mu1 / np.linalg.norm(mu1) 
 		idxEx = np.argmin(np.sqrt(np.sum((means - mu1) ** 2, axis=1))) #compute the euclidean norm among all the rows in phiX
 		newExs.append(idxsImages[idxEx])
 		phiNewEx.append(features[idxEx])
