@@ -138,8 +138,9 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS, classe):
 			x = ICaRL( image, features = True)
 			x /= torch.norm(x, p=2)
 			for s in x:
+				print('shape s = ', s.shape)
 				features.append(np.array(s.data.cpu()))
-
+	print('features shape = ', features.shape)
 	means = np.mean(features, axis=0)
 	means = means / np.linalg.norm(means)
 
