@@ -132,7 +132,7 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS, classe):
 	with torch.no_grad():
 		for idx in idxsImages:
 			img, lbl, _ = trainDS.__getitem__(idx)
-			img = img.unsqueeze(0)
+			img = torch.tensor(img).unsqueeze(0)
 			x = ICaRL( img.to(params.DEVICE) , features = True).data.cpu().numpy()
 			x = x / np.linalg.norm(x) 
 			features.append(x[0])
