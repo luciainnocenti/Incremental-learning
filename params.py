@@ -9,7 +9,7 @@ DEVICE = 'cuda' # 'cuda' or 'cpu'
 BATCH_SIZE = 128
 TASK_SIZE = 10
 
-NUM_EPOCHS = 70
+NUM_EPOCHS = 10#70 
 
 WEIGHT_DECAY = 0.00001
 LR = 2
