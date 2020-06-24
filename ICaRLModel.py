@@ -120,19 +120,19 @@ def generateNewExemplars(exemplars, m, col, trainDS, train_indexes, ICaRL, rando
 				idxsImages.append(idx)
 		##print('immagini nuova classe ', classe, ' sono: ', len(idxsImages))
 		if(randomS is not True):
-			exemplars[classe] = constructExemplars(idxsImages, m, ICaRL, trainDS, classe)
+			exemplars[classe] = constructExemplars(idxsImages, m, ICaRL, trainDS)
 		else:
 			exemplars[classe] = random.sample(idxsImages, m)
 	return exemplars
 
-def constructExemplars(idxsImages, m, ICaRL, trainDS, classe):
+def constructExemplars(idxsImages, m, ICaRL, trainDS):
 	ICaRL = ICaRL.train(False)
 
 	features = []
 	with torch.no_grad():
 		for idx in idxsImages:
 			img, lbl, _ = trainDS.__getitem__(idx)
-			img = torch.tensor(img).unsqueeze(0).float()
+			img = img.unsqueeze(0)
 			x = ICaRL( img.to(params.DEVICE) , features = True).data.cpu().numpy()
 			x = x / np.linalg.norm(x) 
 			features.append(x[0])
@@ -143,19 +143,16 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS, classe):
 
 	newExs = []
 	phiNewEx = []
-	selIdx = []
+	mapFeatures = np.arange( len(features) )
 	for k in range (0, m):
 		phiX = features #le features di tutte le immagini della classe Y ---> rige = len(ss); colonne = #features
 		phiP = np.sum(phiNewEx, axis = 0) #somma su tutte le colonne degli exemplars esistenti. Quindi ogni colonna di phiP sarà la somma del valore di quella feature per ognuna degli exemplars
 		mu1 = 1/(k+1)* ( phiX + phiP)
-		mu1 = mu1 / np.linalg.norm(mu1) 
-		dist = np.sqrt(np.sum((means - mu1) ** 2, axis=1)) #compute the euclidean norm among all the rows in phiX
-		if ( k > 0):
-			dist[selIdx] = sys.maxsize
-		idxEx = np.argmin(dist)
-		newExs.append(idxsImages[idxEx])
+		idxEx = np.argmin(np.sqrt(np.sum((means - mu1) ** 2, axis=1))) #compute the euclidean norm among all the rows in phiX
+		newExs.append(idxsImages[mapFeatures[idxEx]])
 		phiNewEx.append(features[idxEx])
-		selIdx.append(idxEx)
+		features.pop(idxEx)
+		mapFeatures = np.delete(mapFeatures, idxEx) 
 	return newExs
 
 def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
