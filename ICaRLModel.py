@@ -156,7 +156,7 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS, classe):
 		dist = np.sqrt(np.sum((means - mu1) ** 2, axis=1)) #compute the euclidean norm among all the rows in phiX
 		if ( k > 0):
 			dist[selIdx] = sys.maxsize
-		idxEx = np.argmin(distances)
+		idxEx = np.argmin(dist)
 		newExs.append(idxsImages[idxEx])
 		phiNewEx.append(features[idxEx])
 		selIdx.append(idxEx)
