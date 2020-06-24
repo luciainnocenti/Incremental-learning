@@ -132,14 +132,13 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 	loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=1024)
 	features = []
 	with torch.no_grad():
-		for i, (image, label, idx) in enumerate(loader):
-			
+		for image, label, idx in loader:
 			image = image.float().to(params.DEVICE)
 			x = ICaRL( image, features = True)
 			x /= torch.norm(x, p=2)
-
-		for s in x:
-			features.append(np.array(s.data.cpu()))
+			print("x shape = ", x.shape)
+			for s in x:
+				features.append(np.array(s.data.cpu()))
 
 	means = np.mean(features, axis=0)
 	means = means / np.linalg.norm(means)
@@ -156,6 +155,7 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 		phiNewEx.append(features[idxEx])
 		features.pop(idxEx)
 		idxsImages.pop(idxEx)
+		print("idx = ", idxEx)
 	return newExs
 
 def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
