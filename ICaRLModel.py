@@ -151,7 +151,6 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS, classe):
 		phiP = np.sum(phiNewEx, axis = 0) #somma su tutte le colonne degli exemplars esistenti. Quindi ogni colonna di phiP sarà la somma del valore di quella feature per ognuna degli exemplars
 		mu1 = 1/(k+1)* ( phiX + phiP)
 		mu1 = mu1 / np.linalg.norm(mu1) 
-		print("mu1 shape = ", mu1.shape)
 		idxEx = np.argmin(np.sqrt(np.sum((means - mu1) ** 2, axis=1))) #compute the euclidean norm among all the rows in phiX
 		if(trainDS.__getitem__(idxsImages[idxEx])[1] != classe):
 			print("PROBLEMA", trainDS.__getitem__(idxsImages[idxEx])[1], " ", classe)
@@ -159,6 +158,8 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS, classe):
 		phiNewEx.append(features[idxEx])
 		features.pop(idxEx)
 		idxsImages.pop(idxEx)
+	print('classe ', classe)
+	print(newExs)
 	return newExs
 
 def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
