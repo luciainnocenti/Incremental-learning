@@ -20,19 +20,16 @@ from torchvision import transforms
 import random
 random.seed(params.SEED)
 
-def incrementalTrain(task, trainDS, ICaRL, exemplars, transformer, random = False):
+def incrementalTrain(task, trainDS, ICaRL, exemplars, transformer, randomS = False):
 	trainSplits = trainDS.splits
 	
 	train_indexes = trainDS.__getIndexesGroups__(task)
-
 
 	col = []
 	for i,x in enumerate( trainSplits[ :int(task/10) + 1]) : #comprende le 10 classi di questo task
 		v = np.array(x)
 		col = np.concatenate( (col,v), axis = None)
 	col = col.astype(int)
-	print('col = ', col)
-	print('col[:10]',  np.array(col[:10]))
 
 	ICaRL = updateRep(task, trainDS, train_indexes, ICaRL, exemplars, trainSplits, transformer)
 
@@ -40,7 +37,7 @@ def incrementalTrain(task, trainDS, ICaRL, exemplars, transformer, random = Fals
 	m = int(m+1) #arrotondo per eccesso; preferisco avere max 100 exemplars in più che non 100 in meno
 	exemplars = reduceExemplars(exemplars,m)
 
-	exemplars = generateNewExemplars(exemplars, m, col[task:], trainDS, train_indexes, ICaRL, random = random)
+	exemplars = generateNewExemplars(exemplars, m, col[task:], trainDS, train_indexes, ICaRL, randomS = randomS)
 
 	return ICaRL, exemplars
 
@@ -87,8 +84,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 			
 			outputs = ICaRL(images, features = False)
 			old_outputs = old_ICaRL(images, features = False)
-			#weights = torch.sum( onehot_labels, dim=0)/torch.sum(onehot_labels) #prova con media fatta sul batch corrente
-			#print(weights)
+
 			loss = utils.calculateLoss(outputs, old_outputs, onehot_labels, task, splits)
 			
 			cut_outputs = np.take_along_axis(outputs.to(params.DEVICE), col[None,:], axis = 1).to(params.DEVICE)
@@ -112,7 +108,7 @@ def reduceExemplars(exemplars,m):
 			exemplars[i] = el[:m]
 	return exemplars	
 
-def generateNewExemplars(exemplars, m, col, trainDS, train_indexes, ICaRL, random = False):
+def generateNewExemplars(exemplars, m, col, trainDS, train_indexes, ICaRL, randomS = False):
 	#col contiene i valori delle 10 classi in analisi in questo momento
 	exemplars = deepcopy(exemplars)
 	for classe in col:
@@ -122,7 +118,7 @@ def generateNewExemplars(exemplars, m, col, trainDS, train_indexes, ICaRL, rando
 			if( label == classe ):
 				idxsImages.append(idx)
 		##print('immagini nuova classe ', classe, ' sono: ', len(idxsImages))
-		if(random is not True):
+		if(randomS is not True):
 			exemplars[classe] = constructExemplars(idxsImages, m, ICaRL, trainDS)
 		else:
 			exemplars[classe] = random.sample(idxsImages, m)
