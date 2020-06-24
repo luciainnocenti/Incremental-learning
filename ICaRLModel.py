@@ -129,23 +129,21 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 
 	ss = StdSubset(trainDS, idxsImages)
 
-	loader = DataLoader( ss, num_workers=10, batch_size=1024)
+	loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=1024)
 	features = []
-	means = torch.zeros( (1, 64)).to(params.DEVICE)
-	for i, (image, label, idx) in enumerate(loader):
-		with torch.no_grad():
+	with torch.no_grad():
+		for i, (image, label, idx) in enumerate(loader):
+			
 			image = image.float().to(params.DEVICE)
 			x = ICaRL( image, features = True)
 			x /= torch.norm(x, p=2)
+
 		for s in x:
 			features.append(np.array(s.data.cpu()))
-		##print(' features dovrebbe avere dimensione i*batchSize, 64')
-		##print('shape = ', len(features), '  ', features[0].size)
-		ma = torch.sum(x, dim=0) #sommo sulle colonne, ovvero sulle features
-		means += ma
-	means = means/ len(idxsImages) # medio
-	means = means / means.norm()
-	means = means.data.cpu().numpy()
+
+	means = np.mean(features, axis=0)
+	means = means / np.linalg.norm(means)
+
 	newExs = []
 	phiNewEx = []
 	mapFeatures = np.arange( len(features) )
