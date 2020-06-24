@@ -119,16 +119,16 @@ def generateNewExemplars(exemplars, m, col, trainDS, train_indexes, ICaRL, rando
 				idxsImages.append(idx)
 		##print('immagini nuova classe ', classe, ' sono: ', len(idxsImages))
 		if(randomS is not True):
-			exemplars[classe] = constructExemplars(idxsImages, m, ICaRL, trainDS)
+			exemplars[classe] = constructExemplars(idxsImages, m, ICaRL, trainDS, classe)
 		else:
 			exemplars[classe] = random.sample(idxsImages, m)
 	return exemplars
 
-def constructExemplars(idxsImages, m, ICaRL, trainDS):
+def constructExemplars(idxsImages, m, ICaRL, trainDS, classe):
 	ICaRL = ICaRL.train(False)
 
 	ss = StdSubset(trainDS, idxsImages)
-
+	print("idxImages = ", idxImages)
 	loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=1024)
 	features = []
 	with torch.no_grad():
@@ -150,12 +150,14 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 		phiP = np.sum(phiNewEx, axis = 0) #somma su tutte le colonne degli exemplars esistenti. Quindi ogni colonna di phiP sarà la somma del valore di quella feature per ognuna degli exemplars
 		mu1 = 1/(k+1)* ( phiX + phiP)
 		mu1 = mu1 / np.linalg.norm(mu1) 
+		print("mu1 shape = ", mu1.shape)
 		idxEx = np.argmin(np.sqrt(np.sum((means - mu1) ** 2, axis=1))) #compute the euclidean norm among all the rows in phiX
+		if(trainDS.__getitem__(idxsImages[idxEx])[1] != classe):
+			print("PROBLEMA", trainDS.__getitem__(idxsImages[idxEx])[1], " ", classe)
 		newExs.append(idxsImages[idxEx])
 		phiNewEx.append(features[idxEx])
 		features.pop(idxEx)
 		idxsImages.pop(idxEx)
-		print("idx = ", idxEx)
 	return newExs
 
 def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
