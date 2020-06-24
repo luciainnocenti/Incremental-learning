@@ -16,6 +16,7 @@ from copy import deepcopy
 from torch.utils.data import Subset as StdSubset
 from torch.utils.data import DataLoader
 from torch.nn import functional as F
+from sklearn.neighbors import KNeighborsClassifier
 from torchvision import transforms
 import random
 random.seed(params.SEED)
