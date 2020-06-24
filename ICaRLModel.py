@@ -136,8 +136,9 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 			x = ICaRL( img.to(params.DEVICE) , features = True).data.cpu().numpy()
 			x = x / np.linalg.norm(x) 
 			features.append(x[0])
-			
+	print('1 :', len(features))
 	features = np.array(features)
+	print('2 :', features.shape)
 	means = np.mean(features, axis=0)
 	means = means / np.linalg.norm(means)
 
