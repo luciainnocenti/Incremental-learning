@@ -147,7 +147,9 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 	idxsImages = deepcopy(idxsImages)
 	for k in range (0, m):
 		phiX = features #le features di tutte le immagini della classe Y ---> rige = len(ss); colonne = #features
+		print('3 :', phiX.shape)
 		phiP = np.sum(phiNewEx, axis = 0) #somma su tutte le colonne degli exemplars esistenti. Quindi ogni colonna di phiP sarà la somma del valore di quella feature per ognuna degli exemplars
+		print('4 :', phiP.shape)
 		mu1 = 1/(k+1)* ( phiX + phiP)
 		idxEx = np.argmin(np.sqrt(np.sum((means - mu1) ** 2, axis=1))) #compute the euclidean norm among all the rows in phiX
 		newExs.append(idxsImages[idxEx])
