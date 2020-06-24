@@ -112,7 +112,7 @@ def reduceExemplars(exemplars,m):
 			exemplars[i] = el[:m]
 	return exemplars	
 
-def generateNewExemplars(exemplars, m, col, trainDS, train_indexes, ICaRL):
+def generateNewExemplars(exemplars, m, col, trainDS, train_indexes, ICaRL, random = None):
 	#col contiene i valori delle 10 classi in analisi in questo momento
 	exemplars = deepcopy(exemplars)
 	for classe in col:
@@ -122,16 +122,18 @@ def generateNewExemplars(exemplars, m, col, trainDS, train_indexes, ICaRL):
 			if( label == classe ):
 				idxsImages.append(idx)
 		##print('immagini nuova classe ', classe, ' sono: ', len(idxsImages))
-		exemplars[classe] = constructExemplars(idxsImages, m, ICaRL, trainDS)
+		if(random is None):
+			exemplars[classe] = constructExemplars(idxsImages, m, ICaRL, trainDS)
+		else:
+			exemplars[classe] = random.sample(idxsImages, m)
 	return exemplars
 
 def constructExemplars(idxsImages, m, ICaRL, trainDS):
-	ICaRL = deepcopy(ICaRL).train(False)
+	ICaRL = ICaRL.train(False)
 
-	ds = trainDS
-	ss = StdSubset(ds, idxsImages)
+	ss = StdSubset(trainDS, idxsImages)
 
-	loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE)
+	loader = DataLoader( ss, num_workers=10, batch_size=1024)
 	features = []
 	means = torch.zeros( (1, 64)).to(params.DEVICE)
 	for i, (image, label, idx) in enumerate(loader):
