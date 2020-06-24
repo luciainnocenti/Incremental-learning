@@ -154,7 +154,7 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 		idxEx = np.argmin(np.sqrt(np.sum((means - mu1) ** 2, axis=1))) #compute the euclidean norm among all the rows in phiX
 		newExs.append(idxsImages[idxEx])
 		phiNewEx.append(features[idxEx])
-		features = np.delete(features, idxEx)
+		features = np.delete(features, idxEx, axis = 0)
 		idxsImages.pop(idxEx)
 	return newExs
 
