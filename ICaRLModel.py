@@ -127,22 +127,17 @@ def generateNewExemplars(exemplars, m, col, trainDS, train_indexes, ICaRL, rando
 
 def constructExemplars(idxsImages, m, ICaRL, trainDS, classe):
 	ICaRL = ICaRL.train(False)
-	
-	trs = transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)) ])
-	ss = Subset(trainDS, idxsImages, trs)
 
-	loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=1024)
 	features = []
 	with torch.no_grad():
-		for image, label, idx in loader:
-			image = image.float().to(params.DEVICE)
-			x = ICaRL( image, features = True)
-			for s in x:
-				#print('shape s = ', s.shape)
-				s = np.array(s.data.cpu())
-				s = s / np.linalg.norm(s) 
-				features.append(s)
-	#print('features shape = ', len(features) )
+		for idx in idxsImages:
+			img, lbl, _ = trainDS.__getitem__(idx)
+			img = img.unsqueeze(0)
+			x = ICaRL( img.to(params.DEVICE) , features = True).data.cpu().numpy()
+			x = x / np.linalg.norm(x) 
+			features.append(x[0])
+			
+	features = np.array(features)
 	means = np.mean(features, axis=0)
 	means = means / np.linalg.norm(means)
 
@@ -161,8 +156,6 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS, classe):
 		newExs.append(idxsImages[idxEx])
 		phiNewEx.append(features[idxEx])
 		selIdx.append(idxEx)
-	print('classe ', classe)
-	print(newExs)
 	return newExs
 
 def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
