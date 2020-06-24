@@ -181,6 +181,7 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 			##print('split i = ', ds.splits[i])
 			classiAnalizzate = np.concatenate( (classiAnalizzate, ds.splits[i]) )
 		##print('classi = ', classiAnalizzate)
+		X_train, y_train = [], []
 		for y in range (0, task + params.TASK_SIZE):
 			#now idxsImages contains the list of all the images selected as exemplars
 			classY = int(classiAnalizzate[y])
