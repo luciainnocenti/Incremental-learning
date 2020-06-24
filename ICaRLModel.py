@@ -160,8 +160,8 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS, classe):
 		newExs.append(idxsImages[idxEx])
 		phiNewEx.append(features[idxEx])
 		selIdx.append(idxEx)
-	#print('classe ', classe)
-	#print(newExs)
+	print('classe ', classe)
+	print(newExs)
 	return newExs
 
 def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
