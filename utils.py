@@ -60,14 +60,15 @@ def trainfunction(task, train_loader, train_splits):
 			#print(labels)
 			mappedLabels = mapFunction(labels, col)
 			#print(mappedLabels)
-			onehot_labels = torch.eye(100)[labels].to(params.DEVICE)#it creates the one-hot-encoding list for the labels; needed for BCELoss
+			
+			#onehot_labels = torch.eye(100)[labels].to(params.DEVICE)#it creates the one-hot-encoding list for the labels; needed for BCELoss
 			
 			optimizer.zero_grad() # Zero-ing the gradients
 			
 			# Forward pass to the network
 			old_outputs = old_resNet(images)
 			outputs = resNet(images)
-			loss = calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits )
+			loss = calculateLoss(outputs, old_outputs, labels, task, train_splits )
 			
 			
 			# Get predictions		
