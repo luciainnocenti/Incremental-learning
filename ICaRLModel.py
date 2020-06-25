@@ -11,6 +11,7 @@ import torch.optim as optim
 import torchvision
 import torch.nn.functional as f
 import copy
+import sys
 import numpy as np
 from copy import deepcopy
 from torch.utils.data import Subset as StdSubset
@@ -84,8 +85,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 			
 			outputs = ICaRL(images, features = False)
 			old_outputs = old_ICaRL(images, features = False)
-			#weights = torch.sum( onehot_labels, dim=0)/torch.sum(onehot_labels) #prova con media fatta sul batch corrente
-			#print(weights)
+
 			loss = utils.calculateLoss(outputs, old_outputs, onehot_labels, task, splits)
 			
 			cut_outputs = np.take_along_axis(outputs.to(params.DEVICE), col[None,:], axis = 1).to(params.DEVICE)
@@ -126,41 +126,33 @@ def generateNewExemplars(exemplars, m, col, trainDS, train_indexes, ICaRL, rando
 	return exemplars
 
 def constructExemplars(idxsImages, m, ICaRL, trainDS):
-	ICaRL = deepcopy(ICaRL).train(False)
+	ICaRL = ICaRL.train(False)
 
-	ds = trainDS
-	ss = StdSubset(ds, idxsImages)
-
-	loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE)
 	features = []
-	means = torch.zeros( (1, 64)).to(params.DEVICE)
-	for i, (image, label, idx) in enumerate(loader):
-		with torch.no_grad():
-			image = image.float().to(params.DEVICE)
-			x = ICaRL( image, features = True)
-			x /= torch.norm(x, p=2)
-		for s in x:
-			features.append(np.array(s.data.cpu()))
-		##print(' features dovrebbe avere dimensione i*batchSize, 64')
-		##print('shape = ', len(features), '  ', features[0].size)
-		ma = torch.sum(x, dim=0) #sommo sulle colonne, ovvero sulle features
-		means += ma
-	means = means/ len(idxsImages) # medio
-	means = means / means.norm()
-	means = means.data.cpu().numpy()
+	with torch.no_grad():
+		for idx in idxsImages:
+			img, lbl, _ = trainDS.__getitem__(idx)
+			img = torch.tensor(img).unsqueeze(0).float()
+			x = ICaRL( img.to(params.DEVICE) , features = True).data.cpu().numpy()
+			x = x / np.linalg.norm(x) 
+			features.append(x[0])
+	features = np.array(features)
+	means = np.mean(features, axis=0)
+	means = means / np.linalg.norm(means)
+
 	newExs = []
 	phiNewEx = []
-	mapFeatures = np.arange( len(features) )
+	idxsImages = deepcopy(idxsImages)
 	for k in range (0, m):
 		phiX = features #le features di tutte le immagini della classe Y ---> rige = len(ss); colonne = #features
 		phiP = np.sum(phiNewEx, axis = 0) #somma su tutte le colonne degli exemplars esistenti. Quindi ogni colonna di phiP sarà la somma del valore di quella feature per ognuna degli exemplars
 		mu1 = 1/(k+1)* ( phiX + phiP)
 		idxEx = np.argmin(np.sqrt(np.sum((means - mu1) ** 2, axis=1))) #compute the euclidean norm among all the rows in phiX
-		newExs.append(idxsImages[mapFeatures[idxEx]])
+		newExs.append(idxsImages[idxEx])
 		phiNewEx.append(features[idxEx])
-		features.pop(idxEx)
-		mapFeatures = np.delete(mapFeatures, idxEx) 
-		
+		features = np.delete(features, idxEx, axis = 0)
+		idxsImages.pop(idxEx)
+	#print('Selected: ',newExs)
 	return newExs
 
 def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
