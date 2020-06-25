@@ -10,7 +10,10 @@ from torchvision import transforms
 from torch.utils.data import Subset, DataLoader
 from torch.nn import functional as F
 import numpy as np
+import seaborn as sn
+import pandas as pd
 import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
 
 def mapFunction(labels, splits):
 	m_l = []
@@ -86,6 +89,8 @@ def evaluationTest(task, test_loader, test_splits):
 		 col = np.concatenate( (col,v), axis = None)
 	col = col.astype(int)
 	
+	tot_preds = []
+ 	tot_lab = []	
 	for images, labels, _ in test_loader:
 		images = images.float().to(params.DEVICE)
 		labels = labels.to(params.DEVICE)
@@ -100,6 +105,8 @@ def evaluationTest(task, test_loader, test_splits):
 		cut_outputs = np.take_along_axis(outputs, col[None, :], axis = 1)
 		cut_outputs = cut_outputs.to(params.DEVICE)
 		_, preds = torch.max(cut_outputs.data, 1)
+		tot_preds = np.concatenate( ( tot_preds, preds.data.cpu().numpy() ) )
+		tot_lab = np.concatenate( (tot_lab, mappedLabels.data.cpu().numpy()  ) )
 		# Update Corrects
 		running_corrects += torch.sum(preds == mappedLabels.data).data.item()
 		print(len(images))
@@ -110,7 +117,11 @@ def evaluationTest(task, test_loader, test_splits):
 	#Calculate Loss
 	
 	loss = criterion(outputs,onehot_labels)
-	print('Validation Loss: {} Validation Accuracy : {}'.format(loss.item(),accuracy) )
+	print('Test Loss: {} Test Accuracy : {}'.format(loss.item(),accuracy) )
+	cf = confusion_matrix(tot_lab, tot_preds)
+	df_cm = pd.DataFrame(cf, range(task + params.TASK_SIZE), range(task + params.TASK_SIZE))
+	sn.set(font_scale=1.4) # for label sizesn.heatmap(df_cm, annot=False)
+	plt.show()
 	return(accuracy, loss.item())	  
 
 
