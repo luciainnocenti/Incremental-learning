@@ -77,7 +77,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 
 		for images, labels, idx in loader:
 			images = images.float().to(params.DEVICE)
-			labels = labels.float().to(params.DEVICE)
+			labels = labels.long().to(params.DEVICE)
 			
 			#onehot_labels = torch.eye(100)[labels].to(params.DEVICE)
 			
