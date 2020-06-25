@@ -161,5 +161,6 @@ def calculateLoss(outputs, old_outputs, labels, task, train_splits, typeLoss = '
 			target[:, col] = m(old_outputs[:,col]).to(params.DEVICE)
 		else:
 			target[:, col] = old_outputs[:,col].to(params.DEVICE)
+		print(outputs.requires_grad)
 		loss = criterion( input=outputs, target=target )
 	return loss
