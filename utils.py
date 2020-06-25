@@ -146,14 +146,13 @@ def calculateLoss(outputs, old_outputs, labels, task, train_splits, typeLoss = '
         'MSELoss' : [nn.MSELoss(), None ]
 	}
 	criterion, m = switcher[typeLoss]
+	print(criterion)
 	outputs, old_outputs, labels = outputs.to(params.DEVICE), old_outputs.to(params.DEVICE), labels.to(params.DEVICE)
 	col = []
 	for i,x in enumerate( train_splits[ :int(task/10) ]):
 		v = np.array(x)
 		col = np.concatenate( (col,v), axis = None)
 	col = np.array(col).astype(int)
-	print('out',outputs.requires_grad)
-	print('lab',labels.requires_grad)
 	
 	if( task == 0):
 		loss = criterion(outputs,labels)
