@@ -15,6 +15,19 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 
+def generateWeights(task, col):
+	i = 0
+	w = task + 10
+	weights = torch.zeros(100)
+	for el in col:
+		weights[el] = w / params.TASK_SIZE
+		if( i == 9):
+			w -= 10
+			i = 0
+		else:
+			i+= 1
+	return weights
+
 def mapFunction(labels, splits):
 	m_l = []
 	l_splits = list(splits)
@@ -124,13 +137,15 @@ def evaluationTest(task, test_loader, test_splits):
 	plt.show()
 	return(accuracy, loss.item())	  
 
-
-def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits):
-	criterion = torch.nn.BCEWithLogitsLoss()
-	m = nn.Sigmoid()
-	
-	outputs, old_outputs, onehot_labels = outputs.to(params.DEVICE), old_outputs.to(params.DEVICE), onehot_labels.to(params.DEVICE)
-
+def calculateLoss(outputs, old_outputs, labels, task, train_splits, typeLoss = 'BCE', weights = None):
+	switcher = {
+        'BCE': [torch.nn.BCEWithLogitsLoss(), nn.Sigmoid()], 
+        'WBCE': [torch.nn.BCEWithLogitsLoss(pos_weight = weights), nn.Sigmoid()], 
+        'LogLoss':[torch.nn.NLLLoss(weights = weights), nn.LogSoftmax(dim=1)], 
+        'MSELoss' : [nn.MSELoss(), None ]
+	}
+	criterion, m = switcher[typeLoss]
+	outputs, old_outputs, labels = outputs.to(params.DEVICE), old_outputs.to(params.DEVICE), labels.to(params.DEVICE)
 	col = []
 	for i,x in enumerate( train_splits[ :int(task/10) ]):
 		v = np.array(x)
@@ -138,9 +153,12 @@ def calculateLoss(outputs, old_outputs, onehot_labels, task, train_splits):
 	col = np.array(col).astype(int)
 	
 	if( task == 0):
-		loss = criterion(outputs,onehot_labels)
+		loss = criterion(outputs,labels)
 	if( task > 0 ):
-		target = onehot_labels.clone().to(params.DEVICE)
-		target[:, col] = m(old_outputs[:,col]).to(params.DEVICE)
+		target = labels.clone().to(params.DEVICE)
+		if(m):
+			target[:, col] = m(old_outputs[:,col]).to(params.DEVICE)
+		else:
+			target[:, col] = old_outputs[:,col].to(params.DEVICE)
 		loss = criterion( input=outputs, target=target )
 	return loss
