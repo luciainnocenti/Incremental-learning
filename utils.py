@@ -142,7 +142,7 @@ def calculateLoss(outputs, old_outputs, labels, task, train_splits, typeLoss = '
 	switcher = {
         'BCE': [torch.nn.BCEWithLogitsLoss(), nn.Sigmoid()], 
         'WBCE': [torch.nn.BCEWithLogitsLoss(pos_weight = weights), nn.Sigmoid()], 
-        'LogLoss':[torch.nn.NLLLoss(weight = weights), nn.LogSoftmax(dim=1)], 
+        'CE': [torch.nn.CrossEntropyLoss(), None], 
         'MSELoss' : [nn.MSELoss(), None ]
 	}
 	criterion, m = switcher[typeLoss]
@@ -154,8 +154,6 @@ def calculateLoss(outputs, old_outputs, labels, task, train_splits, typeLoss = '
 	col = np.array(col).astype(int)
 	
 	if( task == 0):
-		if(m):
-			outputs = m(outputs)
 		loss = criterion(outputs,labels)
 	if( task > 0 ):
 		target = labels.clone().to(params.DEVICE)
