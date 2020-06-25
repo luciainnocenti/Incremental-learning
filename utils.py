@@ -119,7 +119,8 @@ def evaluationTest(task, test_loader, test_splits):
 	print('Test Loss: {} Test Accuracy : {}'.format(loss.item(),accuracy) )
 	cf = confusion_matrix(tot_lab, tot_preds)
 	df_cm = pd.DataFrame(cf, range(task + params.TASK_SIZE), range(task + params.TASK_SIZE))
-	sn.set(font_scale=1.4) # for label sizesn.heatmap(df_cm, annot=False)
+	sn.set(font_scale=.4) # for label size
+	sn.heatmap(df_cm, annot=False)
 	plt.show()
 	return(accuracy, loss.item())	  
 
