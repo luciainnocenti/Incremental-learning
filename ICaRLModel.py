@@ -152,7 +152,7 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 		phiNewEx.append(features[idxEx])
 		features = np.delete(features, idxEx, axis = 0)
 		idxsImages.pop(idxEx)
-	print('Selected: ',idxsImages[newExs])
+	print('Selected: ',newExs)
 	return newExs
 
 def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
