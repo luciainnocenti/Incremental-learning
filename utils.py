@@ -152,6 +152,8 @@ def calculateLoss(outputs, old_outputs, labels, task, train_splits, typeLoss = '
 		v = np.array(x)
 		col = np.concatenate( (col,v), axis = None)
 	col = np.array(col).astype(int)
+	print('out',outputs.requires_grad)
+	print('lab',labels.requires_grad)
 	
 	if( task == 0):
 		loss = criterion(outputs,labels)
@@ -161,6 +163,6 @@ def calculateLoss(outputs, old_outputs, labels, task, train_splits, typeLoss = '
 			target[:, col] = m(old_outputs[:,col]).to(params.DEVICE)
 		else:
 			target[:, col] = old_outputs[:,col].to(params.DEVICE)
-		print(outputs.requires_grad)
+		
 		loss = criterion( input=outputs, target=target )
 	return loss
