@@ -156,6 +156,6 @@ def calculateLoss(outputs, old_outputs, labels, task, train_splits, typeLoss = '
 		
 	if( task > 0 ):
 		classLoss = classCriterion(outputstrain_splits[ int(task/10) + 1 ], labels[ int(task/10) + 1 ])
-		distLoss = distCriterion(outputs[:, col]], oldoutputs[:, col] )
+		distLoss = distCriterion(outputs[:, col], oldoutputs[:, col] )
 		loss = classLoss + distLoss
 	return loss
