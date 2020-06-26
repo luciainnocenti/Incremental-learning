@@ -146,7 +146,7 @@ def calculateLoss(outputs, old_outputs, labels, task, train_splits, typeLoss = '
         'MSELoss' : [nn.MSELoss(), None ]
 	}
 	criterion, m = switcher[typeLoss]
-	print(criterion)
+
 	outputs, old_outputs, labels = outputs.to(params.DEVICE), old_outputs.to(params.DEVICE), labels.to(params.DEVICE)
 	col = []
 	for i,x in enumerate( train_splits[ :int(task/10) ]):
