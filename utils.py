@@ -140,12 +140,13 @@ def evaluationTest(task, test_loader, test_splits):
 
 def calculateLoss(outputs, old_outputs, labels, task, train_splits, typeLoss = 'BCE', weights = None):
 	switcher = {
-        'BCE': [torch.nn.BCEWithLogitsLoss(), nn.Sigmoid()], 
-        'WBCE': [torch.nn.BCEWithLogitsLoss(pos_weight = weights), nn.Sigmoid()], 
-        'CE': [torch.nn.CrossEntropyLoss(), None], 
-        'MSELoss' : [nn.MSELoss(), None ]
+        'BCE': [torch.nn.BCEWithLogitsLoss(), nn.Sigmoid(), False], 
+        'WBCE': [torch.nn.BCEWithLogitsLoss(pos_weight = weights), nn.Sigmoid(), False], 
+        'CE': [torch.nn.CrossEntropyLoss(), None, False], 
+        'MSELoss' : [nn.MSELoss(), nn.Softmax(dim=1), True]
 	}
-	criterion, m = switcher[typeLoss]
+	
+	criterion, m, flag = switcher[typeLoss]
 
 	outputs, old_outputs, labels = outputs.to(params.DEVICE), old_outputs.to(params.DEVICE), labels.to(params.DEVICE)
 	col = []
@@ -155,6 +156,9 @@ def calculateLoss(outputs, old_outputs, labels, task, train_splits, typeLoss = '
 	col = np.array(col).astype(int)
 	
 	if( task == 0):
+		if(flag):
+			outputs = m(outputs)
+			
 		loss = criterion(outputs,labels)
 	if( task > 0 ):
 		target = labels.clone().to(params.DEVICE)
