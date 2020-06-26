@@ -154,6 +154,11 @@ def calculateLoss(outputs, old_outputs, labels, task, train_splits, typeLoss = '
 		col = np.concatenate( (col,v), axis = None)
 	col = np.array(col).astype(int)
 	
+	if( task == 0):
+		if(flag):
+			outputs = m(outputs)
+		loss = criterion(outputs,labels)
+		
 	if( task > 0 ):
 		target = labels.clone().to(params.DEVICE)
 		if(m):
