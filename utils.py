@@ -140,13 +140,7 @@ def evaluationTest(task, test_loader, test_splits):
 	return(accuracy, loss.item())	  
 
 def calculateLoss(outputs, old_outputs, labels, task, train_splits, typeLoss = 'BCE', weights = None):
-	switcher = {
-        'BCE': [torch.nn.BCEWithLogitsLoss(), nn.Sigmoid(), False], 
-        'WBCE': [torch.nn.BCEWithLogitsLoss(pos_weight = weights), nn.Sigmoid(), False], 
-        'LogLoss':[torch.nn.NLLLoss(), nn.Softmax(dim=1), True], 
-        'MSELoss' : [nn.MSELoss(), None, False ]
-	}
-	criterion, m, flag = switcher[typeLoss]
+	
 	outputs, old_outputs, labels = outputs.to(params.DEVICE), old_outputs.to(params.DEVICE), labels.to(params.DEVICE)
 	col = []
 	for i,x in enumerate( train_splits[ :int(task/10) ]):
@@ -154,18 +148,14 @@ def calculateLoss(outputs, old_outputs, labels, task, train_splits, typeLoss = '
 		col = np.concatenate( (col,v), axis = None)
 	col = np.array(col).astype(int)
 	
+	classCriterion = nn.CrossEntropyLoss()
+	distCriterion = nn.MESLoss()
+	
 	if( task == 0):
-		if(flag):
-			outputs = m(outputs)
-		loss = criterion(outputs,labels)
+		loss = classCriterion(outputs,labels)
 		
 	if( task > 0 ):
-		target = labels.clone().to(params.DEVICE)
-		if(m):
-			target[:, col] = m(old_outputs[:,col]).to(params.DEVICE)
-		else:
-			target[:, col] = old_outputs[:,col].to(params.DEVICE)
-		if(flag):
-			outputs = m(outputs)
-		loss = criterion( input=outputs, target=target )
+		classLoss = classCriterion(outputstrain_splits[ int(task/10) + 1 ], labels[ int(task/10) + 1 ])
+		distLoss = distCriterion(outputs[:, col]], oldoutputs[:, col] )
+		loss = classLoss + distLoss
 	return loss
