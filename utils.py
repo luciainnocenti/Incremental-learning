@@ -167,7 +167,7 @@ def calculateLoss(outputs, old_outputs, labels, task, train_splits, typeLoss = '
 	if( task > 0 ):
 		target = labels.clone().to(params.DEVICE)
 		if(m):
-			target[:, col] = m1(old_outputs[:,col]).to(params.DEVICE)
+			target[:, col] = m(old_outputs[:,col]).to(params.DEVICE)
 		else:
 			target[:, col] = old_outputs[:,col].to(params.DEVICE)
 		if(flag):
