@@ -141,12 +141,12 @@ def evaluationTest(task, test_loader, test_splits):
 
 def calculateLoss(outputs, old_outputs, labels, task, train_splits, typeLoss = 'BCE', weights = None):
 	switcher = {
-        'BCE': [torch.nn.BCEWithLogitsLoss(), nn.Sigmoid()], 
-        'WBCE': [torch.nn.BCEWithLogitsLoss(pos_weight = weights), nn.Sigmoid()], 
-        'LogLoss':[torch.nn.NLLLoss(weight = weights), nn.LogSoftmax(dim=1)], 
-        'MSELoss' : [nn.MSELoss(), None ]
+        'BCE': [torch.nn.BCEWithLogitsLoss(), nn.Sigmoid(), False], 
+        'WBCE': [torch.nn.BCEWithLogitsLoss(pos_weight = weights), nn.Sigmoid(), False], 
+        'LogLoss':[torch.nn.NLLLoss(), nn.LogSoftmax(dim=1), True], 
+        'MSELoss' : [nn.MSELoss(), None, False ]
 	}
-	criterion, m = switcher[typeLoss]
+	criterion, m, flag = switcher[typeLoss]
 	outputs, old_outputs, labels = outputs.to(params.DEVICE), old_outputs.to(params.DEVICE), labels.to(params.DEVICE)
 	col = []
 	for i,x in enumerate( train_splits[ :int(task/10) ]):
@@ -154,13 +154,13 @@ def calculateLoss(outputs, old_outputs, labels, task, train_splits, typeLoss = '
 		col = np.concatenate( (col,v), axis = None)
 	col = np.array(col).astype(int)
 	
-	if( task == 0):
-		loss = criterion(outputs,labels)
 	if( task > 0 ):
 		target = labels.clone().to(params.DEVICE)
 		if(m):
 			target[:, col] = m(old_outputs[:,col]).to(params.DEVICE)
 		else:
 			target[:, col] = old_outputs[:,col].to(params.DEVICE)
+		if(flag):
+			outputs = m(outputs)
 		loss = criterion( input=outputs, target=target )
 	return loss
