@@ -158,7 +158,7 @@ def calculateLoss(outputs, old_outputs, labels, task, train_splits, typeLoss = '
 		loss = classCriterion(outputs, labels)
 		
 	if( task > 0 ):
-		classLoss = classCriterion(outputs, labels.long() )
-		distLoss = distCriterion(outputs[:, col], oldoutputs[:, col] )
+		classLoss = classCriterion(outputs, labels)
+		distLoss = distCriterion(outputs[:, col], old_outputs[:, col] )
 		loss = classLoss + distLoss
 	return loss
