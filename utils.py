@@ -26,6 +26,8 @@ def generateWeights(task, col):
 			i = 0
 		else:
 			i+= 1
+	print(col)
+	print(weights)
 	return weights
 
 def mapFunction(labels, splits):
