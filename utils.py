@@ -154,7 +154,8 @@ def calculateLoss(outputs, old_outputs, labels, task, train_splits, typeLoss = '
 	distCriterion = nn.MSELoss()
 	
 	if( task == 0):
-		loss = classCriterion(outputs[ :, train_splits[int(task/10)] ], mapFunction(labels , train_splits[int(task/10)] )  )
+		#loss = classCriterion(outputs[ :, train_splits[int(task/10)] ], mapFunction(labels , train_splits[int(task/10)] )  )
+		loss = classCriterion(outputs, labels)
 		
 	if( task > 0 ):
 		classLoss = classCriterion(outputs, labels.long() )
