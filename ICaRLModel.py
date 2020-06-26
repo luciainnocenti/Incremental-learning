@@ -89,10 +89,8 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 			old_outputs = old_ICaRL(images, features = False)
 			#weights = torch.sum( onehot_labels, dim=0)/torch.sum(onehot_labels) #prova con media fatta sul batch corrente
 			weights = utils.generateWeights(task, col).to(params.DEVICE)
-			crt = nn.MSELoss()
-			m = nn.Softmax(dim=1)
-			loss = crt( m(outputs), onehot_labels)
-			#loss = utils.calculateLoss(outputs, old_outputs, onehot_labels, task, splits, typeLoss = 'MSELoss', weights = weights)
+			
+			loss = utils.calculateLoss(outputs, old_outputs, onehot_labels, task, splits, typeLoss = 'MSELoss', weights = weights)
 			cut_outputs = np.take_along_axis(outputs.to(params.DEVICE), col[None,:], axis = 1).to(params.DEVICE)
 			_ , preds = torch.max(cut_outputs.data, 1)
 			
