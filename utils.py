@@ -140,8 +140,9 @@ def evaluationTest(task, test_loader, test_splits):
 	return(accuracy, loss.item())	  
 
 def calculateLoss(outputs, old_outputs, labels, task, train_splits, typeLoss = 'BCE', weights = None):
-	import matplotlib.pyplot as plt
-	plt.matshow(labels[train_splits[ int(task/10) + 1 ] ].cpu().numpy() )
+	#import matplotlib.pyplot as plt
+	#plt.matshow(labels[train_splits[ int(task/10) + 1 ] ].cpu().numpy() )
+	
 	outputs, old_outputs, labels = outputs.to(params.DEVICE), old_outputs.to(params.DEVICE), labels.to(params.DEVICE)
 	col = []
 	for i,x in enumerate( train_splits[ :int(task/10) ]):
@@ -153,10 +154,10 @@ def calculateLoss(outputs, old_outputs, labels, task, train_splits, typeLoss = '
 	distCriterion = nn.MSELoss()
 	
 	if( task == 0):
-		loss = classCriterion(outputs[train_splits[ int(task/10) + 1 ]], labels[train_splits[ int(task/10) + 1 ] ].long())
+		loss = classCriterion(outputs, labels.long() )
 		
 	if( task > 0 ):
-		classLoss = classCriterion(outputs[train_splits[ int(task/10) + 1 ] ], labels[train_splits[ int(task/10) + 1 ] ].long())
+		classLoss = classCriterion(outputs, labels.long() )
 		distLoss = distCriterion(outputs[:, col], oldoutputs[:, col] )
 		loss = classLoss + distLoss
 	return loss
