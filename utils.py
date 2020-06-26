@@ -149,7 +149,7 @@ def calculateLoss(outputs, old_outputs, labels, task, train_splits, typeLoss = '
 	col = np.array(col).astype(int)
 	
 	classCriterion = nn.CrossEntropyLoss()
-	distCriterion = nn.MESLoss()
+	distCriterion = nn.MSELoss()
 	
 	if( task == 0):
 		loss = classCriterion(outputs,labels)
