@@ -87,9 +87,10 @@ class Subset(Dataset):
         self.indices = indices
         self.transform = transform
         self.listExemplars = []
-        if(exemplars in not None):
+        if(exemplars is not None):
             for el in exemplars:
-                np.concatenate( (self.listExemplars, el) )
+                if(el is not None):
+                    np.concatenate( (self.listExemplars, el) )
             self.exemplarsTransform = exemplarsTransform
 
     def __getitem__(self, idx):
