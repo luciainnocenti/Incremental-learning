@@ -139,38 +139,25 @@ def evaluationTest(task, test_loader, test_splits):
 	return(accuracy, loss.item())	  
 
 def calculateLoss(outputs, old_outputs, labels, task, train_splits, typeLoss = 'BCE', weights = None):
-	switcher = {
-        'BCE': [torch.nn.BCEWithLogitsLoss(), nn.Sigmoid(), False], 
-        'WBCE': [torch.nn.BCEWithLogitsLoss(pos_weight = weights), nn.Sigmoid(), False], 
-        'CE': [torch.nn.CrossEntropyLoss(), None, False], 
-        'MSELoss' : [nn.MSELoss(), nn.Softmax(dim=1), True]
-	}
+	#import matplotlib.pyplot as plt
+	#plt.matshow(labels[train_splits[ int(task/10) + 1 ] ].cpu().numpy() )
 	
-	criterion, m, flag = switcher[typeLoss]
-
 	outputs, old_outputs, labels = outputs.to(params.DEVICE), old_outputs.to(params.DEVICE), labels.to(params.DEVICE)
 	col = []
 	for i,x in enumerate( train_splits[ :int(task/10) ]):
 		v = np.array(x)
 		col = np.concatenate( (col,v), axis = None)
 	col = np.array(col).astype(int)
-	if(flag):
-		m1 = nn.Sigmoid()
-	else:
-		m1 = m
-		
+	
+	classCriterion = nn.CrossEntropyLoss()
+	distCriterion = nn.CosineEmbeddingLoss()
+	
 	if( task == 0):
-		if(flag):
-			outputs = m(outputs)
-		loss = criterion(outputs,labels)
+		loss = classCriterion(outputs, labels)
 		
 	if( task > 0 ):
-		target = labels.clone().to(params.DEVICE)
-		if(m):
-			target[:, col] = m(old_outputs[:,col]).to(params.DEVICE)
-		else:
-			target[:, col] = old_outputs[:,col].to(params.DEVICE)
-		if(flag):
-			outputs = m(outputs)
-		loss = criterion( input=outputs, target=target )
+		ys = torch.ones(len(col))
+		classLoss = classCriterion(outputs, labels)
+		distLoss = distCriterion(outputs[:, col], old_outputs[:, col], ys )
+		loss = classLoss + distLoss
 	return loss
