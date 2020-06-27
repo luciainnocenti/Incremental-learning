@@ -90,7 +90,7 @@ class Subset(Dataset):
         if(exemplars is not None):
             for el in exemplars:
                 if(el is not None):
-                    np.concatenate( (self.listExemplars, el) )
+                    self.listExemplars = np.concatenate( (self.listExemplars, el) )
             self.exemplarsTransform = exemplarsTransform
 
     def __getitem__(self, idx):
