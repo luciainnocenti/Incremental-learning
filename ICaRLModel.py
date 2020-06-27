@@ -79,7 +79,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 			images = images.float().to(params.DEVICE)
 			labels = labels.long().to(params.DEVICE)
 			
-			onehot_labels = torch.eye(100)[labels].to(params.DEVICE)
+			onehot_labels = torch.eye(100)[labels].long().to(params.DEVICE)
 			
 			mappedLabels = utils.mapFunction(labels, col)
 			
