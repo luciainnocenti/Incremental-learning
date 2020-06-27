@@ -156,7 +156,7 @@ def calculateLoss(outputs, old_outputs, labels, task, train_splits, typeLoss = '
 		loss = classCriterion(outputs, labels)
 		
 	if( task > 0 ):
-		ys = torch.ones(len(col)).to(params.DEVICE)
+		ys = torch.ones(len(labels)).to(params.DEVICE)
 		classLoss = classCriterion(outputs, labels)
 		distLoss = distCriterion(outputs[:, col], old_outputs[:, col], ys )
 		loss = classLoss + distLoss
