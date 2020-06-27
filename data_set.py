@@ -82,14 +82,22 @@ class Subset(Dataset):
         dataset (Dataset): The whole Dataset
         indices (sequence): Indices in the whole set selected for subset
     """
-    def __init__(self, dataset, indices, transform):
+    def __init__(self, dataset, indices, transform, exemplars = None, exemplarsTransform = None):
         self.dataset = dataset
         self.indices = indices
         self.transform = transform
+        self.listExemplars = []
+        if(exemplars in not None):
+            for el in exemplars:
+                np.concatenate( (self.listExemplars, el) )
+            self.exemplarsTransform = exemplarsTransform
 
     def __getitem__(self, idx):
         im, labels, _ = self.dataset[self.indices[idx]]
-        return self.transform( Image.fromarray(np.transpose(im))), labels, idx
+        if(idx not in self.listExemplars):
+            return self.transform( Image.fromarray(np.transpose(im))), labels, idx
+        else:
+            return self.exemplarsTransform( Image.fromarray(np.transpose(im))), labels, idx
     
     def __len__(self):
         return len(self.indices)
