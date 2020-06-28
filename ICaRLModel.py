@@ -61,13 +61,13 @@ def incrementalTrain(task, trainDS, ICaRL, exemplars, transformer, randomS = Fal
 def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transformer, BIC):
 
 	dataIdx = np.array(train_indexes)
-	validationSet = random.sample( dataIdx, 10)
+	validationSet = random.sample( dataIdx, 100)
 	dataIdx = np.array( set(data) - set(validationSet))
 
 	for classe in exemplars:
 		if( classe is not None):
 			#print('classe = ', classe)
-			valClass = random.sample( classe, 10)
+			valClass = random.sample( classe, int(100/(task) ) ) 
 			validationSet = np.concatenate( (validationSet, valClass))
 
 			classe = np.array( set(classe) - set(valClass))
@@ -128,7 +128,13 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 			optimizer.step()
 		accuracy = running_corrects / float(lenght)
 		scheduler.step()
-		print("At step ", str(task), " and at epoch = ", epoch, " the loss is = ", loss.item(), " and accuracy is = ", accuracy)
+		
+		valD = StdSubset(trainDS, validationSet)
+		loader = DataLoader( valD, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE, shuffle = True)
+		
+		criterion = nn.CrossEntropyLoss()
+		biasOptimizer = optim.Adam(BIC.bias_layers[task/params.TASK_SIZE].parameters(), lr=0.001)
+		BIC = stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC)
 	return ICaRL
 
 def reduceExemplars(exemplars,m):
