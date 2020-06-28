@@ -20,7 +20,7 @@ from torch.nn import functional as F
 from torchvision import transforms
 import random
 random.seed(params.SEED)
-def stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC):
+def stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC, task):
 
 	for image, label, idx in valLoader:
 		image = image.float().to(params.DEVICE)
@@ -132,7 +132,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 		
 		criterion = nn.CrossEntropyLoss()
 		biasOptimizer = optim.Adam(BIC.bias_layers[int(task/params.TASK_SIZE)].parameters(), lr=0.001)
-		BIC = stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC)
+		BIC = stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC, task)
 	return ICaRL
 
 def reduceExemplars(exemplars,m):
