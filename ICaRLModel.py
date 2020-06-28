@@ -37,7 +37,7 @@ def stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC):
 		biasOptimizer.step()
 	return BIC
 
-def incrementalTrain(task, trainDS, ICaRL, exemplars, transformer, randomS = False, BIC):
+def incrementalTrain(task, trainDS, ICaRL, exemplars, transformer, randomS = False, BIC=None):
 	trainSplits = trainDS.splits
 	
 	train_indexes = trainDS.__getIndexesGroups__(task)
