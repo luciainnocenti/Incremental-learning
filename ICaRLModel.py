@@ -36,7 +36,7 @@ def incrementalTrain(task, trainDS, ICaRL, exemplars, transformer, randomS = Fal
 
 	m = params.K/(task + params.TASK_SIZE)
 	m = int(m + .5) #arrotondo per eccesso; preferisco avere max 100 exemplars in più che non 100 in meno
-	exemplars = reduceExemplars(exemplars,m)
+	#exemplars = reduceExemplars(exemplars,m)
 
 	exemplars = generateNewExemplars(exemplars, m, col[task:], trainDS, train_indexes, ICaRL, randomS = randomS)
 
