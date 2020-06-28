@@ -1,6 +1,7 @@
 import torch.nn as nn
 import math
 import torch
+from DatasetCIFAR import params
 """
 Credits to @hshustc
 Taken from https://github.com/hshustc/CVPR19_Incremental_Learning/tree/master/cifar100-class-incremental
