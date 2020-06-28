@@ -132,7 +132,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 		loader = DataLoader( valD, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE, shuffle = True)
 		
 		criterion = nn.CrossEntropyLoss()
-		biasOptimizer = optim.Adam(BIC.bias_layers[task/params.TASK_SIZE].parameters(), lr=0.001)
+		biasOptimizer = optim.Adam(BIC.bias_layers[int(task/params.TASK_SIZE)].parameters(), lr=0.001)
 		BIC = stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC)
 	return ICaRL
 
