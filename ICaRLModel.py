@@ -36,7 +36,7 @@ def stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC, task):
 		loss = criterion(p[:,:task + params.TASK_SIZE], label)
 		
 		biasOptimizer.zero_grad()
-		loss.backward()            
+		#loss.backward()            
 		biasOptimizer.step()
 	return BIC
 
