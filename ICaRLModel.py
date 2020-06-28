@@ -127,7 +127,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 			optimizer.step()
 		accuracy = running_corrects / float(lenght)
 		scheduler.step()
-		
+		print("At step ", str(task), " and at epoch = ", epoch, " the loss is = ", loss.item(), " and accuracy is = ", accuracy)
 		valD = StdSubset(trainDS, validationSet)
 		valLoader = DataLoader( valD, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE, shuffle = True)
 		
