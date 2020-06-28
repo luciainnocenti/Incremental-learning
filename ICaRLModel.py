@@ -65,8 +65,9 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 
 	for classe in exemplars:
 		if( classe is not None):
-			#print('classe = ', classe)
+			print('len classe = ', len(classe))
 			valClass = random.sample( classe, int(100/(task) ) ) 
+			print('len valclasse = ', len(valClass))
 			validationSet = np.concatenate( (validationSet, valClass))
 
 			classe = np.array( set(classe) - set(valClass))
