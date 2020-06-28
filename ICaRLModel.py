@@ -20,8 +20,24 @@ from torch.nn import functional as F
 from torchvision import transforms
 import random
 random.seed(params.SEED)
+def stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC):
 
-def incrementalTrain(task, trainDS, ICaRL, exemplars, transformer, randomS = False):
+	for image, label, idx in valLoader:
+		image = image.to(params.DEVICE)
+		label = label.to(params.DEVICE)
+		ICaRL.eval()
+		BIC.train(True)
+
+		p = ICaRL(image)
+
+		p = BIC.bias_forward(p)
+		loss = criterion(p[:,:task + params.TASK_SIZE], label)
+		biasOptimizer.zero_grad()
+		loss.backward()            
+		biasOptimizer.step()
+	return BIC
+
+def incrementalTrain(task, trainDS, ICaRL, exemplars, transformer, randomS = False, BIC):
 	trainSplits = trainDS.splits
 	
 	train_indexes = trainDS.__getIndexesGroups__(task)
@@ -32,7 +48,7 @@ def incrementalTrain(task, trainDS, ICaRL, exemplars, transformer, randomS = Fal
 		col = np.concatenate( (col,v), axis = None)
 	col = col.astype(int)
 
-	ICaRL = updateRep(task, trainDS, train_indexes, ICaRL, exemplars, trainSplits, transformer)
+	ICaRL = updateRep(task, trainDS, train_indexes, ICaRL, exemplars, trainSplits, transformer, BIC)
 
 	m = params.K/(task + params.TASK_SIZE)
 	m = int(m + .5) #arrotondo per eccesso; preferisco avere max 100 exemplars in più che non 100 in meno
@@ -42,12 +58,19 @@ def incrementalTrain(task, trainDS, ICaRL, exemplars, transformer, randomS = Fal
 
 	return ICaRL, exemplars
 
-def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transformer):
+def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transformer, BIC):
 
 	dataIdx = np.array(train_indexes)
+	validationSet = random.sample( dataIdx, 10)
+	dataIdx = np.array( set(data) - set(validationSet))
+
 	for classe in exemplars:
 		if( classe is not None):
 			#print('classe = ', classe)
+			valClass = random.sample( classe, 10)
+			validationSet = np.concatenate( (validationSet, valClass))
+
+			classe = np.array( set(classe) - set(valClass))
 			dataIdx = np.concatenate( (dataIdx, classe) )
 
 	#dataIdx contiene gli indici delle immagini, in train DS, delle nuove classi e dei vecchi exemplars
@@ -90,6 +113,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 			optimizer.zero_grad()
 			
 			outputs = ICaRL(images, features = False)
+			outputs = BIC.bias_forward(outputs)
 			old_outputs = old_ICaRL(images, features = False)
 
 			loss = utils.calculateLoss(outputs, old_outputs, onehot_labels, task, splits)
