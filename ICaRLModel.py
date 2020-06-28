@@ -129,7 +129,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 		scheduler.step()
 		
 		valD = StdSubset(trainDS, validationSet)
-		loader = DataLoader( valD, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE, shuffle = True)
+		valLoader = DataLoader( valD, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE, shuffle = True)
 		
 		criterion = nn.CrossEntropyLoss()
 		biasOptimizer = optim.Adam(BIC.bias_layers[int(task/params.TASK_SIZE)].parameters(), lr=0.001)
