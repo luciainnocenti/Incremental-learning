@@ -38,10 +38,7 @@ class Dataset(torch.utils.data.Dataset):
     #This method returns a list mapping the 100 classes into a human readable label. E.g. names[0] is the label that maps the class 0
     names = []
     classi = list(self._dataset.class_to_idx.keys())
-    for i in self.searched_classes:
-      names.append(classi[int(i)])
-    self._labelNames = names
-    return names
+    return classi
   
   def __init__(self, train = True, transform=None, target_transform=None):
     self._train = train
