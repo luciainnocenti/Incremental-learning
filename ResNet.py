@@ -156,3 +156,34 @@ def resnet56(pretrained=False, **kwargs):
     n = 9
     model = ResNet(Bottleneck, [n, n, n], **kwargs)
     return model
+
+class BiasLayer(nn.Module):
+    def __init__(self):
+        super(BiasLayer, self).__init__()
+        self.alpha = nn.Parameter(torch.ones(1, requires_grad=True, device="cuda"))
+        self.beta = nn.Parameter(torch.zeros(1, requires_grad=True, device="cuda"))
+    def forward(self, x):
+        return self.alpha * x + self.beta
+
+class BIC:
+    def __init__(self):
+        self.bias_layer1 = BiasLayer().cuda()
+        self.bias_layer2 = BiasLayer().cuda()
+        self.bias_layer3 = BiasLayer().cuda()
+        self.bias_layer4 = BiasLayer().cuda()
+        self.bias_layer5 = BiasLayer().cuda()
+        self.bias_layers=[self.bias_layer1, self.bias_layer2, self.bias_layer3, self.bias_layer4, self.bias_layer5]
+
+	def bias_forward(self, input):
+		in1 = input[:, :20]
+		in2 = input[:, 20:40]
+		in3 = input[:, 40:60]
+		in4 = input[:, 60:80]
+		in5 = input[:, 80:100]
+		out1 = self.bias_layer1(in1)
+		out2 = self.bias_layer2(in2)
+		out3 = self.bias_layer3(in3)
+		out4 = self.bias_layer4(in4)
+		out5 = self.bias_layer5(in5)
+		return torch.cat([out1, out2, out3, out4, out5], dim = 1)
+
