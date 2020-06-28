@@ -1,6 +1,5 @@
 import torch.nn as nn
 import math
-import torch.utils.model_zoo as model_zoo
 
 """
 Credits to @hshustc
@@ -165,7 +164,7 @@ class BiasLayer(nn.Module):
     def forward(self, x):
         return self.alpha * x + self.beta
 
-class BICModel:
+class BICModel():
 	def __init__(self):
 		self.bias_layer1 = BiasLayer().cuda()
 		self.bias_layer2 = BiasLayer().cuda()
