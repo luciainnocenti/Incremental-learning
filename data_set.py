@@ -50,12 +50,6 @@ class Dataset(torch.utils.data.Dataset):
     self._targets = np.array(self._dataset.targets) #Essendo CIFAR100 una sottoclasse di CIFAR10, qui fa riferimento a quell'implementazione.
     self._data = np.array(self._dataset.data)
     self.splits = params.returnSplits()
-    X = self._data
-    Y = self._targets
-    X_train, X_val, y_train, y_val = train_test_split(X, Y, test_size=0.10, stratify = Y)
-    self._data = X_train
-    self.targets = y_train
-    self.validationSet = (X_val, y_val)
 
   def __getIndexesGroups__(self, index = 0):
     #This method returns a list containing the indexes of all the images belonging to classes [starIndex, startIndex + 10]
