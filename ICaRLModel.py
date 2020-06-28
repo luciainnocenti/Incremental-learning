@@ -26,7 +26,6 @@ def stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC):
 		image = image.to(params.DEVICE)
 		label = label.to(params.DEVICE)
 		ICaRL.eval()
-		BIC.train(True)
 
 		p = ICaRL(image)
 
