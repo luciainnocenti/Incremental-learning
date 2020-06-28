@@ -28,9 +28,10 @@ def stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC, task):
 		ICaRL.eval()
 
 		p = ICaRL(image)
-		print(p[:,:task + params.TASK_SIZE])
+		
 		p = BIC.bias_forward(p)
-		print(p[:,:task + params.TASK_SIZE])
+		print(criterion)
+		print(biasOptimizer)
 		
 		loss = criterion(p[:,:task + params.TASK_SIZE], label)
 		
@@ -134,11 +135,11 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 		valD = StdSubset(trainDS, validationSet)
 		valLoader = DataLoader( valD, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE, shuffle = True)
 		
-	if(task > 0):
-		for epoch in range(params.NUM_EPOCHS):
-			criterion = nn.CrossEntropyLoss()
-			biasOptimizer = optim.Adam(BIC.bias_layers[int(task/params.TASK_SIZE)].parameters(), lr=0.001)
-			BIC = stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC, task)
+	#if(task > 0):
+	for epoch in range(params.NUM_EPOCHS):
+		criterion = nn.CrossEntropyLoss()
+		biasOptimizer = optim.Adam(BIC.bias_layers[int(task/params.TASK_SIZE)].parameters(), lr=0.001)
+		BIC = stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC, task)
 	return ICaRL
 
 def reduceExemplars(exemplars,m):
