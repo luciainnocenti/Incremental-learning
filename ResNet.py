@@ -173,7 +173,7 @@ class BICModel:
         self.bias_layer4 = BiasLayer().cuda()
         self.bias_layer5 = BiasLayer().cuda()
         self.bias_layers=[self.bias_layer1, self.bias_layer2, self.bias_layer3, self.bias_layer4, self.bias_layer5]
-
+	
 	def bias_forward(self, input):
 		in1 = input[:, :20]
 		in2 = input[:, 20:40]
