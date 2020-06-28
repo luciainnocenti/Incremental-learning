@@ -22,10 +22,10 @@ import random
 random.seed(params.SEED)
 def stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC, task, col):
 
-	for image, label, idx in valLoader:
+	for image, labels, idx in valLoader:
 
 		image = image.float().to(params.DEVICE)
-		label = label.to(params.DEVICE)
+		labels = labels.to(params.DEVICE)
 		ICaRL.eval()
 
 		p = ICaRL(image)
