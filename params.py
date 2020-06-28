@@ -27,7 +27,7 @@ BIAS_LR = .1
 BIAS_GAMMA = 1/100
 BIAS_STEP_SIZE = [100,150,200]
 BIAS_WEIGHT_DECAY = 0.0002
-
+BIAS_NUM_EPOCHS = 250
 
 def returnSplits():
 	el = np.linspace(0,99,100)
