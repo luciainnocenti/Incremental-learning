@@ -94,6 +94,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 	ICaRL.train(True)
 
 	optimizer = torch.optim.SGD(ICaRL.parameters(), lr=params.LR, momentum=params.MOMENTUM, weight_decay=params.WEIGHT_DECAY)
+	print(optimizer)
 	scheduler = optim.lr_scheduler.MultiStepLR(optimizer, params.STEP_SIZE, gamma=params.GAMMA) #allow to change the LR at predefined epochs
 	current_step = 0
 	col = []
