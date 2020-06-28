@@ -1,3 +1,5 @@
+import scipy as sp
+from scipy.spatial import Rectangle
 from DatasetCIFAR.data_set import Dataset 
 from DatasetCIFAR.data_set import Subset 
 from DatasetCIFAR import ResNet
