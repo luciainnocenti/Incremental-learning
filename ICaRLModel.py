@@ -24,7 +24,7 @@ def stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC, task):
 
 	for image, label, idx in valLoader:
 		print(label)
-		print(ixd)
+		print(idx)
 		print(len(valLoader))
 		image = image.float().to(params.DEVICE)
 		label = label.to(params.DEVICE)
