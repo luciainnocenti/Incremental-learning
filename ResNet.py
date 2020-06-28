@@ -165,7 +165,7 @@ class BiasLayer(nn.Module):
     def forward(self, x):
         return self.alpha * x + self.beta
 
-class BIC:
+class BICModel:
     def __init__(self):
         self.bias_layer1 = BiasLayer().cuda()
         self.bias_layer2 = BiasLayer().cuda()
