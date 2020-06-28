@@ -20,12 +20,10 @@ from torch.nn import functional as F
 from torchvision import transforms
 import random
 random.seed(params.SEED)
-def stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC, task):
+def stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC, task, col):
 
 	for image, label, idx in valLoader:
-		print(label)
-		print(idx)
-		print(len(valLoader))
+
 		image = image.float().to(params.DEVICE)
 		label = label.to(params.DEVICE)
 		ICaRL.eval()
@@ -33,10 +31,8 @@ def stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC, task):
 		p = ICaRL(image)
 		
 		p = BIC.bias_forward(p)
-		print(criterion)
-		print(biasOptimizer)
-		
-		loss = criterion(p[:,:task + params.TASK_SIZE], label)
+		mappedLabels = utils.mapFunction(labels, col)
+		loss = criterion(p[:,:task + params.TASK_SIZE], mappedLabels)
 		
 		biasOptimizer.zero_grad()
 		#loss.backward()            
@@ -144,7 +140,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 		criterion = nn.CrossEntropyLoss()
 		print('pars = ', BIC.bias_layers[int(task/params.TASK_SIZE)].parameters())
 		biasOptimizer = torch.optim.SGD(BIC.bias_layers[int(task/params.TASK_SIZE)].parameters(), lr=params.LR, momentum=params.MOMENTUM, weight_decay=params.WEIGHT_DECAY)
-		BIC = stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC, task)
+		BIC = stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC, task, col)
 	return ICaRL
 
 def reduceExemplars(exemplars,m):
