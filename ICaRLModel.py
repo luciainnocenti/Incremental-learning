@@ -65,12 +65,12 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 
 	for classe in exemplars:
 		if( classe is not None):
-			print('len classe = ', len(classe))
+			#print('len classe = ', len(classe))
 			valClass = random.sample( classe, int(100/(task) ) ) 
-			print('len valclasse = ', len(valClass))
+			#print('len valclasse = ', len(valClass))
 			validationSet = np.concatenate( (validationSet, valClass))
 
-			classe = np.array( set(classe) - set(valClass))
+			classe = list( set(classe) - set(valClass))
 			dataIdx = np.concatenate( (dataIdx, classe) )
 
 	#dataIdx contiene gli indici delle immagini, in train DS, delle nuove classi e dei vecchi exemplars
