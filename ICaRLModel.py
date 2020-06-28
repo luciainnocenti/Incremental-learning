@@ -28,8 +28,10 @@ def stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC, task):
 		ICaRL.eval()
 
 		p = ICaRL(image)
-
+		print(p[:,:task + params.TASK_SIZE])
 		p = BIC.bias_forward(p)
+		print(p[:,:task + params.TASK_SIZE])
+		
 		loss = criterion(p[:,:task + params.TASK_SIZE], label)
 		
 		biasOptimizer.zero_grad()
