@@ -139,7 +139,8 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 	#if(task > 0):
 	for epoch in range(params.NUM_EPOCHS):
 		criterion = nn.CrossEntropyLoss()
-		biasOptimizer = optim.Adam(BIC.bias_layers[int(task/params.TASK_SIZE)].parameters(), lr=0.001)
+		print('pars = ', BIC.bias_layers[int(task/params.TASK_SIZE)].parameters())
+		biasOptimizer = torch.optim.SGD(BIC.bias_layers[int(task/params.TASK_SIZE)].parameters(), lr=params.LR, momentum=params.MOMENTUM, weight_decay=params.WEIGHT_DECAY)
 		BIC = stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC, task)
 	return ICaRL
 
