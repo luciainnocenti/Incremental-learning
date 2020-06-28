@@ -59,10 +59,9 @@ def incrementalTrain(task, trainDS, ICaRL, exemplars, transformer, randomS = Fal
 	return ICaRL, exemplars
 
 def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transformer, BIC):
-
-	dataIdx = np.array(train_indexes)
-	validationSet = random.sample( dataIdx, 100)
-	dataIdx = np.array( set(data) - set(validationSet))
+	
+	validationSet = random.sample( train_indexes, 100)
+	dataIdx = list( set(train_indexes) - set(validationSet))
 
 	for classe in exemplars:
 		if( classe is not None):
