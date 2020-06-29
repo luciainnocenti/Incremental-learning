@@ -23,6 +23,64 @@ from torchvision import transforms
 import random
 random.seed(params.SEED)
 
+def matchAndClassify(images, exemplars, ICaRL, trainDS):
+	ICaRL.train(False)
+	#For each class in exemplars, build the hyper-rectangle of its exemplars
+	classiAnalizzate = []
+	for i in range( 0, int(task/10) + 1) :
+		classiAnalizzate = np.concatenate( (classiAnalizzate, ds.splits[i]) )
+	hyperrectangles = []
+	transformer = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+	#classiAnalizzate contains a list of all classes seen so far, also the last 10
+	for classe in classiAnalizzate:
+		ss = Subset(trainDS, exemplars[classe], transformer)
+		loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=256)#per ogni classe massimo ho 2000/10 = 200 exemplar
+		for img, lbl, idx in loader:
+			with torch.no_grad():
+				img = img.float().to(params.DEVICE)
+				x = ICaRL(img, features = True)
+				x /= torch.norm(x, p=2)
+				maxs = torch.max(x,dim=0)[0]
+				mins = torch.min(x,dim=0)[0]
+
+				hyperrectangles.append(Rectangle(maxs, mins))
+
+
+	#for each image to classify, find the closest hyper-rectangle
+	preds = []
+	images = images.float().to(params.DEVICE)
+	phiX = ICaRL(images, features = True)
+	phiX /= torch.norm(phiX, p=2)
+
+	dists = []
+	for imageFeatures in phiX:
+		for rect in hyperrectangles:
+			dists.append(rect.min_distance_point(t, p =2.0))
+		minDist = np.amin(dists)
+		idxs = np.where(dists == minDist)[0]
+
+		#if more than one rect have the same distance, and it is the minimum one, select the smallest one
+		if( len(idxs) > 1):
+			min_vol = sys.maxsize
+			for i in idxs:
+				if( rect[i].volume() < min_vol):
+					min_vol = rect[i].volume()
+					selectedClass = i
+		#else, if only one rect has a distance = minDist, select it
+		else:
+			selectedClass = idxs[0]
+		preds.append(selectedClass)
+		#if the rect don't contains the image, the rect have to be update
+		if(minDist != 0):
+			toUpdateRect = hyperrectangles[selectedClass]
+			maxes = toUpdateRect.maxes
+			mins = toUpdateRect.mins
+
+			maxes = torch.max( maxes, imageFeatures ) #elemens-wise comparization
+			mins = torch.max( mins, imageFeatures )
+			hyperrectangles[selectedClass] = Rectangle(maxes, mins)
+	return preds
+
 def incrementalTrain(task, trainDS, ICaRL, exemplars, transformer, randomS = False):
 	trainSplits = trainDS.splits
 	
