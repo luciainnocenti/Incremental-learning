@@ -79,13 +79,13 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 		if(minDist != 0):
 			idx = np.where(classiAnalizzate == selectedClass)[0]
 			print('idx=',idx)
-			toUpdateRect = hyperrectangles[selectedClass]
+			toUpdateRect = hyperrectangles[idx]
 			maxes = torch.tensor(toUpdateRect.maxes).to(params.DEVICE)
 			mins = torch.tensor(toUpdateRect.mins).to(params.DEVICE)
 
 			maxes = torch.max( maxes, imageFeatures.double() ) #elemens-wise comparization
 			mins = torch.max( mins, imageFeatures.double() )
-			hyperrectangles[selectedClass] = Rectangle(maxes.cpu().numpy(), mins.cpu().numpy())
+			hyperrectangles[idx] = Rectangle(maxes.cpu().numpy(), mins.cpu().numpy())
 	return preds
 
 def incrementalTrain(task, trainDS, ICaRL, exemplars, transformer, randomS = False):
