@@ -54,8 +54,9 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 		phiX = ICaRL(images, features = True)
 		phiX /= torch.norm(phiX, p=2)
 
-	dists = []
+	
 	for imageFeatures in phiX:
+		dists = []
 		for rect in hyperrectangles:
 			dists.append(rect.min_distance_point(imageFeatures.cpu().numpy(), p =2.0))
 		minDist = np.amin(dists)
@@ -77,7 +78,7 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 		#if the rect don't contains the image, it has to be update
 		if(minDist != 0):
 			idx = np.where(classiAnalizzate == selectedClass)[0]
-			print(idx)
+			print('idx=',idx)
 			toUpdateRect = hyperrectangles[selectedClass]
 			maxes = torch.tensor(toUpdateRect.maxes).to(params.DEVICE)
 			mins = torch.tensor(toUpdateRect.mins).to(params.DEVICE)
