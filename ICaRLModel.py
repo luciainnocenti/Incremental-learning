@@ -135,9 +135,9 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 			
 			optimizer.zero_grad()
 			outputs = ICaRL(images, features = False)
-			
+			print(outputs)
 			outputs[:, splits[int(task/10)]] = BIC.bias_forward(outputs[:, splits[int(task/10)]])
-			
+			print(outputs[:, splits[int(task/10)]])
 			old_outputs = old_ICaRL(images, features = False)
 			
 			loss = utils.calculateLoss(outputs, old_outputs, onehot_labels, task, splits)
