@@ -154,10 +154,6 @@ def calculateLoss(outputs, old_outputs, labels, task, train_splits, typeLoss = '
 		v = np.array(x)
 		col = np.concatenate( (col,v), axis = None)
 	col = np.array(col).astype(int)
-	if(flag):
-		m1 = nn.Sigmoid()
-	else:
-		m1 = m
 		
 	if( task == 0):
 		if(flag):
