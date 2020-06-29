@@ -34,7 +34,7 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 	#classiAnalizzate contains a list of all classes seen so far, also the last 10
 	for classe in classiAnalizzate:
 		print('classe =', classe)
-		ss = Subset(trainDS, exemplars[classe], transformer)
+		ss = Subset(trainDS, exemplars[int(classe)], transformer)
 		loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=256)#per ogni classe massimo ho 2000/10 = 200 exemplar
 		for img, lbl, idx in loader:
 			print('Dovrebbe stamparlo solo una volta')
@@ -65,6 +65,7 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 		if( len(idxs) > 1):
 			min_vol = sys.maxsize
 			for i in idxs:
+				i = int(i)
 				if( rect[i].volume() < min_vol):
 					min_vol = rect[i].volume()
 					selectedClass = i
