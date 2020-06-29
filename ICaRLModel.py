@@ -59,7 +59,6 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 			dists.append(rect.min_distance_point(imageFeatures.cpu().numpy(), p =2.0))
 		minDist = np.amin(dists)
 		idxs = np.where(dists == minDist)[0]
-		print('indici classi minima distanza =',idxs)
 		#if more than one rect have the same distance, and it is the minimum one, select the smallest one
 		if( len(idxs) > 1):
 			min_vol = sys.maxsize
@@ -71,13 +70,11 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 		#else, if only one rect has a distance = minDist, select it
 		else:
 			selectedClass = int(classiAnalizzate[idxs[0]])
-		print('selected =', selectedClass)
 		preds.append(selectedClass)
 		#if the rect don't contains the image, it has to be update
 		if(minDist != 0):
 			idx = np.where(classiAnalizzate == selectedClass)[0]
 			idx = int(idx)
-			print('idx=',idx)
 			toUpdateRect = hyperrectangles[idx]
 			maxes = torch.tensor(toUpdateRect.maxes).to(params.DEVICE)
 			mins = torch.tensor(toUpdateRect.mins).to(params.DEVICE)
