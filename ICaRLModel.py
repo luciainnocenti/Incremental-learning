@@ -29,7 +29,6 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 	classiAnalizzate = []
 	for i in range( 0, int(task/10) + 1) :
 		classiAnalizzate = np.concatenate( (classiAnalizzate, trainDS.splits[i]) )
-	print(classiAnalizzate)
 	hyperrectangles = []
 	transformer = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 	#classiAnalizzate contains a list of all classes seen so far, also the last 10
@@ -37,7 +36,6 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 		ss = Subset(trainDS, exemplars[int(classe)], transformer)
 		loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=256)#per ogni classe massimo ho 2000/10 = 200 exemplar
 		for img, lbl, idx in loader:
-			print('Dovrebbe stamparlo solo una volta')
 			with torch.no_grad():
 				img = img.float().to(params.DEVICE)
 				x = ICaRL(img, features = True)
@@ -78,6 +76,7 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 		#if the rect don't contains the image, it has to be update
 		if(minDist != 0):
 			idx = np.where(classiAnalizzate == selectedClass)[0]
+			idx = int(idx)
 			print('idx=',idx)
 			toUpdateRect = hyperrectangles[idx]
 			maxes = torch.tensor(toUpdateRect.maxes).to(params.DEVICE)
