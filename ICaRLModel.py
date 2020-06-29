@@ -17,7 +17,10 @@ from torch.utils.data import Subset as StdSubset
 from torch.utils.data import DataLoader
 from torch.nn import functional as F
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import LinearSVC, SVC
+
 from torchvision import transforms
+
 import random
 random.seed(params.SEED)
 
@@ -225,11 +228,12 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 						y_train.append(elem2)
 
 
-		model = KNeighborsClassifier(n_neighbors=3)
+		#model = KNeighborsClassifier(n_neighbors=3)
 
-		#model = LinearSVC()
+		model = LinearSVC()
+		#model= svm.SVC(kernel='rbf', C=1)
 
-		#model = MLPClassifier(hidden_layer_sizes=(100,50,25), random_state=1)
+		
 		#print ("this is X_train")
 		#print (X_train)
 		#print ("this is y")
