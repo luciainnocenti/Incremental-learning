@@ -80,8 +80,8 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 			maxes = torch.tensor(toUpdateRect.maxes).to(params.DEVICE)
 			mins = torch.tensor(toUpdateRect.mins).to(params.DEVICE)
 
-			maxes = torch.max( maxes, imageFeatures ) #elemens-wise comparization
-			mins = torch.max( mins, imageFeatures )
+			maxes = torch.max( maxes, imageFeatures.double() ) #elemens-wise comparization
+			mins = torch.max( mins, imageFeatures.double() )
 			hyperrectangles[selectedClass] = Rectangle(maxes.cpu().numpy(), mins.cpu().numpy())
 	return preds
 
