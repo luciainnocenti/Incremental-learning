@@ -21,16 +21,23 @@ from torchvision import transforms
 import random
 random.seed(params.SEED)
 
-def stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC, task, col):
-	for image, labels, idx in valLoader:
-		image = image.float().to(params.DEVICE)
-		labels = labels.to(params.DEVICE)
+def stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, ICaRL, BIC, task, col):
+	old_iterator = iter(validationOldLoader)
+	for imagesNew, labelsNew, _ in validationNewLoader:
+		
+		imagesOld, labelsOld, _ = next(old_iterator)
+		
+		imagesNew = imagesNew.float().to(params.DEVICE)
+		imagesOld = imagesOld.float().to(params.DEVICE)
 		ICaRL.eval()
 
-		p = ICaRL(image)
-		p = BIC.bias_forward(p)
-		#mappedLabels = utils.mapFunction(labels, col)
-		loss = criterion(p, labels)
+		pNew = ICaRL(imagesNew)
+		pNew = BIC.bias_forward(pNew)
+		
+		pOld = ICaRL(imagesOld)
+		pOld = BIC.bias_forward(pOld)
+
+		loss = criterion(pNew, pOld)
 		
 		biasOptimizer.zero_grad()
 		loss.backward()            
@@ -60,19 +67,19 @@ def incrementalTrain(task, trainDS, ICaRL, exemplars, transformer, randomS = Fal
 
 def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transformer, BIC):
 	
-	validationSet = random.sample( train_indexes, 100)
-	dataIdx = list( set(train_indexes) - set(validationSet))
 
+	validationOld = []
 	for classe in exemplars:
 		if( classe is not None):
 			print('len classe = ', len(classe))
 			valClass = random.sample( classe, int( len(classe)/9 ) ) 
 			print('len valclasse = ', len(valClass))
-			validationSet = np.concatenate( (validationSet, valClass))
-
+			validationOld = np.concatenate( (validationOld, valClass))
 			classe = list( set(classe) - set(valClass))
 			dataIdx = np.concatenate( (dataIdx, classe) )
-
+	l = len(validationOld)
+	validationNew = random.sample(train_indexes, l)
+	dataIdx = list( set(train_indexes) - set(validationNew))
 	#dataIdx contiene gli indici delle immagini, in train DS, delle nuove classi e dei vecchi exemplars
 	ex_transformer = transforms.Compose([transforms.RandomCrop(size = 32, padding=4),
 						transforms.RandomHorizontalFlip(),
@@ -100,13 +107,15 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 	col = np.array(col).astype(int)
 	
 	if(task>0):
-		valD = StdSubset(trainDS, validationSet)
-		valLoader = DataLoader( valD, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE, shuffle = True)
-		criterion = nn.CrossEntropyLoss()
+		valD = StdSubset(trainDS, validationNew)
+		validationNewLoader = DataLoader( valD, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE)
+		valD = StdSubset(trainDS, validationOld)
+		validationOldLoader = DataLoader( valD, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE)
+		criterion = nn.MSELoss()
 		biasOptimizer = torch.optim.SGD(BIC.bias_layers[int(task/params.TASK_SIZE)].parameters(), lr=0.5, momentum=params.MOMENTUM, weight_decay=params.BIAS_WEIGHT_DECAY )
 		biasScheduler = optim.lr_scheduler.MultiStepLR(biasOptimizer, params.BIAS_STEP_SIZE, gamma=params.BIAS_GAMMA)
 		for epoch in range(70):
-			BIC = stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC, task, col)
+			BIC = stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, ICaRL, BIC, task, col)
 			biasScheduler.step()
 	print('task :', task)
 	BIC.printBICparams()
