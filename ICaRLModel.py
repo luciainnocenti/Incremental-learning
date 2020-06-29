@@ -71,15 +71,15 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 	validationOld = []
 	for classe in exemplars:
 		if( classe is not None):
-			print('len classe = ', len(classe))
 			valClass = random.sample( classe, int( len(classe)/9 ) ) 
-			print('len valclasse = ', len(valClass))
 			validationOld = np.concatenate( (validationOld, valClass)).astype(int)
 			classe = list( set(classe) - set(valClass))
 			dataIdx = np.concatenate( (dataIdx, classe) ).astype(int)
 	l = len(validationOld)
-
+	if( l == 0):
+		l = 300
 	validationNew = random.sample(train_indexes, l)
+	
 
 	trainNew = list( set(train_indexes) - set(validationNew))
 	dataIdx = np.concatenate( (dataIdx, trainNew) ).astype(int)
