@@ -117,7 +117,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 		valD = StdSubset(trainDS, validationOld)
 		validationOldLoader = DataLoader( valD, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE)
 		criterion = nn.MSELoss()
-		biasOptimizer = torch.optim.SGD(BIC.bias_layer.parameters(), lr=0.5, momentum=params.MOMENTUM, weight_decay=params.BIAS_WEIGHT_DECAY )
+		biasOptimizer = torch.optim.SGD(BIC.bias_layer.parameters(), lr= 0.005, weight_decay=params.BIAS_WEIGHT_DECAY )
 		biasScheduler = optim.lr_scheduler.MultiStepLR(biasOptimizer, params.BIAS_STEP_SIZE, gamma=params.BIAS_GAMMA)
 		for epoch in range(70):
 			BIC = stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, ICaRL, BIC, task, col)
