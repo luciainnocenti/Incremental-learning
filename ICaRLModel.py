@@ -69,10 +69,10 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 				i = int(i)
 				if( hyperrectangles[i].volume() < min_vol):
 					min_vol = hyperrectangles[i].volume()
-					selectedClass = classiAnalizzate[i]
+					selectedClass = int(classiAnalizzate[i])
 		#else, if only one rect has a distance = minDist, select it
 		else:
-			selectedClass = classiAnalizzate[idxs[0]]
+			selectedClass = int(classiAnalizzate[idxs[0]])
 		preds.append(selectedClass)
 		#if the rect don't contains the image, the rect have to be update
 		if(minDist != 0):
