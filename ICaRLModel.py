@@ -230,8 +230,8 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 
 		#model = KNeighborsClassifier(n_neighbors=3)
 
-		model = LinearSVC()
-		#model= svm.SVC(kernel='rbf', C=1)
+		#model = LinearSVC()
+		model= svm.SVC(kernel='rbf', C=1)
 
 		
 		#print ("this is X_train")
