@@ -67,7 +67,7 @@ def incrementalTrain(task, trainDS, ICaRL, exemplars, transformer, randomS = Fal
 
 def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transformer, BIC):
 	
-
+	dataIdx = []
 	validationOld = []
 	for classe in exemplars:
 		if( classe is not None):
@@ -79,7 +79,9 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 			dataIdx = np.concatenate( (dataIdx, classe) )
 	l = len(validationOld)
 	validationNew = random.sample(train_indexes, l)
-	dataIdx = list( set(train_indexes) - set(validationNew))
+	trainNew = list( set(train_indexes) - set(validationNew))
+	dataIdx = np.concatenate( (dataIdx, trainNew) )
+	
 	#dataIdx contiene gli indici delle immagini, in train DS, delle nuove classi e dei vecchi exemplars
 	ex_transformer = transforms.Compose([transforms.RandomCrop(size = 32, padding=4),
 						transforms.RandomHorizontalFlip(),
