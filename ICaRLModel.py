@@ -29,6 +29,7 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 	classiAnalizzate = []
 	for i in range( 0, int(task/10) + 1) :
 		classiAnalizzate = np.concatenate( (classiAnalizzate, trainDS.splits[i]) )
+	print(classiAnalizzate)
 	hyperrectangles = []
 	transformer = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 	#classiAnalizzate contains a list of all classes seen so far, also the last 10
@@ -73,6 +74,7 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 		#else, if only one rect has a distance = minDist, select it
 		else:
 			selectedClass = int(classiAnalizzate[idxs[0]])
+		print('selected =', selectedClass)
 		preds.append(selectedClass)
 		#if the rect don't contains the image, the rect have to be update
 		if(minDist != 0):
