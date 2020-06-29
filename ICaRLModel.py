@@ -38,7 +38,7 @@ def stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, I
 		pNew = BIC.bias_forward(pNew)
 		
 		pOld = ICaRL(imagesOld)
-		
+		pOld = pOld.detach()
 		loss = criterion(m(pNew), m(pOld) )
 		
 		loss.backward()            
@@ -134,13 +134,9 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 			mappedLabels = utils.mapFunction(labels, col)
 			
 			optimizer.zero_grad()
-			print('1')
-			BIC.printBICparams()
 			outputs = ICaRL(images, features = False)
 			
 			outputs[:, splits[int(task/10)]] = BIC.bias_forward(outputs[:, splits[int(task/10)]])
-			print('2')
-			BIC.printBICparams()
 			
 			old_outputs = old_ICaRL(images, features = False)
 			
