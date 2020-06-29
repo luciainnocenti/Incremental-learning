@@ -51,13 +51,14 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 	#for each image to classify, find the closest hyper-rectangle
 	preds = []
 	images = images.float().to(params.DEVICE)
-	phiX = ICaRL(images, features = True)
-	phiX /= torch.norm(phiX, p=2)
+	with torch.no_grad():
+		phiX = ICaRL(images, features = True)
+		phiX /= torch.norm(phiX, p=2)
 
 	dists = []
 	for imageFeatures in phiX:
 		for rect in hyperrectangles:
-			dists.append(rect.min_distance_point(imageFeatures.cpu().detach().numpy(), p =2.0))
+			dists.append(rect.min_distance_point(imageFeatures.cpu().numpy(), p =2.0))
 		minDist = np.amin(dists)
 		idxs = np.where(dists == minDist)[0]
 
