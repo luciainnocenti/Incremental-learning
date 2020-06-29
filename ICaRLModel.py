@@ -194,9 +194,9 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 					x = ICaRL(img, features = True)
 					x /= torch.norm(x, p=2)
 					for elem in x:
-					X_train.append(elem.cpu().numpy())
+					X_train.append(elem.cpu())#.numpy()
 					for elem in y:
-					y_train.append(y)
+					y_train.append(elem)
 	else:
 		means = mean
 	model = KNeighborsClassifier(n_neighbors=3)
