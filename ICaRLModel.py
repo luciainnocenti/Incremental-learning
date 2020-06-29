@@ -22,7 +22,6 @@ import random
 random.seed(params.SEED)
 
 def stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC, task, col):
-	BIC.printBICparams()
 	for image, labels, idx in valLoader:
 		image = image.float().to(params.DEVICE)
 		labels = labels.to(params.DEVICE)
@@ -106,9 +105,11 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 		criterion = nn.CrossEntropyLoss()
 		biasOptimizer = torch.optim.SGD(BIC.bias_layers[int(task/params.TASK_SIZE)].parameters(), lr=params.BIAS_LR, momentum=params.MOMENTUM, weight_decay=params.BIAS_WEIGHT_DECAY )
 		biasScheduler = optim.lr_scheduler.MultiStepLR(biasOptimizer, params.BIAS_STEP_SIZE, gamma=params.BIAS_GAMMA)
-		for epoch in range(params.NUM_EPOCHS):
+		for epoch in range(params.BIAS_NUM_EPOCHS ):
 			BIC = stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC, task, col)
 			biasScheduler.step()
+	print('task :', task)
+	BIC.printBICparams()
 	
 	for epoch in range(params.NUM_EPOCHS):
 		lenght = 0
