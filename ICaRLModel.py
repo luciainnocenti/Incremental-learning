@@ -76,6 +76,8 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 		preds.append(selectedClass)
 		#if the rect don't contains the image, it has to be update
 		if(minDist != 0):
+			idx = np.where(classiAnalizzate == selectedClass)[0]
+			print(idx)
 			toUpdateRect = hyperrectangles[selectedClass]
 			maxes = torch.tensor(toUpdateRect.maxes).to(params.DEVICE)
 			mins = torch.tensor(toUpdateRect.mins).to(params.DEVICE)
