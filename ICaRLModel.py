@@ -38,6 +38,7 @@ def stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, I
 		pOld = BIC.bias_forward(pOld)
 		print('New=', pNew)
 		print('Old=', pOld)
+		print('pars=', BIC.printBICparams())
 		loss = criterion(pNew, pOld)
 		
 		biasOptimizer.zero_grad()
