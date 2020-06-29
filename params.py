@@ -5,7 +5,7 @@ from torchvision import transforms
 from torchvision import datasets
 import random
 
-DEVICE = 'cuda' # 'cuda' or 'cpu'
+DEVICE = 'cpu' # 'cuda' or 'cpu'
 BATCH_SIZE = 128
 TASK_SIZE = 10
 
