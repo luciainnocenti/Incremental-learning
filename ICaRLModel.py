@@ -163,7 +163,7 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 		
 	return newExs
 
-def classify(images, exemplars, ICaRL, task, trainDS,mean):
+def classify(images, exemplars, ICaRL, task, trainDS,mean=None):
 	preds = []
 
 	nClasses = task + params.TASK_SIZE
