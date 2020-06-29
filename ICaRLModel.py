@@ -20,16 +20,15 @@ from torch.nn import functional as F
 from torchvision import transforms
 import random
 random.seed(params.SEED)
-def stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC, task, col):
 
+def stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC, task, col):
 	for image, labels, idx in valLoader:
 		BIC.bias_layer1.printParam(1)
 		image = image.float().to(params.DEVICE)
 		labels = labels.to(params.DEVICE)
-		ICaRL.eval()
+		#ICaRL.eval()
 
 		p = ICaRL(image)
-		
 		p = BIC.bias_forward(p)
 		mappedLabels = utils.mapFunction(labels, col)
 		loss = criterion(p[:,:task + params.TASK_SIZE], mappedLabels)
@@ -67,9 +66,9 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 
 	for classe in exemplars:
 		if( classe is not None):
-			#print('len classe = ', len(classe))
-			valClass = random.sample( classe, int(100/(task) ) ) 
-			#print('len valclasse = ', len(valClass))
+			print('len classe = ', len(classe))
+			valClass = random.sample( classe, int( len(classe)/9 ) ) 
+			print('len valclasse = ', len(valClass))
 			validationSet = np.concatenate( (validationSet, valClass))
 
 			classe = list( set(classe) - set(valClass))
@@ -93,7 +92,6 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 	ICaRL.train(True)
 
 	optimizer = torch.optim.SGD(ICaRL.parameters(), lr=params.LR, momentum=params.MOMENTUM, weight_decay=params.WEIGHT_DECAY)
-	print(optimizer)
 	scheduler = optim.lr_scheduler.MultiStepLR(optimizer, params.STEP_SIZE, gamma=params.GAMMA) #allow to change the LR at predefined epochs
 	current_step = 0
 	col = []
@@ -101,12 +99,20 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 		v = np.array(x)
 		col = np.concatenate( (col,v), axis = None)
 	col = np.array(col).astype(int)
-
+	
+	if(task>0):
+		valD = StdSubset(trainDS, validationSet)
+		valLoader = DataLoader( valD, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE, shuffle = True)
+		criterion = nn.CrossEntropyLoss()
+		biasOptimizer = torch.optim.SGD(BIC.bias_layers[int(task/params.TASK_SIZE)].parameters(), lr=params.BIAS_LR, momentum=params.MOMENTUM, weight_decay=params.BIAS_WEIGHT_DECAY )
+		biasScheduler = optim.lr_scheduler.MultiStepLR(biasOptimizer, params.BIAS_STEP_SIZE, gamma=params.BIAS_GAMMA)
+		for epoch in range(params.NUM_EPOCHS):
+			BIC = stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC, task, col)
+			biasScheduler.step()
+	
 	for epoch in range(params.NUM_EPOCHS):
 		lenght = 0
 		running_corrects = 0
-  	  
-
 		for images, labels, idx in loader:
 			images = images.float().to(params.DEVICE)
 			labels = labels.to(params.DEVICE)
@@ -132,16 +138,6 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 		accuracy = running_corrects / float(lenght)
 		scheduler.step()
 		print("At step ", str(task), " and at epoch = ", epoch, " the loss is = ", loss.item(), " and accuracy is = ", accuracy)
-		valD = StdSubset(trainDS, validationSet)
-		valLoader = DataLoader( valD, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE, shuffle = True)
-		
-	#if(task > 0):
-	
-	criterion = nn.CrossEntropyLoss()
-	biasOptimizer = torch.optim.SGD(BIC.bias_layers[int(task/params.TASK_SIZE)].parameters(), lr=params.BIAS_LR, momentum=params.MOMENTUM, weight_decay=params.BIAS_WEIGHT_DECAY )
-	biasScheduler = optim.lr_scheduler.MultiStepLR(biasOptimizer, params.BIAS_STEP_SIZE, gamma=params.BIAS_GAMMA)
-	for epoch in range(params.NUM_EPOCHS):
-		BIC = stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC, task, col)
 	return ICaRL
 
 def reduceExemplars(exemplars,m):
