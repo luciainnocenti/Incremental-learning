@@ -30,6 +30,7 @@ def stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, I
 		
 		imagesNew = imagesNew.float().to(params.DEVICE)
 		imagesOld = imagesOld.float().to(params.DEVICE)
+		biasOptimizer.zero_grad()
 		ICaRL.eval()
 
 		pNew = ICaRL(imagesNew)
@@ -43,7 +44,6 @@ def stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, I
 		BIC.printBICparams()
 		loss = criterion(m(pNew), m(pOld) )
 		
-		biasOptimizer.zero_grad()
 		loss.backward()            
 		biasOptimizer.step()
 	return BIC
