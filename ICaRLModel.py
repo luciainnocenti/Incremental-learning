@@ -18,6 +18,7 @@ from torch.utils.data import DataLoader
 from torch.nn import functional as F
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import LinearSVC, SVC
+from sklearn import svm
 
 from torchvision import transforms
 
