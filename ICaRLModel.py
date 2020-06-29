@@ -22,6 +22,7 @@ import random
 random.seed(params.SEED)
 
 def stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, ICaRL, BIC, task, col):
+	m = nn.Sigmoid()
 	old_iterator = iter(validationOldLoader)
 	for imagesNew, labelsNew, _ in validationNewLoader:
 		
@@ -40,7 +41,7 @@ def stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, I
 		print('Old=', pOld)
 		print('pars=')
 		BIC.printBICparams()
-		loss = criterion(pNew, pOld)
+		loss = criterion(m(pNew), m(pOld) )
 		
 		biasOptimizer.zero_grad()
 		loss.backward()            
