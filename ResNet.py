@@ -164,8 +164,8 @@ class BiasLayer(nn.Module):
 		self.beta = nn.Parameter(torch.zeros(1, requires_grad=True, device="cuda"))
 	def forward(self, x):
 		return self.alpha * x + self.beta
-	def printParam(self, i):
-		print(i, self.alpha.item(), self.beta.item())
+	def printParam(self):
+		print(self.alpha.item(), self.beta.item())
 
 
 class BICModel():
@@ -177,6 +177,10 @@ class BICModel():
 		self.bias_layer5 = BiasLayer().to(params.DEVICE)
 		self.bias_layers=[self.bias_layer1, self.bias_layer2, self.bias_layer3, self.bias_layer4, self.bias_layer5]
 		
+	def printBICparams(self):
+		for el in sel.bias_layers:
+			el.printParam()
+			
 	def bias_forward(self, input):
 		in1 = input[:, :20]
 		in2 = input[:, 20:40]
