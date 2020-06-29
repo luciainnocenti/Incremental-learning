@@ -169,7 +169,7 @@ class BiasLayer(nn.Module):
 
 
 class BICModel():
-	def __init__(self):
+	def __init__(self, splits):
 		self.bias_layer0 = BiasLayer().to(params.DEVICE)
 		self.bias_layer1 = BiasLayer().to(params.DEVICE)
 		self.bias_layer2 = BiasLayer().to(params.DEVICE)
@@ -187,6 +187,7 @@ class BICModel():
 			el.printParam()
 			
 	def bias_forward(self, input):
+		splits = self.splits
 		in0 = input[:, :10]
 		in1 = input[:, 10:20]
 		in2 = input[:, 20:30]
@@ -197,6 +198,9 @@ class BICModel():
 		in7 = input[:, 70:80]
 		in8 = input[:, 80:90]
 		in9 = input[:, 90:100]
+		#in0 = input[:, splits[0] ]
+		#in1 = input[:, splits[1] ]
+		#in2 = input[:, splits[3] ]
 		out0 = self.bias_layer0(in0)
 		out1 = self.bias_layer1(in1)
 		out2 = self.bias_layer2(in2)
