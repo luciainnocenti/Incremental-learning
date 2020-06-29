@@ -22,8 +22,8 @@ import random
 random.seed(params.SEED)
 
 def stage2(valLoader, criterion, biasOptimizer, ICaRL, BIC, task, col):
+	BIC.printBICparams()
 	for image, labels, idx in valLoader:
-		BIC.bias_layer1.printParam(1)
 		image = image.float().to(params.DEVICE)
 		labels = labels.to(params.DEVICE)
 		#ICaRL.eval()
