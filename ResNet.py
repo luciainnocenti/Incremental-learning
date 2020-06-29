@@ -160,8 +160,8 @@ def resnet56(pretrained=False, **kwargs):
 class BiasLayer(nn.Module):
 	def __init__(self):
 		super(BiasLayer, self).__init__()
-		self.alpha = nn.Parameter(torch.ones(1, requires_grad=True, device="cuda"))
-		self.beta = nn.Parameter(torch.zeros(1, requires_grad=True, device="cuda"))
+		self.alpha = nn.Parameter(torch.ones(1, requires_grad=True, device=params.DEVICE))
+		self.beta = nn.Parameter(torch.zeros(1, requires_grad=True, device=params.DEVICE))
 	def forward(self, x):
 		return self.alpha * x + self.beta
 	def printParam(self):
