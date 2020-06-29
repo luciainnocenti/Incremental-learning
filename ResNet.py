@@ -170,6 +170,7 @@ class BiasLayer(nn.Module):
 
 class BICModel():
 	def __init__(self, splits):
+		self.splits = splits
 		self.bias_layer0 = BiasLayer().to(params.DEVICE)
 		self.bias_layer1 = BiasLayer().to(params.DEVICE)
 		self.bias_layer2 = BiasLayer().to(params.DEVICE)
