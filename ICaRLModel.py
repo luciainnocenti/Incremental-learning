@@ -177,6 +177,7 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 	transformer = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 	ds = trainDS
 	classiAnalizzate = []
+	X_train, y_train = [], [] 
 	if(mean == None):
 		for i in range( 0, int(task/10) + 1) :
 			##print('split i = ', ds.splits[i])
