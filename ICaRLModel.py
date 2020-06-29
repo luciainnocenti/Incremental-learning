@@ -34,7 +34,6 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 	transformer = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 	#classiAnalizzate contains a list of all classes seen so far, also the last 10
 	for classe in classiAnalizzate:
-		print('classe =', classe)
 		ss = Subset(trainDS, exemplars[int(classe)], transformer)
 		loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=256)#per ogni classe massimo ho 2000/10 = 200 exemplar
 		for img, lbl, idx in loader:
@@ -47,7 +46,6 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 				mins = torch.min(x,dim=0)[0]
 
 				hyperrectangles.append(Rectangle(maxs.cpu().numpy(), mins.cpu().numpy()))
-				print('quanti hyp:', len(hyperrectangles))
 
 	#for each image to classify, find the closest hyper-rectangle
 	preds = []
@@ -62,7 +60,7 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 			dists.append(rect.min_distance_point(imageFeatures.cpu().numpy(), p =2.0))
 		minDist = np.amin(dists)
 		idxs = np.where(dists == minDist)[0]
-		print(idxs)
+		print('indici classi minima distanza =',idxs)
 		#if more than one rect have the same distance, and it is the minimum one, select the smallest one
 		if( len(idxs) > 1):
 			min_vol = sys.maxsize
@@ -76,7 +74,7 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 			selectedClass = int(classiAnalizzate[idxs[0]])
 		print('selected =', selectedClass)
 		preds.append(selectedClass)
-		#if the rect don't contains the image, the rect have to be update
+		#if the rect don't contains the image, it has to be update
 		if(minDist != 0):
 			toUpdateRect = hyperrectangles[selectedClass]
 			maxes = torch.tensor(toUpdateRect.maxes).to(params.DEVICE)
