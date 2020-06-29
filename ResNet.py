@@ -169,55 +169,13 @@ class BiasLayer(nn.Module):
 
 
 class BICModel():
-	def __init__(self, splits):
-		self.splits = splits
-		self.bias_layer0 = BiasLayer().to(params.DEVICE)
-		self.bias_layer1 = BiasLayer().to(params.DEVICE)
-		self.bias_layer2 = BiasLayer().to(params.DEVICE)
-		self.bias_layer3 = BiasLayer().to(params.DEVICE)
-		self.bias_layer4 = BiasLayer().to(params.DEVICE)
-		self.bias_layer5 = BiasLayer().to(params.DEVICE)
-		self.bias_layer6 = BiasLayer().to(params.DEVICE)
-		self.bias_layer7 = BiasLayer().to(params.DEVICE)
-		self.bias_layer8 = BiasLayer().to(params.DEVICE)
-		self.bias_layer9 = BiasLayer().to(params.DEVICE)
-		self.bias_layers=[self.bias_layer0, self.bias_layer1, self.bias_layer2, self.bias_layer3, self.bias_layer4, self.bias_layer5, self.bias_layer6, self.bias_layer7, self.bias_layer8, self.bias_layer9]
+	def __init__(self):
+		self.bias_layer= BiasLayer().to(params.DEVICE)
 		
 	def printBICparams(self):
-		for el in self.bias_layers:
-			el.printParam()
+		self.bias_layer.printParam()
 			
 	def bias_forward(self, input):
-		splits = self.splits
-		#in0 = input[:, :10]
-		#in1 = input[:, 10:20]
-		#in2 = input[:, 20:30]
-		#in3 = input[:, 30:40]
-		#in4 = input[:, 40:50]
-		#in5 = input[:, 50:60]
-		#in6 = input[:, 60:70]
-		#in7 = input[:, 70:80]
-		#in8 = input[:, 80:90]
-		#in9 = input[:, 90:100]
-		in0 = input[:, splits[0] ]
-		in1 = input[:, splits[1] ]
-		in2 = input[:, splits[2] ]
-		in3 = input[:, splits[3] ]
-		in4 = input[:, splits[4] ]
-		in5 = input[:, splits[5] ]
-		in6 = input[:, splits[6] ]
-		in7 = input[:, splits[7] ]
-		in8 = input[:, splits[8] ]
-		in9 = input[:, splits[9] ]
-		out0 = self.bias_layer0(in0)
-		out1 = self.bias_layer1(in1)
-		out2 = self.bias_layer2(in2)
-		out3 = self.bias_layer3(in3)
-		out4 = self.bias_layer4(in4)
-		out5 = self.bias_layer5(in5)
-		out6 = self.bias_layer5(in6)
-		out7 = self.bias_layer5(in7)
-		out8 = self.bias_layer5(in8)
-		out9 = self.bias_layer5(in9)
-		return torch.cat([out0, out1, out2, out3, out4, out5, out6, out7, out8, out9], dim = 1)
+		out = self.bias_layer(input)
+		return out
 
