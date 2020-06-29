@@ -23,7 +23,7 @@ from torchvision import transforms
 import random
 random.seed(params.SEED)
 
-def matchAndClassify(images, exemplars, ICaRL, trainDS):
+def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 	ICaRL.train(False)
 	#For each class in exemplars, build the hyper-rectangle of its exemplars
 	classiAnalizzate = []
@@ -33,9 +33,11 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS):
 	transformer = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 	#classiAnalizzate contains a list of all classes seen so far, also the last 10
 	for classe in classiAnalizzate:
+		print('classe =', classe)
 		ss = Subset(trainDS, exemplars[classe], transformer)
 		loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=256)#per ogni classe massimo ho 2000/10 = 200 exemplar
 		for img, lbl, idx in loader:
+			print('Dovrebbe stamparlo solo una volta')
 			with torch.no_grad():
 				img = img.float().to(params.DEVICE)
 				x = ICaRL(img, features = True)
@@ -44,7 +46,7 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS):
 				mins = torch.min(x,dim=0)[0]
 
 				hyperrectangles.append(Rectangle(maxs, mins))
-
+				print('quanti hyp:', len(hyperrectangles))
 
 	#for each image to classify, find the closest hyper-rectangle
 	preds = []
