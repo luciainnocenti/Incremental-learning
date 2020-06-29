@@ -22,7 +22,7 @@ import random
 random.seed(params.SEED)
 
 def stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, ICaRL, BIC, task, col):
-	m = nn.Sigmoid()
+	m = nn.Softmax()
 	old_iterator = iter(validationOldLoader)
 	for imagesNew, labelsNew, _ in validationNewLoader:
 		
