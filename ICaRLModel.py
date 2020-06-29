@@ -39,8 +39,9 @@ def stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, I
 		
 		with torch.no_grad():
 			pOld = ICaRL(imagesOld)
-		loss = criterion(m(pNew), m(pOld) )
-		
+		#loss = criterion(m(pNew), m(pOld) )
+		loss = criterion(pNew, pOld)
+		print('l=',loss.item)
 		loss.backward()            
 		biasOptimizer.step()
 	return BIC
