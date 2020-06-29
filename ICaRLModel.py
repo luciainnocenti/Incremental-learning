@@ -67,8 +67,8 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 			min_vol = sys.maxsize
 			for i in idxs:
 				i = int(i)
-				if( rect[i].volume() < min_vol):
-					min_vol = rect[i].volume()
+				if( hyperrectangles[i].volume() < min_vol):
+					min_vol = hyperrectangles[i].volume()
 					selectedClass = i
 		#else, if only one rect has a distance = minDist, select it
 		else:
