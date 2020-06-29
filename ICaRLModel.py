@@ -61,7 +61,7 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 			dists.append(rect.min_distance_point(imageFeatures.cpu().numpy(), p =2.0))
 		minDist = np.amin(dists)
 		idxs = np.where(dists == minDist)[0]
-
+		print(idxs)
 		#if more than one rect have the same distance, and it is the minimum one, select the smallest one
 		if( len(idxs) > 1):
 			min_vol = sys.maxsize
@@ -69,10 +69,10 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 				i = int(i)
 				if( hyperrectangles[i].volume() < min_vol):
 					min_vol = hyperrectangles[i].volume()
-					selectedClass = i
+					selectedClass = classiAnalizzate[i]
 		#else, if only one rect has a distance = minDist, select it
 		else:
-			selectedClass = idxs[0]
+			selectedClass = classiAnalizzate[idxs[0]]
 		preds.append(selectedClass)
 		#if the rect don't contains the image, the rect have to be update
 		if(minDist != 0):
