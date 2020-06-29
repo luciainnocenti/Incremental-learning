@@ -28,7 +28,7 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 	#For each class in exemplars, build the hyper-rectangle of its exemplars
 	classiAnalizzate = []
 	for i in range( 0, int(task/10) + 1) :
-		classiAnalizzate = np.concatenate( (classiAnalizzate, ds.splits[i]) )
+		classiAnalizzate = np.concatenate( (classiAnalizzate, trainDS.splits[i]) )
 	hyperrectangles = []
 	transformer = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 	#classiAnalizzate contains a list of all classes seen so far, also the last 10
