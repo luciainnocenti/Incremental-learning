@@ -45,7 +45,7 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 				maxs = torch.max(x,dim=0)[0]
 				mins = torch.min(x,dim=0)[0]
 
-				hyperrectangles.append(Rectangle(maxs, mins))
+				hyperrectangles.append(Rectangle(maxs.cpu().numpy(), mins.cpu().numpy()))
 				print('quanti hyp:', len(hyperrectangles))
 
 	#for each image to classify, find the closest hyper-rectangle
@@ -76,12 +76,12 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 		#if the rect don't contains the image, the rect have to be update
 		if(minDist != 0):
 			toUpdateRect = hyperrectangles[selectedClass]
-			maxes = toUpdateRect.maxes
-			mins = toUpdateRect.mins
+			maxes = torch.tensor(toUpdateRect.maxes).to(params.DEVICE)
+			mins = torch.tensor(toUpdateRect.mins).to(params.DEVICE)
 
 			maxes = torch.max( maxes, imageFeatures ) #elemens-wise comparization
 			mins = torch.max( mins, imageFeatures )
-			hyperrectangles[selectedClass] = Rectangle(maxes, mins)
+			hyperrectangles[selectedClass] = Rectangle(maxes.cpu().numpy(), mins.cpu().numpy())
 	return preds
 
 def incrementalTrain(task, trainDS, ICaRL, exemplars, transformer, randomS = False):
