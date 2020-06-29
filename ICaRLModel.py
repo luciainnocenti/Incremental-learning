@@ -134,16 +134,16 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 			mappedLabels = utils.mapFunction(labels, col)
 			
 			optimizer.zero_grad()
-			
+			print('1')
+			BIC.printBICparams()
 			outputs = ICaRL(images, features = False)
-			print('1:')
-			print(outputs)
+			
 			outputs[:, splits[int(task/10)]] = BIC.bias_forward(outputs[:, splits[int(task/10)]])
-			print('2:')
-			print(outputs)
+			print('2')
+			BIC.printBICparams()
+			
 			old_outputs = old_ICaRL(images, features = False)
-			print('3:')
-			print(old_outputs)
+			
 			loss = utils.calculateLoss(outputs, old_outputs, onehot_labels, task, splits)
 			
 			cut_outputs = np.take_along_axis(outputs.to(params.DEVICE), col[None,:], axis = 1).to(params.DEVICE)
