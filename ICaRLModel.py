@@ -84,7 +84,8 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 	trainNew = list( set(train_indexes) - set(validationNew))
 	print('trainNewLen = ', len(trainNew))
 	dataIdx = np.concatenate( (dataIdx, trainNew) )
-	print(dataIdx)
+	print('led data idx',len(dataIdx))
+	print('type els',type(dataIdx[0]))
 	#dataIdx contiene gli indici delle immagini, in train DS, delle nuove classi e dei vecchi exemplars
 	ex_transformer = transforms.Compose([transforms.RandomCrop(size = 32, padding=4),
 						transforms.RandomHorizontalFlip(),
