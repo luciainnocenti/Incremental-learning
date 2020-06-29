@@ -178,7 +178,7 @@ class BICModel():
 		self.bias_layers=[self.bias_layer1, self.bias_layer2, self.bias_layer3, self.bias_layer4, self.bias_layer5]
 		
 	def printBICparams(self):
-		for el in sel.bias_layers:
+		for el in self.bias_layers:
 			el.printParam()
 			
 	def bias_forward(self, input):
