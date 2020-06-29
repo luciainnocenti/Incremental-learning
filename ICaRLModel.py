@@ -57,7 +57,7 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 	dists = []
 	for imageFeatures in phiX:
 		for rect in hyperrectangles:
-			dists.append(rect.min_distance_point(imageFeatures, p =2.0))
+			dists.append(rect.min_distance_point(torch.tensor(imageFeatures), p =2.0))
 		minDist = np.amin(dists)
 		idxs = np.where(dists == minDist)[0]
 
