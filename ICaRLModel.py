@@ -193,7 +193,9 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 					img = img.float().to(params.DEVICE)
 					x = ICaRL(img, features = True)
 					x /= torch.norm(x, p=2)
-					X_train.append(x.cpu().numpy())
+					for elem in x:
+					X_train.append(elem.cpu().numpy())
+					for elem in y:
 					y_train.append(y)
 	else:
 		means = mean
