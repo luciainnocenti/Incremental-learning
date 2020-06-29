@@ -36,7 +36,8 @@ def stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, I
 		
 		pOld = ICaRL(imagesOld)
 		pOld = BIC.bias_forward(pOld)
-
+		print('New=', pNew)
+		print('Old=', pOld)
 		loss = criterion(pNew, pOld)
 		
 		biasOptimizer.zero_grad()
@@ -71,16 +72,14 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 	validationOld = []
 	for classe in exemplars:
 		if( classe is not None):
-			valClass = random.sample( classe, int( len(classe)/9 ) ) 
+			valClass = random.sample( classe, int( len(classe)*0.1 ) ) 
 			validationOld = np.concatenate( (validationOld, valClass)).astype(int)
 			classe = list( set(classe) - set(valClass))
 			dataIdx = np.concatenate( (dataIdx, classe) ).astype(int)
 	l = len(validationOld)
-	if( l == 0):
-		l = 300
+	print('l =', l)
 	validationNew = random.sample(train_indexes, l)
 	
-
 	trainNew = list( set(train_indexes) - set(validationNew))
 	dataIdx = np.concatenate( (dataIdx, trainNew) ).astype(int)
 	
