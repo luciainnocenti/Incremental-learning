@@ -22,7 +22,7 @@ import random
 random.seed(params.SEED)
 
 def stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, ICaRL, BIC, task, col):
-	#m = nn.LogSoftmax()
+	m = nn.Softmax()
 	old_iterator = iter(validationOldLoader)
 	for imagesNew, labelsNew, _ in validationNewLoader:
 		
@@ -34,13 +34,13 @@ def stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, I
 		ICaRL.eval()
 		with torch.no_grad():
 			pNew = ICaRL(imagesNew)
-			pNew = pNew.detach()
+		pNew = pNew.detach()
 		pNew = BIC.bias_forward(pNew)
 		
 		with torch.no_grad():
 			pOld = ICaRL(imagesOld)
-		#loss = criterion(m(pNew), m(pOld) )
-		loss = criterion(pNew, pOld)
+		loss = criterion(m(pNew), m(pOld) )
+		#loss = criterion(pNew, pOld)
 		print('l=',loss.item())
 		loss.backward()            
 		biasOptimizer.step()
