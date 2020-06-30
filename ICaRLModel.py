@@ -183,24 +183,18 @@ def classify(images, exemplars, ICaRL, task, trainDS):
 
 	ss = StdSubset(trainDS, trainSet)
 	loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=256)
-	X = []
-	Y = []
+	X_train = np.zeros(len(trainSet))
+	y_train = np.zeros(len(trainSet))
 	i = 0
-	X_train = []
-	y_train = []
 	for img, lbl, idx in loader:
-		print(i)
-		i += 1
 		with torch.no_grad():
 			img = img.float().to(params.DEVICE)
 			x = ICaRL(img, features=True)
 			x /= torch.norm(x, p=2)
-			for elem in x:
-				elem=np.array(elem.detach().cpu())
-				X_train.append(elem)#.numpy()
-			for elem2 in lbl:
-				elem2=np.array(elem2.detach().cpu())
-				y_train.append(elem2)
+			for image, label in zip(x, lbl):
+				X_train[i] = np.array(image.detach().cpu())
+				y_train[i] = np.array(label.detach().cpu())
+				
 		
 
 		model = KNeighborsClassifier(n_neighbors=3)
