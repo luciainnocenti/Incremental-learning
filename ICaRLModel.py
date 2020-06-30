@@ -183,7 +183,9 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 	for classe in exemplars:
 		if( classe is not None):
 			trainSet = np.concatenate( (trainSet, classe) )
-	print(trainSet)		
+	print(trainSet)	
+	trainSet = trainSet.astype(int)
+	print(trainSet)	
 	ss = StdSubset(trainDS, trainSet)
 	loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=256)
 	
