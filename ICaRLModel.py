@@ -236,12 +236,12 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 		scaler = StandardScaler()
 		X_train = scaler.fit_transform(X_train)
 		
-		print ("this is X_train")
-		print (X_train)
+		#print ("this is X_train")
+		#print (X_train)
 		
 		y_train=np.stack( y_train, axis=0 )
-		print ("this is y_train")
-		print(y_train)
+		#print ("this is y_train")
+		#print(y_train)
 		#nsamples, nx, ny = X_train.shape
 		#X_trainReshaped = X_train.reshape((nsamples,nx*ny))
 		#X_train.reshape(1, -1)
