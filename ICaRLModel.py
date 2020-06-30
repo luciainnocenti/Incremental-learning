@@ -24,6 +24,7 @@ import random
 random.seed(params.SEED)
 
 def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
+	
 	ICaRL.train(False)
 	#For each class in exemplars, build the hyper-rectangle of its exemplars
 	classiAnalizzate = []
