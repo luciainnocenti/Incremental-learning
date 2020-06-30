@@ -146,14 +146,14 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 			outputs = ICaRL(images, features = False)
 			
 			if(epoch == 1 and flag == 3):
-				filename = task + '_' + epoch + '_pre'
+				filename = str(task) + '_' + str(epoch) + '_pre'
 				path = '/content/gdrive/My Drive/' + filename
 				with open(path, 'w') as f:
 					for param in ICaRL.parameters():
 						f.write(param.data)
 			outputs[:, splits[int(task/10)]] = BIC(outputs[:, splits[int(task/10)]])
 			if(epoch == 1 and flag == 3):
-				filename = task + '_' + epoch + '_post'
+				filename = str(task) + '_' + str(epoch) + '_post'
 				path = '/content/gdrive/My Drive/' + filename
 				with open(path, 'w') as f:
 					for param in ICaRL.parameters():
