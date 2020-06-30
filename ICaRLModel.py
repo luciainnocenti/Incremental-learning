@@ -186,38 +186,15 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 	gamma=[0.1, 1, 10]
 	if(mean == None):
 		for i in range( 0, int(task/10) + 1) :
-			##print('split i = ', ds.splits[i])
+			
 			classiAnalizzate = np.concatenate( (classiAnalizzate, ds.splits[i]) )
-		##print('classi = ', classiAnalizzate)
-		#for cval in c: 
-		#for gammaval in gamma:
-			''''print("cval=")
-			print(cval)
-			print("gammaval=")
-			print(gammaval)'''
+		
 		for y in range (0, task + params.TASK_SIZE):
 			#now idxsImages contains the list of all the images selected as exemplars
 			classY = int(classiAnalizzate[y])
 			ss = Subset(ds, exemplars[classY], transformer)
 			loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE)
-			'''
-			for img, lbl, idx in loader:
-				with torch.no_grad():
-					img = img.float().to(params.DEVICE)
-					x = ICaRL(img, features = True)
-					x /= torch.norm(x, p=2)
-				ma = torch.sum(x, dim=0)
-				means[y] += ma
-			means[y] = means[y]/ len(idx) # medio
-			means[y] = means[y] / means[y].norm()
-	else:
-		means = mean
-	for data in phiX:
-		#print('shape data = ', data.shape)
-		pred = np.argmin(np.sqrt( np.sum((data.data.cpu().numpy() - means.data.cpu().numpy())**2, axis = 1 )   ) )
-		preds.append(pred)
-	return (torch.tensor(preds), means)'''
-				#Try different other classifiers
+
 			for img, lbl, idx in loader:
 				with torch.no_grad():
 					img = img.float().to(params.DEVICE)
@@ -233,21 +210,7 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 						elem2=np.array(elem2.detach().cpu())
 						y_train.append(elem2)
 
-
-		#model = KNeighborsClassifier(n_neighbors=3)
-
-		#model = LinearSVC()
 		model= svm.SVC(kernel='rbf', C=1)
-
-
-		#print ("this is X_train")
-		#print (X_train)
-		#print ("this is y")
-		#print(y_train)
-		#nsamples, nx, ny = X_train.shape
-		#X_trainReshaped = X_train.reshape((nsamples,nx*ny))
-		#X_train.reshape(1, -1)
-
 		model.fit(X_train, y_train)#Reshaped
 
 
