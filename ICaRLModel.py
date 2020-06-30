@@ -121,13 +121,13 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 		criterion = nn.MSELoss()
 		biasOptimizer = torch.optim.SGD(BIC.parameters(), lr=0.005 , weight_decay=params.BIAS_WEIGHT_DECAY )
 		biasScheduler = optim.lr_scheduler.MultiStepLR(biasOptimizer, params.BIAS_STEP_SIZE, gamma=params.BIAS_GAMMA)
-		'''
+		
 		for epoch in range(params.BIAS_NUM_EPOCHS ):
 			ICaRL.train(False)
 			newICaRL = deepCopy(ICaRL)
 			BIC = stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, newICaRL, BIC, task, col)
 			biasScheduler.step()
-		'''
+		
 	print('task :', task)
 	BIC.printParam()
 	
