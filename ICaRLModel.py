@@ -180,11 +180,10 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 	phiX /= torch.norm(phiX, p=2)
 
 	trainSet = []
-
-	for el in exemplars :
-		if el is not None:
-			trainSet = np.concatenate( (trainSet, el), axis = None)
-
+	for classe in exemplars:
+		if( classe is not None):
+			trainSet = np.concatenate( (dataIdx, classe) )
+	print(trainSet)		
 	ss = StdSubset(trainDS, trainSet)
 	loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=256)
 	
