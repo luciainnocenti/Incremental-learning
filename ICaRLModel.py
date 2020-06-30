@@ -168,11 +168,7 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 		
 	return newExs
 
-def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
-	preds = []
-
-	nClasses = task + params.TASK_SIZE
-	means = torch.zeros( ( nClasses, 64)).to(params.DEVICE)
+def classify(images, exemplars, ICaRL, task, trainDS):
 
 	ICaRL.train(False)
 	images = images.float().to(params.DEVICE)
@@ -223,4 +219,4 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 
 	preds = model.predict(X)
 
-	return (torch.tensor(preds), mean)
+	return (torch.tensor(preds))
