@@ -18,7 +18,6 @@ from torch.utils.data import DataLoader
 from torch.nn import functional as F
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import LinearSVC, SVC
-from sklearn.preprocessing import StandardScaler
 from sklearn import svm
 
 from torchvision import transforms
@@ -168,52 +167,96 @@ def constructExemplars(idxsImages, m, ICaRL, trainDS):
 		
 	return newExs
 
-def classify(images, exemplars, ICaRL, task, trainDS):
+def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
+	preds = []
+
+	nClasses = task + params.TASK_SIZE
+	means = torch.zeros( ( nClasses, 64)).to(params.DEVICE)
 
 	ICaRL.train(False)
 	images = images.float().to(params.DEVICE)
 	phiX = ICaRL(images, features = True)
 	phiX /= torch.norm(phiX, p=2)
 
-	trainSet = []
-	for classe in exemplars:
-		if( classe is not None):
-			trainSet = np.concatenate( (trainSet, classe) )
-	trainSet = trainSet.astype(int)
-
-	ss = StdSubset(trainDS, trainSet)
-	loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=256)
-	X_train = []
-	y_train = []
-	for i, (image, label, idx) in enumerate(loader):
-		with torch.no_grad():
-			image = image.float().to(params.DEVICE)
-			x = ICaRL( image, features = True)
-			x /= torch.norm(x, p=2)
-		for s in x:
-			X_train.append(np.array(s.data.cpu()))
-		y_train = np.concatenate( (y_train, label) )
-				
-		
-
-	model = KNeighborsClassifier(n_neighbors=3)
-
-	scaler = StandardScaler()
-	X_train = scaler.fit_transform(X_train)
-
-	#y_train=np.stack( y_train, axis=0 )
-
-	model.fit(X_train, y_train)#Reshaped
-
-	X = []
-
+	transformer = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+	ds = trainDS
+	classiAnalizzate = []
+	X_train, y_train = [], [] 
+	c=[0.1,1,10]
+	gamma=[0.1, 1, 10]
+	if(mean == None):
+		for i in range( 0, int(task/10) + 1) :
+			##print('split i = ', ds.splits[i])
+			classiAnalizzate = np.concatenate( (classiAnalizzate, ds.splits[i]) )
+		##print('classi = ', classiAnalizzate)
+		#for cval in c: 
+		#for gammaval in gamma:
+			''''print("cval=")
+			print(cval)
+			print("gammaval=")
+			print(gammaval)'''
+		for y in range (0, task + params.TASK_SIZE):
+			#now idxsImages contains the list of all the images selected as exemplars
+			classY = int(classiAnalizzate[y])
+			ss = Subset(ds, exemplars[classY], transformer)
+			loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE)
+			'''
+			for img, lbl, idx in loader:
+				with torch.no_grad():
+					img = img.float().to(params.DEVICE)
+					x = ICaRL(img, features = True)
+					x /= torch.norm(x, p=2)
+				ma = torch.sum(x, dim=0)
+				means[y] += ma
+			means[y] = means[y]/ len(idx) # medio
+			means[y] = means[y] / means[y].norm()
+	else:
+		means = mean
 	for data in phiX:
-		data=np.array(data.detach().cpu())
-		X.append(data)
-		
-		
-	X = scaler.transform(X)
+		#print('shape data = ', data.shape)
+		pred = np.argmin(np.sqrt( np.sum((data.data.cpu().numpy() - means.data.cpu().numpy())**2, axis = 1 )   ) )
+		preds.append(pred)
+	return (torch.tensor(preds), means)'''
+				#Try different other classifiers
+			for img, lbl, idx in loader:
+				with torch.no_grad():
+					img = img.float().to(params.DEVICE)
+					x = ICaRL(img, features=True)
+					# x =  f.normalize(x,dim=0,p=2)
+					x /= torch.norm(x, p=2)
+					#print ("this is x")
+					#print(x)
+					for elem in x:
+						elem=np.array(elem.detach().cpu())
+						X_train.append(elem)#.numpy()
+					for elem2 in lbl:
+						elem2=np.array(elem2.detach().cpu())
+						y_train.append(elem2)
 
-	preds = model.predict(X)
 
-	return (torch.tensor(preds))
+		model = KNeighborsClassifier(n_neighbors=3)
+
+		#model = LinearSVC()
+		#model= svm.SVC(kernel='rbf', C=1)
+
+
+		#print ("this is X_train")
+		#print (X_train)
+		#print ("this is y")
+		#print(y_train)
+		#nsamples, nx, ny = X_train.shape
+		#X_trainReshaped = X_train.reshape((nsamples,nx*ny))
+		#X_train.reshape(1, -1)
+
+		model.fit(X_train, y_train)#Reshaped
+
+
+		X = []
+
+		for data in phiX:
+			data=np.array(data.detach().cpu())
+			X.append(data)
+
+		preds = model.predict(X)
+
+		return (torch.tensor(preds), mean)
