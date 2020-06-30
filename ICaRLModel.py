@@ -22,7 +22,6 @@ import random
 random.seed(params.SEED)
 
 def stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, ICaRL, BIC, task, col):
-	m = nn.Softmax()
 	old_iterator = iter(validationOldLoader)
 	for imagesNew, labelsNew, _ in validationNewLoader:
 		
@@ -40,7 +39,7 @@ def stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, I
 		with torch.no_grad():
 			pOld = ICaRL(imagesOld)
 		
-		lossBIC = criterion(m(pNew), pOld )
+		lossBIC = criterion(pNew, pOld )
 		print('l = ',lossBIC.item())
 		lossBIC.backward()            
 		biasOptimizer.step()
@@ -112,8 +111,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 		validationNewLoader = DataLoader( valD, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE)
 		valD = StdSubset(trainDS, validationOld)
 		validationOldLoader = DataLoader( valD, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE)
-		#criterion = nn.MSELoss()
-		criterion = nn.CrossEntropyLoss()
+		criterion = nn.MSELoss()
 		#biasOptimizer = torch.optim.SGD(BIC.parameters(), lr=0.0005 , weight_decay=params.BIAS_WEIGHT_DECAY )
 		biasOptimizer = optim.Adam(BIC.parameters(), lr=0.001)
 		#biasScheduler = optim.lr_scheduler.MultiStepLR(biasOptimizer, params.BIAS_STEP_SIZE, gamma=params.BIAS_GAMMA)
