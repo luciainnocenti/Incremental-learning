@@ -124,7 +124,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 		
 		for epoch in range(params.BIAS_NUM_EPOCHS ):
 			ICaRL.train(False)
-			newICaRL = deepCopy(ICaRL)
+			newICaRL = deepcopy(ICaRL)
 			BIC = stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, newICaRL, BIC, task, col)
 			biasScheduler.step()
 		
