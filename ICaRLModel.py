@@ -179,75 +179,36 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 	phiX = ICaRL(images, features = True)
 	phiX /= torch.norm(phiX, p=2)
 
-	transformer = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-	ds = trainDS
-	classiAnalizzate = []
-	X_train, y_train = [], [] 
-	if(mean == None):
-		for i in range( 0, int(task/10) + 1) :
-			##print('split i = ', ds.splits[i])
-			classiAnalizzate = np.concatenate( (classiAnalizzate, ds.splits[i]) )
-		##print('classi = ', classiAnalizzate)
-		for y in range (0, task + params.TASK_SIZE):
-			#now idxsImages contains the list of all the images selected as exemplars
-			classY = int(classiAnalizzate[y])
-			ss = Subset(ds, exemplars[classY], transformer)
-			loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE)
-			'''
-			for img, lbl, idx in loader:
-				with torch.no_grad():
-					img = img.float().to(params.DEVICE)
-					x = ICaRL(img, features = True)
-					x /= torch.norm(x, p=2)
-				ma = torch.sum(x, dim=0)
-				means[y] += ma
-			means[y] = means[y]/ len(idx) # medio
-			means[y] = means[y] / means[y].norm()
-	else:
-		means = mean
-	for data in phiX:
-		#print('shape data = ', data.shape)
-		pred = np.argmin(np.sqrt( np.sum((data.data.cpu().numpy() - means.data.cpu().numpy())**2, axis = 1 )   ) )
-		
-		preds.append(pred)
-	return (torch.tensor(preds), means)'''
-				#Try different other classifiers
-			for img, lbl, idx in loader:
-				with torch.no_grad():
-					img = img.float().to(params.DEVICE)
-					x = ICaRL(img, features=True)
-					# x =  f.normalize(x,dim=0,p=2)
-					x /= torch.norm(x, p=2)
-					#print ("this is x")
-					#print(x)
-					for elem in x:
-						elem=np.array(elem.detach().cpu())
-						X_train.append(elem)#.numpy()
-					for elem2 in lbl:
-						elem2=np.array(elem2.detach().cpu())
-						y_train.append(elem2)
-					
+	trainSet = []
 
+	for el in exemplars :
+		if el is not None:
+			trainSet = np.concatenate( (trainSet, el), axis = None)
+
+	ss = StdSubset(trainDS, trainSet)
+	loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=256)
+	
+	for img, lbl, idx in loader:
+		with torch.no_grad():
+			img = img.float().to(params.DEVICE)
+			x = ICaRL(img, features=True)
+			x /= torch.norm(x, p=2)
+			for elem in x:
+				elem=np.array(elem.detach().cpu())
+				X_train.append(elem)#.numpy()
+			for elem2 in lbl:
+				elem2=np.array(elem2.detach().cpu())
+				y_train.append(elem2)
+					
 
 		model = KNeighborsClassifier(n_neighbors=3)
 
-		#model = LinearSVC()
-		#model= svm.SVC(kernel='rbf', C=1)
 		scaler = StandardScaler()
 		X_train = scaler.fit_transform(X_train)
-		
-		#print ("this is X_train")
-		#print (X_train)
-		
+
 		y_train=np.stack( y_train, axis=0 )
-		#print ("this is y_train")
-		#print(y_train)
-		#nsamples, nx, ny = X_train.shape
-		#X_trainReshaped = X_train.reshape((nsamples,nx*ny))
-		#X_train.reshape(1, -1)
 
 		model.fit(X_train, y_train)#Reshaped
-
 
 	X = []
 
