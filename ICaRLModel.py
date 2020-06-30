@@ -33,13 +33,13 @@ def stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, I
 		biasOptimizer.zero_grad()
 		ICaRL.eval()
 		with torch.no_grad():
-			#imagesNew = imagesNew.detach()
+			imagesNew = imagesNew.detach()
 			pNew = ICaRL(imagesNew)
 		pNew = pNew.detach()
 		pNew = BIC(pNew)
 		
 		with torch.no_grad():
-			#imagesOld = imagesOld.detach()
+			imagesOld = imagesOld.detach()
 			pOld = ICaRL(imagesOld)
 			
 		lossBIC = criterion(m(pNew), m(pOld) )
