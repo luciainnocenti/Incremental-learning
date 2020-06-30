@@ -195,11 +195,12 @@ def classify(images, exemplars, ICaRL, task, trainDS):
 			img = img.float().to(params.DEVICE)
 			x = ICaRL(img, features=True)
 			x /= torch.norm(x, p=2)
-			for image, label in zip(x, lbl):
-				image=np.array(image.detach().cpu())
-				X_train.append(image)
-				label=np.array(label.detach().cpu())
-				y_train.append(label)
+			for elem in x:
+				elem=np.array(elem.detach().cpu())
+				X_train.append(elem)#.numpy()
+			for elem2 in lbl:
+				elem2=np.array(elem2.detach().cpu())
+				y_train.append(elem2)
 		
 
 		model = KNeighborsClassifier(n_neighbors=3)
