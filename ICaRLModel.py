@@ -146,15 +146,18 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 			outputs = ICaRL(images, features = False)
 			
 			if(epoch == 1 and flag == 3):
-				#print(outputs)
-				for param in ICaRL.parameters():
-					print('pre param',param.data)
+				filename = task + '_' + epoch + '_pre'
+				path = '/content/gdrive/My Drive/' + filename
+				with open(path, 'w') as f:
+					for param in ICaRL.parameters():
+						f.write(param.data)
 			outputs[:, splits[int(task/10)]] = BIC(outputs[:, splits[int(task/10)]])
 			if(epoch == 1 and flag == 3):
-				#print(outputs[:, splits[int(task/10)]])
-				for param in ICaRL.parameters():
-					print('post param', param.data)
-
+				filename = task + '_' + epoch + '_post'
+				path = '/content/gdrive/My Drive/' + filename
+				with open(path, 'w') as f:
+					for param in ICaRL.parameters():
+						f.write(param.data)
 			old_outputs = old_ICaRL(images, features = False)
 			
 			loss = utils.calculateLoss(outputs, old_outputs, onehot_labels, task, splits)
