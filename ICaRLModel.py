@@ -188,7 +188,7 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 	print(trainSet)	
 	ss = StdSubset(trainDS, trainSet)
 	loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=256)
-	
+	X_train = []
 	for img, lbl, idx in loader:
 		with torch.no_grad():
 			img = img.float().to(params.DEVICE)
