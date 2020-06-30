@@ -40,7 +40,6 @@ def stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, I
 			pOld = ICaRL(imagesOld)
 		
 		lossBIC = criterion(pNew, pOld )
-		print('l = ',lossBIC.item())
 		lossBIC.backward()            
 		biasOptimizer.step()
 	return BIC
