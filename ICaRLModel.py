@@ -192,11 +192,12 @@ def classify(images, exemplars, ICaRL, task, trainDS):
 			x /= torch.norm(x, p=2)
 			for elem in x:
 				elem = np.array(elem.detach().cpu())
-				X_train = np.concatenate((X_train, elem))#.numpy()
+				X_train = np.concatenate((X_train, elem), axis = 0)#.numpy()
 				print(X_train.shape)
 			for elem in lbl:
 				elem = np.array(elem.detach().cpu())
-				y_train = np.concatenate((y_train, elem))
+				print(elem.shape)
+				y_train = np.concatenate((y_train, elem), axis = 0)
 					
 
 		model = KNeighborsClassifier(n_neighbors=3)
