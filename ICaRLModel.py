@@ -192,8 +192,7 @@ def classify(images, exemplars, ICaRL, task, trainDS):
 			x /= torch.norm(x, p=2)
 		for s in x:
 			X_train.append(np.array(s.data.cpu()))
-		#for lab in label:
-			#y_train.append(np.array(lab.data.cpu()))
+		y_train = np.concatenate( (y_train, label) )
 				
 		
 
