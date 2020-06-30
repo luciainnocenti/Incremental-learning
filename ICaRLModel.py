@@ -179,9 +179,8 @@ def classify(images, exemplars, ICaRL, task, trainDS):
 	for classe in exemplars:
 		if( classe is not None):
 			trainSet = np.concatenate( (trainSet, classe) )
-	print(trainSet)	
 	trainSet = trainSet.astype(int)
-	print(trainSet)	
+
 	ss = StdSubset(trainDS, trainSet)
 	loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=256)
 	X_train = np.array([])
@@ -193,11 +192,11 @@ def classify(images, exemplars, ICaRL, task, trainDS):
 			x /= torch.norm(x, p=2)
 			for elem in x:
 				elem = np.array(elem.detach().cpu())
-				X_train.append(elem)#.numpy()
+				X_train = np.concatenate((X_train, elem))#.numpy()
 				print(X_train.shape)
 			for elem in lbl:
 				elem = np.array(elem.detach().cpu())
-				y_train.append(elem)
+				y_train = np.concatenate((y_train, elem))
 					
 
 		model = KNeighborsClassifier(n_neighbors=3)
