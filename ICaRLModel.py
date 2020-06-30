@@ -199,8 +199,8 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 				elem = np.array(elem.detach().cpu())
 				X_train.append(elem)#.numpy()
 			for elem in lbl:
-				elem = np.array(elem2.detach().cpu())
-				y_train.append(elem2)
+				elem = np.array(elem.detach().cpu())
+				y_train.append(elem)
 					
 
 		model = KNeighborsClassifier(n_neighbors=3)
