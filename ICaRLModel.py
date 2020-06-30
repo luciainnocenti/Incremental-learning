@@ -183,17 +183,14 @@ def classify(images, exemplars, ICaRL, task, trainDS):
 
 	ss = StdSubset(trainDS, trainSet)
 	loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=256)
-	X_train = np.zeros(len(trainSet))
-	y_train = np.zeros(len(trainSet))
-	i = 0
-	for img, lbl, idx in loader:
+	X_train = []
+	for i, (image, label, idx) in enumerate(loader):
 		with torch.no_grad():
-			img = img.float().to(params.DEVICE)
-			x = ICaRL(img, features=True)
+			image = image.float().to(params.DEVICE)
+			x = ICaRL( image, features = True)
 			x /= torch.norm(x, p=2)
-			for image, label in zip(x, lbl):
-				X_train[i] = np.array(image.detach().cpu())
-				y_train[i] = np.array(label.detach().cpu())
+		for s in x:
+			X_train.append(np.array(s.data.cpu()))
 				
 		
 
