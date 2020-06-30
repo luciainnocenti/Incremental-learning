@@ -33,13 +33,11 @@ def stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, I
 		biasOptimizer.zero_grad()
 		
 		with torch.no_grad():
-			#imagesNew = imagesNew.detach()
 			pNew = ICaRL(imagesNew)
 		pNew = pNew.detach()
 		pNew = BIC(pNew)
 		
 		with torch.no_grad():
-			#imagesOld = imagesOld.detach()
 			pOld = ICaRL(imagesOld)
 		
 		lossBIC = criterion(m(pNew), m(pOld) )
@@ -100,9 +98,6 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 
 	old_ICaRL = deepcopy(ICaRL)
 
-	old_ICaRL.train(False)
-	ICaRL.train(True)
-
 	optimizer = torch.optim.SGD(ICaRL.parameters(), lr=params.LR, momentum=params.MOMENTUM, weight_decay=params.WEIGHT_DECAY)
 	scheduler = optim.lr_scheduler.MultiStepLR(optimizer, params.STEP_SIZE, gamma=params.GAMMA) #allow to change the LR at predefined epochs
 	current_step = 0
@@ -122,10 +117,11 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 		biasScheduler = optim.lr_scheduler.MultiStepLR(biasOptimizer, params.BIAS_STEP_SIZE, gamma=params.BIAS_GAMMA)
 		
 		for epoch in range(params.BIAS_NUM_EPOCHS ):
-			newICaRL = deepcopy(ICaRL)
-			BIC = stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, newICaRL, BIC, task, col)
+			BIC = stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, ICaRL, BIC, task, col)
 			biasScheduler.step()
-		
+			
+	old_ICaRL.train(False)
+	ICaRL.train(True)		
 	print('task :', task)
 	BIC.printParam()
 	for epoch in range(params.NUM_EPOCHS):
