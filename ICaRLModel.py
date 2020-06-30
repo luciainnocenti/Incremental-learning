@@ -53,7 +53,7 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 		phiX = ICaRL(images, features = True)
 		phiX /= torch.norm(phiX, p=2)
 
-	
+	indice = 0
 	for imageFeatures in phiX:
 		dists = []
 		for rect in hyperrectangles:
@@ -73,7 +73,9 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 			selectedClass = int(classiAnalizzate[idxs[0]])
 		preds.append(selectedClass)
 		#if the rect don't contains the image, it has to be update
-		if(minDist != 0):
+		#I can check and update the rect only if the prediction is correct!
+		correctClass = trainDS.__getitem__( [ images[indice] ] )[1]
+		if(minDist != 0 and selectedClass == correctClass):
 			idx = np.where(classiAnalizzate == selectedClass)[0]
 			idx = int(idx)
 			toUpdateRect = hyperrectangles[idx]
@@ -84,6 +86,7 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 			mins = torch.max( mins, imageFeatures.double() )
 			#create a new hyper rect
 			hyperrectangles[idx] = Rectangle(maxes.cpu().numpy(), mins.cpu().numpy())
+		indice += 1
 	return preds
 
 def incrementalTrain(task, trainDS, ICaRL, exemplars, transformer, randomS = False):
