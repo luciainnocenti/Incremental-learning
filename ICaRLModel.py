@@ -23,7 +23,7 @@ from torchvision import transforms
 import random
 random.seed(params.SEED)
 
-def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
+def matchAndClassify(images, exemplars, ICaRL, trainDS, task, labels):
 	
 	ICaRL.train(False)
 	#For each class in exemplars, build the hyper-rectangle of its exemplars
@@ -74,7 +74,7 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 		preds.append(selectedClass)
 		#if the rect don't contains the image, it has to be update
 		#I can check and update the rect only if the prediction is correct!
-		correctClass = trainDS.__getitem__( [ int(images[int(indice)]) ] )[1]
+		correctClass = int(labels[indice])
 		if(minDist != 0 and selectedClass == correctClass):
 			idx = np.where(classiAnalizzate == selectedClass)[0]
 			idx = int(idx)
