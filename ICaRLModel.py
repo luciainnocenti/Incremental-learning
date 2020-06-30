@@ -198,14 +198,14 @@ def classify(images, exemplars, ICaRL, task, trainDS):
 				
 		
 
-		model = KNeighborsClassifier(n_neighbors=3)
+	model = KNeighborsClassifier(n_neighbors=3)
 
-		scaler = StandardScaler()
-		X_train = scaler.fit_transform(X_train)
+	scaler = StandardScaler()
+	X_train = scaler.fit_transform(X_train)
 
-		y_train=np.stack( y_train, axis=0 )
+	#y_train=np.stack( y_train, axis=0 )
 
-		model.fit(X_train, y_train)#Reshaped
+	model.fit(X_train, y_train)#Reshaped
 
 	X = []
 
