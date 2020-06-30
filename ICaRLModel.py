@@ -18,6 +18,7 @@ from torch.utils.data import DataLoader
 from torch.nn import functional as F
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import LinearSVC, SVC
+from sklearn.preprocessing import StandardScaler
 from sklearn import svm
 
 from torchvision import transforms
@@ -202,7 +203,6 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 				means[y] += ma
 			means[y] = means[y]/ len(idx) # medio
 			means[y] = means[y] / means[y].norm()
-
 	else:
 		means = mean
 	for data in phiX:
@@ -210,7 +210,6 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 		pred = np.argmin(np.sqrt( np.sum((data.data.cpu().numpy() - means.data.cpu().numpy())**2, axis = 1 )   ) )
 		
 		preds.append(pred)
-
 	return (torch.tensor(preds), means)'''
 				#Try different other classifiers
 			for img, lbl, idx in loader:
@@ -227,18 +226,22 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 					for elem2 in lbl:
 						elem2=np.array(elem2.detach().cpu())
 						y_train.append(elem2)
+					
 
 
 		model = KNeighborsClassifier(n_neighbors=3)
 
 		#model = LinearSVC()
 		#model= svm.SVC(kernel='rbf', C=1)
-
+		scaler = StandardScaler()
+		X_train = scaler.fit_transform(X_train)
 		
-		#print ("this is X_train")
-		#print (X_train)
-		#print ("this is y")
-		#print(y_train)
+		print ("this is X_train")
+		print (X_train)
+		
+		y_train=np.stack( y_train, axis=0 )
+		print ("this is y_train")
+		print(y_train)
 		#nsamples, nx, ny = X_train.shape
 		#X_trainReshaped = X_train.reshape((nsamples,nx*ny))
 		#X_train.reshape(1, -1)
@@ -246,12 +249,15 @@ def classify(images, exemplars, ICaRL, task, trainDS, mean = None):
 		model.fit(X_train, y_train)#Reshaped
 
 
-		X = []
+	X = []
 
-		for data in phiX:
-			data=np.array(data.detach().cpu())
-			X.append(data)
+	for data in phiX:
+		data=np.array(data.detach().cpu())
+		X.append(data)
+		
+		
+	X = scaler.transform(X)
 
-		preds = model.predict(X)
+	preds = model.predict(X)
 
-		return (torch.tensor(preds), mean)
+	return (torch.tensor(preds), mean)
