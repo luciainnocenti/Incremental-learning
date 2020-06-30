@@ -167,15 +167,3 @@ class BiasLayer(nn.Module):
 	def printParam(self):
 		print(self.alpha.item(), self.beta.item())
 
-
-class BICModel():
-	def __init__(self):
-		self.bias_layer= BiasLayer().to(params.DEVICE)
-		
-	def printBICparams(self):
-		self.bias_layer.printParam()
-			
-	def bias_forward(self, input):
-		out = self.bias_layer(input)
-		return out
-
