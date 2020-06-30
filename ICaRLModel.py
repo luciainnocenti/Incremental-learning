@@ -193,7 +193,7 @@ def classify(images, exemplars, ICaRL, task, trainDS):
 			for elem in x:
 				elem = np.array(elem.detach().cpu())
 				print('el', elem.shape)
-				X_train = np.concatenate((X_train, elem), axis = 0)#.numpy()
+				X_train = np.concatenate((X_train, elem), axis = 1)#.numpy()
 				print('x', X_train.shape)
 			for elem in lbl:
 				elem = np.array(elem.detach().cpu())
