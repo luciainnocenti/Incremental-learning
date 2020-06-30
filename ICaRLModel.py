@@ -115,7 +115,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 		criterion = nn.MSELoss()
 		biasOptimizer = torch.optim.SGD(BIC.parameters(), lr=params.BIAS_LR , weight_decay=params.BIAS_WEIGHT_DECAY )
 		biasScheduler = optim.lr_scheduler.MultiStepLR(biasOptimizer, params.BIAS_STEP_SIZE, gamma=params.BIAS_GAMMA)
-		
+		ICaRL.train(false)
 		for epoch in range(params.BIAS_NUM_EPOCHS ):
 			BIC = stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, ICaRL, BIC, task, col)
 			biasScheduler.step()
@@ -138,19 +138,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 			optimizer.zero_grad()
 			outputs = ICaRL(images, features = False)
 			
-			if(epoch == 1 and flag == 3):
-				filename = str(task) + '_' + str(epoch) + '_pre'
-				path = '/content/gdrive/My Drive/' + filename
-				with open(path, 'w') as f:
-					for param in ICaRL.parameters():
-						f.write(str(param.data.cpu().numpy()))
 			outputs[:, splits[int(task/10)]] = BIC(outputs[:, splits[int(task/10)]])
-			if(epoch == 1 and flag == 3):
-				filename = str(task) + '_' + str(epoch) + '_post'
-				path = '/content/gdrive/My Drive/' + filename
-				with open(path, 'w') as f:
-					for param in ICaRL.parameters():
-						f.write(str( param.data.cpu().numpy() ) )
 			old_outputs = old_ICaRL(images, features = False)
 			
 			loss = utils.calculateLoss(outputs, old_outputs, onehot_labels, task, splits)
