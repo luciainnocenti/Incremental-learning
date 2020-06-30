@@ -191,9 +191,7 @@ def classify(images, exemplars, ICaRL, task, trainDS):
 			x = ICaRL(img, features=True)
 			x /= torch.norm(x, p=2)
 			for elem in x:
-				elem = np.array(elem.detach().cpu())
-				print('el', elem.shape)
-				X_train = np.append(X_train, elem, axis = 0)#.numpy()
+				X_train.append(elem.detach().cpu().numpy())
 				print('x', X_train.shape)
 			for elem in lbl:
 				elem = np.array(elem.detach().cpu())
