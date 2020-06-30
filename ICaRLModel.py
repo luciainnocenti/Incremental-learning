@@ -33,15 +33,18 @@ def stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, I
 		biasOptimizer.zero_grad()
 		ICaRL.eval()
 		with torch.no_grad():
+			#imagesNew = imagesNew.detach()
 			pNew = ICaRL(imagesNew)
 		pNew = pNew.detach()
-		pNew = BIC.bias_forward(pNew)
+		pNew = BIC(pNew)
 		
 		with torch.no_grad():
+			#imagesOld = imagesOld.detach()
 			pOld = ICaRL(imagesOld)
-		loss = criterion(m(pNew), m(pOld) )
-		print('l=',loss.item())
-		loss.backward()            
+			
+		lossBIC = criterion(m(pNew), m(pOld) )
+		print('l=',lossBIC.item())
+		lossBIC.backward()            
 		biasOptimizer.step()
 	return BIC
 
@@ -143,7 +146,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 			optimizer.zero_grad()
 			outputs = ICaRL(images, features = False)
 			print(outputs)
-			outputs[:, splits[int(task/10)]] = BIC.bias_forward(outputs[:, splits[int(task/10)]])
+			outputs[:, splits[int(task/10)]] = BIC(outputs[:, splits[int(task/10)]])
 			print(outputs[:, splits[int(task/10)]])
 			old_outputs = old_ICaRL(images, features = False)
 			
