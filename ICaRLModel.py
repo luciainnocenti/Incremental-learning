@@ -115,7 +115,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 		#criterion = nn.MSELoss()
 		criterion = nn.CrossEntropyLoss()
 		#biasOptimizer = torch.optim.SGD(BIC.parameters(), lr=0.0005 , weight_decay=params.BIAS_WEIGHT_DECAY )
-		bias_optimizer = optim.Adam(BIC.parameters().parameters(), lr=0.001)
+		bias_optimizer = optim.Adam(BIC.parameters(), lr=0.001)
 		#biasScheduler = optim.lr_scheduler.MultiStepLR(biasOptimizer, params.BIAS_STEP_SIZE, gamma=params.BIAS_GAMMA)
 		
 		ICaRL.train(False)
