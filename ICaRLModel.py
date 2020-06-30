@@ -134,7 +134,9 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 	for epoch in range(params.NUM_EPOCHS):
 		lenght = 0
 		running_corrects = 0
+		flag = 0
 		for images, labels, idx in loader:
+			flag += 1
 			images = images.float().to(params.DEVICE)
 			labels = labels.to(params.DEVICE)
 			onehot_labels = torch.eye(100)[labels].to(params.DEVICE)
@@ -143,12 +145,12 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 			optimizer.zero_grad()
 			outputs = ICaRL(images, features = False)
 			
-			if(epoch == 1):
+			if(epoch == 1 and flag == 3):
 				print(outputs)
 				for param in ICaRL.parameters():
 					print(param.data)
 			outputs[:, splits[int(task/10)]] = BIC(outputs[:, splits[int(task/10)]])
-			if(epoch == 1):
+			if(epoch == 1 and flag == 3):
 				print(outputs[:, splits[int(task/10)]])
 				for param in ICaRL.parameters():
 					print(param.data)
