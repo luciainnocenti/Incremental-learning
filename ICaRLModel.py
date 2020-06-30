@@ -123,14 +123,14 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 		biasScheduler = optim.lr_scheduler.MultiStepLR(biasOptimizer, params.BIAS_STEP_SIZE, gamma=params.BIAS_GAMMA)
 		
 		for epoch in range(params.BIAS_NUM_EPOCHS ):
-			ICaRL.train(False)
+			#ICaRL.train(False)
 			newICaRL = deepcopy(ICaRL)
 			BIC = stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, newICaRL, BIC, task, col)
 			biasScheduler.step()
 		
 	print('task :', task)
 	BIC.printParam()
-	ICaRL.train(True)
+	#ICaRL.train(True)
 	for epoch in range(params.NUM_EPOCHS):
 		lenght = 0
 		running_corrects = 0
