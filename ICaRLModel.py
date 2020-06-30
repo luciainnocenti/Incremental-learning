@@ -41,9 +41,10 @@ def stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, I
 		with torch.no_grad():
 			imagesOld = imagesOld.detach()
 			pOld = ICaRL(imagesOld)
-			
+		#pOld = pOld.detach()
+		
 		lossBIC = criterion(m(pNew), m(pOld) )
-		print('l=',lossBIC.item())
+		print('l = ',lossBIC.item())
 		lossBIC.backward()            
 		biasOptimizer.step()
 	return BIC
@@ -80,7 +81,6 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 			classe = list( set(classe) - set(valClass))
 			dataIdx = np.concatenate( (dataIdx, classe) ).astype(int)
 	l = len(validationOld)
-	print('l =', l)
 	validationNew = random.sample(train_indexes, l)
 	
 	trainNew = list( set(train_indexes) - set(validationNew))
@@ -130,7 +130,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 		
 	print('task :', task)
 	BIC.printParam()
-	
+	ICaRL.train(True)
 	for epoch in range(params.NUM_EPOCHS):
 		lenght = 0
 		running_corrects = 0
