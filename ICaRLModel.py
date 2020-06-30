@@ -193,12 +193,12 @@ def classify(images, exemplars, ICaRL, task, trainDS):
 			for elem in x:
 				elem = np.array(elem.detach().cpu())
 				print('el', elem.shape)
-				X_train = np.append((X_train, elem), axis = 0)#.numpy()
+				X_train = np.append(X_train, elem, axis = 0)#.numpy()
 				print('x', X_train.shape)
 			for elem in lbl:
 				elem = np.array(elem.detach().cpu())
 				print(elem.shape)
-				y_train = np.append((y_train, elem), axis = 0)
+				y_train = np.append(y_train, elem, axis = 0)
 					
 
 		model = KNeighborsClassifier(n_neighbors=3)
