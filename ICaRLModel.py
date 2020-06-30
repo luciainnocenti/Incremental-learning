@@ -200,9 +200,9 @@ def classify(images, exemplars, ICaRL, task, trainDS):
 			label = np.array(label.detach().cpu())
 			X.append(image)
 			Y.append(label)
-		X_train = np.concatenate(X_train, X)
+		X_train = np.concatenate( (X_train, X) )
 		print('train', X_train.shape())
-		y_train = np.concatenate(y_train, Y)
+		y_train = np.concatenate( (y_train, Y) )
 		
 
 		model = KNeighborsClassifier(n_neighbors=3)
