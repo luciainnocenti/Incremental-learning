@@ -81,6 +81,7 @@ def matchAndClassify(images, exemplars, ICaRL, trainDS, task):
 
 			maxes = torch.max( maxes, imageFeatures.double() ) #elemens-wise comparization
 			mins = torch.max( mins, imageFeatures.double() )
+			#create a new hyper rect
 			hyperrectangles[idx] = Rectangle(maxes.cpu().numpy(), mins.cpu().numpy())
 	return preds
 
