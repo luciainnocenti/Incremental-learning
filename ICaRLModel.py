@@ -183,7 +183,7 @@ def classify(images, exemplars, ICaRL, task, trainDS):
 
 	ss = StdSubset(trainDS, trainSet)
 	loader = DataLoader( ss, num_workers=params.NUM_WORKERS, batch_size=256)
-	X_train = []
+	X_train = [[]]
 	y_train = []
 	for img, lbl, idx in loader:
 		with torch.no_grad():
