@@ -52,7 +52,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 
 	#dataIdx contiene gli indici delle immagini, in train DS, delle nuove classi e dei vecchi exemplars
 
-	D = Subset(trainDS, dataIdx, transformer)
+	Subset(trainDS, dataIdx, transformer, exemplars, ex_transformer)
 
 	loader = DataLoader( D, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE, shuffle = True)
 
