@@ -83,13 +83,6 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 	
 	validationNew = np.array(validationNew).astype(int)
 	#dataIdx contiene gli indici delle immagini, in train DS, delle nuove classi e dei vecchi exemplars
-	ex_transformer = transforms.Compose([transforms.RandomCrop(size = 32, padding=4),
-						transforms.RandomHorizontalFlip(),
-						transforms.RandomGrayscale(p=0.5),
-						transforms.RandomAffine((0,10), translate= (.2,.5) ),
-						transforms.ToTensor(),
-						transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-					       ])
 	D = Subset(trainDS, dataIdx, transformer)
 
 	loader = DataLoader( D, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE, shuffle = True)
