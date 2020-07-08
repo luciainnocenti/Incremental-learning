@@ -60,7 +60,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 					       ])
 	Subset(trainDS, dataIdx, transformer, exemplars, ex_transformer)
 
-	loader = DataLoader( D, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE, shuffle = True)
+	loader = DataLoader( trainDS, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE, shuffle = True)
 
 	old_ICaRL = deepcopy(ICaRL)
 
