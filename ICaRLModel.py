@@ -90,7 +90,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 						transforms.ToTensor(),
 						transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 					       ])
-	D = Subset(trainDS, dataIdx, transformer, exemplars, ex_transformer)
+	D = Subset(trainDS, dataIdx, transformer)
 
 	loader = DataLoader( D, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE, shuffle = True)
 
@@ -104,7 +104,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 		v = np.array(x)
 		col = np.concatenate( (col,v), axis = None)
 	col = np.array(col).astype(int)
-	'''
+	
 	if(task>0):
 		valD = StdSubset(trainDS, validationNew)
 		validationNewLoader = DataLoader( valD, num_workers=params.NUM_WORKERS, batch_size=params.BATCH_SIZE)
@@ -119,7 +119,7 @@ def updateRep(task, trainDS, train_indexes, ICaRL, exemplars, splits, transforme
 		for epoch in range(params.BIAS_NUM_EPOCHS ):
 			BIC = stage2(validationNewLoader, validationOldLoader, criterion, biasOptimizer, ICaRL, BIC, task, col)
 			#biasScheduler.step()
-	'''		
+			
 	old_ICaRL.train(False)
 	ICaRL.train(True)		
 	print('task :', task)
