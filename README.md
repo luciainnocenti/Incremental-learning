@@ -12,3 +12,7 @@ New proposal and improvements are available in different branches:
 - Loss---* are three branchs with proposal for different losses than BCE
 - Classifier---* are three branchs with proposal for different losses than NME
 - NewVersion---* are three branchs with proposal for modifies to the original structure
+
+
+
+In the PDF "Incremental Learning project report" is available a paper reporting all the techincal aspects and the followed approaches
